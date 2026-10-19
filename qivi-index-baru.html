@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#100d1c">
+<meta name="description" content="QIVI - Sing, Share, Live">
+<title>QIVI — Sing, Share, Live</title>
+<style>
+:root{color-scheme:dark;--bg:#100d1c;--surface:#1b1729;--surface2:#252039;--pink:#ed48d5;--purple:#9346ff;--blue:#438cff;--text:#fff;--muted:#aaa5bd;--border:#363047;--gold:#ffdc7b}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:88px}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;color:inherit}
+button:disabled{opacity:.55;cursor:not-allowed}
+header{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:#15111feF;border-bottom:1px solid var(--border);backdrop-filter:blur(14px)}
+.brand{font-size:29px;font-weight:900;letter-spacing:1px;background:linear-gradient(100deg,#ff75e7,#a71aff,#70aaff);color:transparent;background-clip:text}
+.tagline{font-size:10px;letter-spacing:2px;color:var(--muted)}
+.coin-button{border:1px solid #655083;border-radius:24px;background:var(--surface2);padding:9px 12px;color:var(--gold);font-weight:800}
+main{max-width:720px;margin:auto;padding:16px}
+.page{display:none;animation:appear .18s ease-out}
+.page.active{display:block}
+@keyframes appear{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+h1{font-size:25px;margin:6px 0 10px}h2{font-size:23px;margin:8px 0 12px}h3{font-size:17px;margin:0 0 8px}
+p{line-height:1.55}.muted,.note{color:var(--muted)}.note{font-size:12px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:14px;min-width:0}
+.hero{padding:23px 20px;border-radius:24px;margin-bottom:15px;background:linear-gradient(135deg,#351d5d,#251c45 55%,#344f86)}
+.btn{border:0;border-radius:13px;padding:12px 16px;background:linear-gradient(105deg,var(--purple),var(--pink));color:#fff;font-weight:750}
+.btn.secondary{background:var(--surface2);border:1px solid var(--border)}
+.btn.small{padding:8px 11px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.feature{text-align:left;min-height:112px;padding:15px;background:var(--surface2);border:1px solid var(--border);border-radius:18px}
+.feature span{display:block;font-size:26px;margin-bottom:6px}.feature b{display:block;font-size:18px}.feature small{display:block;margin-top:4px;color:var(--muted)}
+input,textarea,select{display:block;width:100%;min-width:0;margin:8px 0 12px;padding:12px;background:#131020;color:white;border:1px solid var(--border);border-radius:12px}
+textarea{min-height:90px;resize:vertical}
+label{font-size:13px;color:#ded8ec}
+.hidden{display:none!important}
+.empty{text-align:center;padding:20px 8px;color:var(--muted)}
+.media{display:block;width:100%;max-height:420px;object-fit:contain;background:#08070d;border-radius:15px;margin:10px 0}
+.story-row{display:flex;gap:12px;overflow-x:auto;padding:8px 0 12px}
+.story{flex:0 0 72px;border:0;background:none;padding:0;text-align:center;color:var(--muted);font-size:12px}
+.story-ring{width:66px;height:66px;padding:3px;margin:0 auto 6px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple),var(--blue))}
+.story-inner{width:100%;height:100%;border:3px solid var(--surface);border-radius:50%;display:grid;place-items:center;background:#29223d;overflow:hidden;font-size:23px}
+.story-inner img{width:100%;height:100%;object-fit:cover}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;justify-content:space-around;gap:2px;padding:8px 3px calc(8px + env(safe-area-inset-bottom));background:#171326f5;border-top:1px solid var(--border);backdrop-filter:blur(14px)}
+.nav{flex:1;min-width:0;padding:5px 0;border:0;background:none;color:var(--muted);font-size:10px}
+.nav span{display:block;font-size:20px;margin-bottom:3px}.nav.active{color:#ff78e6;font-weight:800}
+.toast{position:fixed;left:16px;right:16px;bottom:90px;z-index:30;background:#302641;border:1px solid #765681;border-radius:12px;padding:12px;text-align:center}
+.room{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface2);border-radius:14px;margin:8px 0}
+.room-icon{font-size:25px}.room-info{flex:1}
+.status-card{background:var(--surface2);border-radius:14px;padding:12px;margin:8px 0}
+video{background:#050509}
+@media(max-width:380px){main{padding:12px}.panel{padding:13px}.nav{font-size:9px}.nav span{font-size:18px}.feature{padding:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="brand">QIVI ✦</div><div class="tagline">SING · SHARE · LIVE</div></div>
+  <button class="coin-button" onclick="openPage('koin')" aria-label="Buka dompet koin">🪙 <span id="coinTop">100</span></button>
+</header>
+<main>
+<section class="page active" id="beranda">
+  <div class="hero"><div>✨ TEMPATNYA BERSINAR</div><h1>Selamat datang di QIVI!</h1><p>Bernyanyi, berbagi video, membuat status, dan bertemu teman baru.</p><button class="btn" onclick="openPage('status')">＋ Buat Status</button></div>
+  <div class="panel"><h3>🔴 Status 24 Jam <button class="btn secondary small" style="float:right" onclick="openPage('status')">Lihat</button></h3><div class="story-row" id="homeStories"><div class="empty">Belum ada status.</div></div></div>
+  <div class="panel"><h3>✨ Jelajahi QIVI</h3><div class="grid">
+    <button class="feature" onclick="openPage('video')"><span>🎬</span><b>Video</b><small>Video pendek</small></button>
+    <button class="feature" onclick="openPage('live')"><span>🔴</span><b>Live</b><small>Siaran langsung</small></button>
+    <button class="feature" onclick="openPage('chat')"><span>💬</span><b>Chat</b><small>Obrolan teman</small></button>
+    <button class="feature" onclick="openPage('nyanyi')"><span>🎤</span><b>Bernyanyi</b><small>Panggung karaoke</small></button>
+    <button class="feature" onclick="openPage('rooms')"><span>🎧</span><b>Rooms</b><small>Ruang obrolan</small></button>
+    <button class="feature" onclick="openPage('koin')"><span>🪙</span><b>Koin</b><small>Dompet QIVI</small></button>
+  </div></div>
+</section>
+
+<section class="page" id="status">
+  <h2>🔴 Status 24 Jam</h2><p class="muted">Bagikan foto, video, atau teks. Status ini disimpan di perangkat selama halaman masih berjalan.</p>
+  <div class="panel"><h3>Buat Status</h3><label for="statusType">Jenis status</label><select id="statusType" onchange="updateStatusForm()"><option value="text">Teks</option><option value="image">Foto</option><option value="video">Video</option></select>
+  <div id="textFields"><textarea id="statusText" maxlength="300" placeholder="Apa yang ingin kamu bagikan?"></textarea></div>
+  <div id="fileFields" class="hidden"><input id="statusFile" type="file" accept="image/*,video/*"><p class="note">Pilih file dari HP untuk pratinjau.</p></div><div id="statusPreview"></div>
+  <button class="btn" onclick="publishStatus()">Bagikan Status ✨</button><p class="note">Versi awal menyimpan status di perangkat, belum ke server.</p></div>
+  <h3>Status saya</h3><div id="myStatuses"></div><h3>Status terbaru</h3><div id="allStatuses"></div>
+</section>
+
+<section class="page" id="video">
+  <h2>🎬 QIVI Video</h2><div class="panel"><h3>Tambahkan video</h3><label for="videoTitle">Judul video</label><input id="videoTitle" maxlength="100" placeholder="Judul video"><input id="videoFile" type="file" accept="video/*"><div id="videoPreview"></div><button class="btn" onclick="previewVideo()">Pratinjau Video</button><p class="note">Pratinjau lokal berfungsi. Unggah permanen memerlukan server.</p></div><div id="videoFeed"><div class="empty">Belum ada video.</div></div>
+</section>
+
+<section class="page" id="live">
+  <h2>🔴 QIVI Live</h2><div class="panel" style="text-align:center"><div style="font-size:58px">📹</div><h3>Ruang siaran langsung</h3><p class="muted">Tes kamera lokal. Ini belum menyiarkan video ke penonton.</p><button class="btn" onclick="startCamera()">Tes Kamera & Mikrofon</button><div id="cameraBox"></div><button class="btn secondary" onclick="stopCamera()">Matikan Kamera</button></div>
+</section>
+
+<section class="page" id="chat">
+  <h2>💬 QIVI Chat</h2><div class="panel"><h3>Obrolan demo</h3><p class="muted">Pesan di bawah tampil di perangkat ini saja, belum dikirim ke pengguna lain.</p><div id="chatMessages" class="empty">Belum ada pesan.</div><textarea id="chatInput" maxlength="1000" placeholder="Tulis pesan..."></textarea><button class="btn" onclick="sendMessage()">Kirim Pesan</button></div>
+</section>
+
+<section class="page" id="nyanyi">
+  <h2>🎤 QIVI Bernyanyi</h2><div class="panel" style="text-align:center"><div style="font-size:60px">🎙️</div><h3>Panggung karaoke</h3><p class="muted">Bagian karaoke dan katalog lagu akan disambungkan pada tahap berikutnya.</p><button class="btn" onclick="openPage('rooms')">Jelajahi Rooms 🎧</button></div>
+</section>
+
+<section class="page" id="rooms">
+  <h2>🎧 QIVI Rooms</h2><div class="panel"><h3>Jelajahi ruangan</h3><button class="room" style="width:100%;text-align:left" onclick="notify('Ruang Musik masih demo. Fitur room online akan disambungkan berikutnya.')"><span class="room-icon">🎵</span><span class="room-info"><b>Ruang Musik</b><small class="muted" style="display:block">Bernyanyi bersama</small></span><span>›</span></button><button class="room" style="width:100%;text-align:left" onclick="notify('Ruang Teman masih demo. Fitur room online akan disambungkan berikutnya.')"><span class="room-icon">💬</span><span class="room-info"><b>Ruang Teman</b><small class="muted" style="display:block">Berkenalan dan mengobrol</small></span><span>›</span></button><button class="room" style="width:100%;text-align:left" onclick="notify('Ruang Games masih demo. Fitur room online akan disambungkan berikutnya.')"><span class="room-icon">🎮</span><span class="room-info"><b>Ruang Games</b><small class="muted" style="display:block">Main bersama teman</small></span><span>›</span></button></div>
+</section>
+
+<section class="page" id="koin">
+  <h2>🪙 Dompet QIVI</h2><div class="hero" style="text-align:center"><div style="font-size:48px">🪙</div><p>Saldo demo</p><h1><span id="coinBalance">100</span> Koin</h1><p class="note">Saldo ini hanya contoh lokal, belum transaksi sungguhan.</p></div><div class="panel"><h3>Dompet dan hadiah</h3><p class="muted">Pembelian koin, hadiah virtual, dan riwayat transaksi membutuhkan server aman. Belum ada transaksi sungguhan yang dilakukan.</p></div>
+</section>
+
+<section class="page" id="profil">
+  <h2>👤 Profil</h2><div class="panel" style="text-align:center"><div style="font-size:60px">👤</div><h3 id="profileName">Pengguna QIVI</h3><p class="muted">Sing · Share · Live</p><button class="btn secondary" onclick="editProfile()">Edit Nama</button><div class="grid" style="margin-top:16px"><div class="panel"><b id="statusCount">0</b><small class="muted" style="display:block">Status lokal</small></div><div class="panel"><b id="videoCount">0</b><small class="muted" style="display:block">Video demo</small></div></div></div>
+</section>
+</main>
+<nav class="bottom" aria-label="Navigasi utama">
+<button class="nav active" data-page="beranda" onclick="openPage('beranda')"><span>⌂</span>Beranda</button>
+<button class="nav" data-page="status" onclick="openPage('status')"><span>🔴</span>Status</button>
+<button class="nav" data-page="video" onclick="openPage('video')"><span>▶</span>Video</button>
+<button class="nav" data-page="live" onclick="openPage('live')"><span>🔴</span>Live</button>
+<button class="nav" data-page="chat" onclick="openPage('chat')"><span>💬</span>Chat</button>
+<button class="nav" data-page="nyanyi" onclick="openPage('nyanyi')"><span>🎤</span>Nyanyi</button>
+<button class="nav" data-page="rooms" onclick="openPage('rooms')"><span>🎧</span>Rooms</button>
+<button class="nav" data-page="profil" onclick="openPage('profil')"><span>👤</span>Profil</button>
+</nav>
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null};
+let toastTimer;
+function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
+function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos()}
+function updateStatusForm(){const type=$('statusType').value;$('textFields').classList.toggle('hidden',type!=='text');$('fileFields').classList.toggle('hidden',type==='text');clearStatusPreview()}
+function clearStatusPreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}$('statusPreview').replaceChildren()}
+$('statusFile').addEventListener('change',()=>{clearStatusPreview();const f=$('statusFile').files[0];if(!f)return;const type=$('statusType').value;if((type==='image'&&!f.type.startsWith('image/'))||(type==='video'&&!f.type.startsWith('video/')))return notify('Jenis file tidak sesuai pilihan.');if(f.size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');state.previewUrl=URL.createObjectURL(f);const m=document.createElement(type==='image'?'img':'video');m.className='media';m.src=state.previewUrl;if(type==='video'){m.controls=true;m.playsInline=true}else m.alt='Pratinjau foto status';$('statusPreview').appendChild(m)});
+function publishStatus(){const type=$('statusType').value;const item={id:Date.now(),type,created:Date.now(),text:'',url:''};if(type==='text'){item.text=$('statusText').value.trim();if(!item.text)return notify('Tulis status terlebih dahulu.')}else{const f=$('statusFile').files[0];if(!f)return notify('Pilih file terlebih dahulu.');if(f.size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');item.url=URL.createObjectURL(f);item.fileName=f.name}state.statuses.unshift(item);$('statusText').value='';$('statusFile').value='';clearStatusPreview();renderStatuses();notify('Status ditambahkan di perangkat ini.')}
+function makeStatusCard(s,includeDelete){const c=document.createElement('article');c.className='status-card';const title=document.createElement('b');title.textContent='✨ '+state.name;c.appendChild(title);const meta=document.createElement('p');meta.className='note';meta.textContent='Baru saja · status lokal';c.appendChild(meta);if(s.type==='text'){const p=document.createElement('p');p.textContent=s.text;c.appendChild(p)}else{const m=document.createElement(s.type==='image'?'img':'video');m.className='media';m.src=s.url;if(s.type==='video'){m.controls=true;m.playsInline=true}else m.alt='Foto status';c.appendChild(m)}if(includeDelete){const b=document.createElement('button');b.className='btn secondary small';b.textContent='Hapus Status';b.onclick=()=>{state.statuses=state.statuses.filter(x=>x.id!==s.id);renderStatuses();notify('Status dihapus dari perangkat ini.')};c.appendChild(b)}return c}
+function renderStatuses(){const mine=$('myStatuses'),all=$('allStatuses'),stories=$('homeStories');mine.replaceChildren();all.replaceChildren();stories.replaceChildren();if(!state.statuses.length){mine.innerHTML='<div class="empty">Belum ada status.</div>';all.innerHTML='<div class="empty">Belum ada status terbaru.</div>';stories.innerHTML='<div class="empty">Belum ada status.</div>'}else{state.statuses.forEach(s=>{mine.appendChild(makeStatusCard(s,true));all.appendChild(makeStatusCard(s,false));const b=document.createElement('button');b.className='story';const ring=document.createElement('div');ring.className='story-ring';const inner=document.createElement('div');inner.className='story-inner';if(s.type==='image'){const img=document.createElement('img');img.src=s.url;img.alt='';inner.appendChild(img)}else inner.textContent=s.type==='video'?'▶':'✦';ring.appendChild(inner);b.appendChild(ring);const label=document.createElement('span');label.textContent=state.name;b.appendChild(label);b.onclick=()=>openPage('status');stories.appendChild(b)})}$('statusCount').textContent=state.statuses.length}
+function previewVideo(){const f=$('videoFile').files[0];if(!f)return notify('Pilih video dari HP dahulu.');if(!f.type.startsWith('video/'))return notify('Pilih file video yang valid.');if(f.size>50*1024*1024)return notify('Ukuran video maksimal 50 MB.');if(state.videoPreviewUrl)URL.revokeObjectURL(state.videoPreviewUrl);state.videoPreviewUrl=URL.createObjectURL(f);const box=$('videoPreview');box.replaceChildren();const v=document.createElement('video');v.className='media';v.controls=true;v.playsInline=true;v.src=state.videoPreviewUrl;box.appendChild(v);const b=document.createElement('button');b.className='btn';b.textContent='Simpan video di daftar lokal';b.onclick=()=>{state.videos.unshift({id:Date.now(),title:$('videoTitle').value.trim()||f.name,url:state.videoPreviewUrl});state.videoPreviewUrl=null;$('videoFile').value='';box.replaceChildren();renderVideos();notify('Video masuk ke daftar lokal perangkat ini.')};box.appendChild(b)}
+function renderVideos(){const feed=$('videoFeed');feed.replaceChildren();if(!state.videos.length)feed.innerHTML='<div class="empty">Belum ada video.</div>';state.videos.forEach(v=>{const c=document.createElement('article');c.className='panel';const h=document.createElement('h3');h.textContent=v.title;const m=document.createElement('video');m.className='media';m.controls=true;m.playsInline=true;m.src=v.url;c.append(h,m);feed.appendChild(c)});$('videoCount').textContent=state.videos.length}
+async function startCamera(){try{if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('Browser tidak mendukung kamera.');stopCamera();state.camera=await navigator.mediaDevices.getUserMedia({video:true,audio:true});const v=document.createElement('video');v.className='media';v.autoplay=true;v.muted=true;v.playsInline=true;v.srcObject=state.camera;$('cameraBox').replaceChildren(v);notify('Kamera aktif di perangkat ini saja.')}catch(e){notify('Kamera tidak dapat dibuka: '+(e.message||'izin ditolak'))}}
+function stopCamera(){if(state.camera)state.camera.getTracks().forEach(t=>t.stop());state.camera=null;$('cameraBox').replaceChildren()}
+function sendMessage(){const value=$('chatInput').value.trim();if(!value)return notify('Tulis pesan terlebih dahulu.');const box=$('chatMessages');if(box.classList.contains('empty')){box.classList.remove('empty');box.replaceChildren()}const m=document.createElement('div');m.className='status-card';m.textContent=state.name+': '+value;box.appendChild(m);$('chatInput').value='';notify('Pesan ditampilkan di perangkat ini saja.')}
+function editProfile(){const value=prompt('Nama profil:',state.name);if(value&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;renderStatuses();notify('Nama profil diperbarui di perangkat ini.')}}
+function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins}
+window.addEventListener('pagehide',stopCamera);
+$('profileName').textContent=state.name;renderCoins();renderStatuses();renderVideos();
+</script>
+</body>
+</html>
