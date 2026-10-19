@@ -516,8 +516,7 @@ $('statusFile').addEventListener('change', () => {
 });
 
 
-const QIVI_SUPABASE_URL = 'https://pcpskybnqrjiqpowcswh.supabase.co';
-const QIVI_SUPABASE_KEY = 'TEMPEL_PUBLISHABLE_KEY_DI_SINI';
+
 
 function qiviAuthHeaders(extra = {}) {
   return {
@@ -528,7 +527,7 @@ function qiviAuthHeaders(extra = {}) {
 }
 
 async function uploadQiviVideo(file, title) {
-  if (QIVI_SUPABASE_KEY === 'TEMPEL_PUBLISHABLE_KEY_DI_SINI') {
+  if (!QIVI_SUPABASE_KEY || QIVI_SUPABASE_KEY.includes('TEMPEL_')) {
     throw new Error('Masukkan Publishable Key Supabase dahulu.');
   }
 
@@ -574,7 +573,7 @@ async function uploadQiviVideo(file, title) {
 }
 
 async function loadQiviVideos() {
-  if (QIVI_SUPABASE_KEY === 'TEMPEL_PUBLISHABLE_KEY_DI_SINI') {
+  if (!QIVI_SUPABASE_KEY || QIVI_SUPABASE_KEY.includes('TEMPEL_')) {
     renderVideos();
     return;
   }
