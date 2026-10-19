@@ -488,8 +488,8 @@ function renderStatuses() {
     button.append(ring,document.createTextNode(state.name));
     button.onclick = () => openPage('status');
     $('homeStories').appendChild(button);
-  });
-  $('statusCount').textContent = state.statuses.length;
+  const QIVI_SUPABASE_URL = 'https://pcpskybnqrjiqpowcswh.supabase.co';
+const QIVI_SUPABASE_KEY = 'TEMPEL_PUBLISHABLE_KEY_DI_SINI';
 }
 
 $('statusFile').addEventListener('change', () => {
