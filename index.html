@@ -322,7 +322,8 @@ label{font-size:13px;color:#ded8ec}
 
 <script>
 'use strict';
-
+const QIVI_SUPABASE_URL = 'https://pcpskybnqrjiqpowcswh.supabase.co';
+const QIVI_SUPABASE_KEY = 'sb_publishable_qHqEoQgximH5TGC1oski0Q_N7k8rnff';
 const $ = id => document.getElementById(id);
 const state = {
   statuses: [], videos: [], camera: null,
@@ -514,50 +515,188 @@ $('statusFile').addEventListener('change', () => {
   $('statusPreview').appendChild(media);
 });
 
+
+const QIVI_SUPABASE_URL = 'https://pcpskybnqrjiqpowcswh.supabase.co';
+const QIVI_SUPABASE_KEY = 'TEMPEL_PUBLISHABLE_KEY_DI_SINI';
+
+function qiviAuthHeaders(extra = {}) {
+  return {
+    apikey: QIVI_SUPABASE_KEY,
+    Authorization: 'Bearer ' + QIVI_SUPABASE_KEY,
+    ...extra
+  };
+}
+
+async function uploadQiviVideo(file, title) {
+  if (QIVI_SUPABASE_KEY === 'TEMPEL_PUBLISHABLE_KEY_DI_SINI') {
+    throw new Error('Masukkan Publishable Key Supabase dahulu.');
+  }
+
+  if (file.size > 50 * 1024 * 1024) {
+    throw new Error('Ukuran video maksimal 50 MB.');
+  }
+
+  const ext = (file.name.split('.').pop() || 'mp4')
+    .toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4';
+
+  const slug = (title || 'video-qivi')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 45) || 'video-qivi';
+
+  const path = Date.now() + '-' + slug + '.' + ext;
+  const endpoint = QIVI_SUPABASE_URL +
+    '/storage/v1/object/qivi-videos/' +
+    encodeURIComponent(path);
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: qiviAuthHeaders({
+      'Content-Type': file.type || 'video/mp4',
+      'x-upsert': 'false'
+    }),
+    body: file
+  });
+
+  if (!response.ok) {
+    throw new Error('Unggah gagal: ' + await response.text());
+  }
+
+  return {
+    title: title || file.name,
+    url: QIVI_SUPABASE_URL +
+      '/storage/v1/object/public/qivi-videos/' +
+      encodeURIComponent(path),
+    storagePath: path
+  };
+}
+
+async function loadQiviVideos() {
+  if (QIVI_SUPABASE_KEY === 'TEMPEL_PUBLISHABLE_KEY_DI_SINI') {
+    renderVideos();
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      QIVI_SUPABASE_URL + '/storage/v1/object/list/qivi-videos',
+      {
+        method: 'POST',
+        headers: qiviAuthHeaders({
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+          prefix: '',
+          limit: 100,
+          offset: 0,
+          sortBy: { column: 'created_at', order: 'desc' }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    const files = await response.json();
+
+    state.videos = files
+      .filter(file => file.name && !file.name.endsWith('/'))
+      .map(file => ({
+        title: file.name.replace(/^\d+-/, '')
+          .replace(/\.[^.]+$/, '').replace(/-/g, ' '),
+        url: QIVI_SUPABASE_URL +
+          '/storage/v1/object/public/qivi-videos/' +
+          encodeURIComponent(file.name),
+        storagePath: file.name
+      }));
+
+    renderVideos();
+  } catch (error) {
+    console.error(error);
+    notify('Daftar video online gagal dimuat. Periksa izin bucket Supabase.');
+  }
+}
+
 function previewVideo() {
   const file = $('videoFile').files[0];
-  if (!file) return notify('Pilih video dari HP terlebih dahulu.');
-  if (!file.type.startsWith('video/')) return notify('File harus berupa video.');
-  if (file.size > 50*1024*1024) return notify('Ukuran maksimal video adalah 50 MB.');
+  if (!file) return notify('Pilih video dari HP dahulu.');
+  if (!file.type.startsWith('video/')) {
+    return notify('Pilih file video yang valid.');
+  }
+  if (file.size > 50 * 1024 * 1024) {
+    return notify('Ukuran maksimal video 50 MB.');
+  }
 
-  const url = URL.createObjectURL(file);
   const box = $('videoPreview');
   box.replaceChildren();
+
   const video = document.createElement('video');
   video.className = 'media';
   video.controls = true;
   video.playsInline = true;
-  video.src = url;
+  video.src = URL.createObjectURL(file);
+  box.appendChild(video);
+
   const add = document.createElement('button');
   add.className = 'btn';
-  add.textContent = 'Tambahkan ke daftar demo';
-  add.onclick = () => {
-    state.videos.unshift({url,title:$('videoTitle').value.trim() || file.name});
-    renderVideos();
-    notify('Video ditambahkan ke daftar lokal, belum diunggah ke server.');
+  add.textContent = 'Unggah Video ke QIVI';
+
+  add.onclick = async () => {
+    add.disabled = true;
+    add.textContent = 'Sedang mengunggah...';
+
+    try {
+      const title = $('videoTitle').value.trim() || file.name;
+      const saved = await uploadQiviVideo(file, title);
+
+      state.videos.unshift(saved);
+      renderVideos();
+      notify('Video berhasil diunggah ke QIVI.');
+    } catch (error) {
+      console.error(error);
+      notify(error.message || 'Unggah video gagal.');
+    } finally {
+      add.disabled = false;
+      add.textContent = 'Unggah Video ke QIVI';
+    }
   };
-  box.append(video,add);
+
+  box.appendChild(add);
 }
 
 function renderVideos() {
   const feed = $('videoFeed');
   feed.replaceChildren();
-  if (!state.videos.length) feed.innerHTML = '<div class="empty">Belum ada video.</div>';
+
+  if (!state.videos.length) {
+    feed.innerHTML = '<div class="empty">Belum ada video.</div>';
+  }
+
   state.videos.forEach(v => {
     const card = document.createElement('article');
     card.className = 'panel';
+
     const title = document.createElement('h3');
-    title.textContent = v.title;
+    title.textContent = v.title || 'Video QIVI';
+
     const video = document.createElement('video');
     video.className = 'media';
     video.controls = true;
     video.playsInline = true;
     video.src = v.url;
-    card.append(title,video);
+
+    card.append(title, video);
     feed.appendChild(card);
   });
+
   $('videoCount').textContent = state.videos.length;
 }
+
+loadQiviVideos();
+
 
 async function startCamera() {
   try {
@@ -620,6 +759,7 @@ $('profileName').textContent = state.name;
 renderCoins();
 renderStatuses();
 renderVideos();
+loadQiviVideos();
 </script>
 </body>
 </html>
