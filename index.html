@@ -60,7 +60,7 @@ label{font-size:13px;color:#ded8ec}
 .room{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface2);border-radius:14px;margin:8px 0}
 .room-icon{font-size:25px}.room-info{flex:1}
 .status-card{background:var(--surface2);border-radius:14px;padding:12px;margin:8px 0}
-video{background:#050509}
+video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}.live-videos video{min-height:150px;max-height:360px;object-fit:contain}
 @media(max-width:380px){main{padding:12px}.panel{padding:13px}.nav{font-size:9px}.nav span{font-size:18px}.feature{padding:12px}}
 </style>
 </head>
@@ -97,7 +97,25 @@ video{background:#050509}
 </section>
 
 <section class="page" id="live">
-  <h2>🔴 QIVI Live</h2><div class="panel" style="text-align:center"><div style="font-size:58px">📹</div><h3>Ruang siaran langsung</h3><p class="muted">Tes kamera lokal. Ini belum menyiarkan video ke penonton.</p><button class="btn" onclick="startCamera()">Tes Kamera & Mikrofon</button><div id="cameraBox"></div><button class="btn secondary" onclick="stopCamera()">Matikan Kamera</button></div>
+  <h2>🔴 QIVI Live</h2>
+  <div class="panel">
+    <h3>Ruang siaran langsung</h3>
+    <p class="muted">Host mulai siaran dan bagikan kode ruang kepada penonton. Penonton memasukkan kode yang sama untuk bergabung.</p>
+    <label for="liveRoomCode">Kode ruang Live</label>
+    <input id="liveRoomCode" maxlength="40" autocomplete="off" placeholder="Kode muncul saat host mulai siaran">
+    <div class="grid">
+      <button class="btn" type="button" onclick="startLiveHost()">🔴 Mulai Live</button>
+      <button class="btn secondary" type="button" onclick="joinLiveViewer()">▶ Gabung Live</button>
+    </div>
+    <p id="liveStatus" class="note" aria-live="polite">Live belum dimulai.</p>
+    <div id="liveRoomShare" class="status-card hidden"><b>Bagikan kode ini kepada penonton:</b><p id="liveRoomDisplay" style="font-size:22px;font-weight:800;letter-spacing:1px;overflow-wrap:anywhere"></p><button class="btn secondary small" type="button" onclick="copyLiveRoomCode()">Salin kode</button></div>
+    <div class="live-videos">
+      <div id="liveLocalWrap" class="hidden"><p class="note">Kamera host</p><video id="liveLocalVideo" class="media" autoplay muted playsinline></video></div>
+      <div id="liveRemoteWrap" class="hidden"><p class="note">Siaran yang diterima</p><video id="liveRemoteVideo" class="media" autoplay playsinline controls></video></div>
+    </div>
+    <button class="btn secondary" type="button" onclick="stopLive()">Matikan / Keluar Live</button>
+    <p class="note">Fitur Live menggunakan WebRTC. Kualitas koneksi bergantung pada jaringan; untuk penggunaan luas mungkin diperlukan server TURN.</p>
+  </div>
 </section>
 
 <section class="page" id="chat">
@@ -150,7 +168,7 @@ const SUPABASE_PUBLISHABLE_KEY='sb_publishable_qHqEoQgximH5TGC1oski0Q_N7k8rnff';
 const VIDEO_BUCKET='qivi-videos';
 const CHAT_TABLE='qivi_chat_messages';
 const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) || null;
-const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false};
+const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[]};
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
 function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages()}
@@ -166,8 +184,136 @@ async function ensureSupabaseSession(){if(!qiviSupabase)throw new Error('Pustaka
 async function uploadVideo(file,button){if(!file)return notify('Pilih video terlebih dahulu.');if(file.size>50*1024*1024)return notify('Ukuran video maksimal 50 MB.');button.disabled=true;const oldText=button.textContent;button.textContent='Mengunggah video…';try{const user=await ensureSupabaseSession();const title=$('videoTitle').value.trim()||file.name;const safeTitle=safeFilePart(title);const safeName=safeFilePart(file.name);const ext=(file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'mp4';const objectName=Date.now()+'__'+safeTitle+'__'+safeName.replace(/\.[^.]+$/,'')+'.'+ext;const path=objectName;const {data,error}=await qiviSupabase.storage.from(VIDEO_BUCKET).upload(path,file,{cacheControl:'3600',contentType:file.type||'video/mp4',upsert:false});if(error)throw error;const {data:publicData}=qiviSupabase.storage.from(VIDEO_BUCKET).getPublicUrl(data.path);state.videos.unshift({id:data.path,title,url:publicData.publicUrl,path:data.path,owner:user.id});$('videoFile').value='';$('videoTitle').value='';if(state.videoPreviewUrl){URL.revokeObjectURL(state.videoPreviewUrl);state.videoPreviewUrl=null}$('videoPreview').replaceChildren();renderVideos();notify('Video berhasil diunggah ke server QIVI.');$('videoServerStatus').textContent='Terhubung ke Supabase · video ditampilkan dari penyimpanan server.'}catch(e){const msg=e?.message||'Kesalahan tidak diketahui';notify('Unggah gagal: '+msg);$('videoServerStatus').textContent='Unggah belum berhasil. Periksa koneksi, login anonim, nama bucket, dan policy INSERT.'}finally{button.disabled=false;button.textContent=oldText}}
 async function loadRemoteVideos(showNotice=false){if(!qiviSupabase){$('videoServerStatus').textContent='Pustaka Supabase belum termuat.';return}try{await ensureSupabaseSession();const {data,error}=await qiviSupabase.storage.from(VIDEO_BUCKET).list('',{limit:100,sortBy:{column:'created_at',order:'desc'}});if(error)throw error;const items=(data||[]).filter(x=>x.name&&!x.name.startsWith('.')).map(x=>{const parts=x.name.split('__');let title=x.name;try{if(parts.length>=3)title=decodeURIComponent(parts[1])}catch{}const {data:publicData}=qiviSupabase.storage.from(VIDEO_BUCKET).getPublicUrl(x.name);return{id:x.name,title,url:publicData.publicUrl,path:x.name}});state.videos=items;renderVideos();$('videoServerStatus').textContent='Terhubung ke Supabase · '+items.length+' video ditemukan di server.';if(showNotice)notify('Daftar video server diperbarui.')}catch(e){$('videoServerStatus').textContent='Belum dapat membaca video server: '+(e?.message||'periksa izin SELECT dan login anonim');if(showNotice)notify('Gagal memuat video server: '+(e?.message||'kesalahan koneksi'))}}
 function renderVideos(){const feed=$('videoFeed');feed.replaceChildren();if(!state.videos.length)feed.innerHTML='<div class="empty">Belum ada video di server.</div>';state.videos.forEach(v=>{const c=document.createElement('article');c.className='panel video-card';const rawName=String(v.path||v.id||'');const rawTitle=String(v.title||'');const looksLikeOpaqueName=!rawTitle||rawTitle===rawName||/^lv_[a-zA-Z0-9_-]+\.(mp4|mov|webm|m4v)$/i.test(rawTitle);const h=document.createElement('h3');h.className='video-card-title';h.textContent=looksLikeOpaqueName?'Video QIVI':rawTitle;c.appendChild(h);if(looksLikeOpaqueName&&rawName){const fileLabel=document.createElement('p');fileLabel.className='note video-file-name';fileLabel.textContent='Nama file: '+rawName;c.appendChild(fileLabel)}const m=document.createElement('video');m.className='media';m.controls=true;m.playsInline=true;m.preload='metadata';m.src=v.url;m.addEventListener('error',()=>{let note=c.querySelector('.video-error');if(!note){note=document.createElement('p');note.className='note video-error';note.textContent='Video tidak dapat dimuat. Periksa izin baca bucket Supabase dan alamat file.';c.appendChild(note)}},{once:true});c.appendChild(m);feed.appendChild(c)});$('videoCount').textContent=state.videos.length}
-async function startCamera(){try{if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('Browser tidak mendukung kamera.');stopCamera();state.camera=await navigator.mediaDevices.getUserMedia({video:true,audio:true});const v=document.createElement('video');v.className='media';v.autoplay=true;v.muted=true;v.playsInline=true;v.srcObject=state.camera;$('cameraBox').replaceChildren(v);notify('Kamera aktif di perangkat ini saja.')}catch(e){notify('Kamera tidak dapat dibuka: '+(e.message||'izin ditolak'))}}
-function stopCamera(){if(state.camera)state.camera.getTracks().forEach(t=>t.stop());state.camera=null;$('cameraBox').replaceChildren()}
+function makeLiveSessionToken(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)}
+function makeLiveRoomCode(){return 'QIVI-'+Math.random().toString(36).slice(2,8).toUpperCase()}
+function setLiveStatus(message){const el=$('liveStatus');if(el)el.textContent=message}
+function liveErrorMessage(e){return e?.message||String(e||'kesalahan tidak diketahui')}
+async function sendLiveSignal(type,payload,recipientId=null){
+  const user=await ensureSupabaseSession();
+  const {error}=await qiviSupabase.from('qivi_live_signals').insert({room_id:state.liveRoomId,sender_id:user.id,recipient_id:recipientId,signal_type:type,payload});
+  if(error)throw error;
+}
+async function subscribeLiveRoom(room){
+  if(!qiviSupabase)throw new Error('Supabase belum termuat.');
+  if(state.liveChannel){await qiviSupabase.removeChannel(state.liveChannel);state.liveChannel=null;}
+  state.liveSeenSignals=new Set();state.livePendingIce=[];
+  return new Promise((resolve,reject)=>{
+    let settled=false;
+    const channel=qiviSupabase.channel('qivi-live-'+room+'-'+Math.random().toString(36).slice(2,7))
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'qivi_live_signals',filter:'room_id=eq.'+room},event=>{handleLiveSignal(event.new).catch(e=>{setLiveStatus('Sinyal Live bermasalah: '+liveErrorMessage(e));});})
+      .subscribe(status=>{
+        if(status==='SUBSCRIBED'&&!settled){settled=true;clearTimeout(timer);resolve(channel);}
+        else if((status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED')&&!settled){settled=true;clearTimeout(timer);reject(new Error('Koneksi Realtime Live gagal: '+status));}
+      });
+    state.liveChannel=channel;
+    const timer=setTimeout(()=>{if(!settled){settled=true;reject(new Error('Realtime Live belum merespons. Periksa koneksi dan tabel Supabase.'));}},12000);
+  });
+}
+async function loadExistingLiveSignals(){
+  const {data,error}=await qiviSupabase.from('qivi_live_signals').select('id,room_id,sender_id,recipient_id,signal_type,payload,created_at').eq('room_id',state.liveRoomId).order('created_at',{ascending:true}).limit(100);
+  if(error)throw error;
+  for(const row of (data||[]))await handleLiveSignal(row);
+}
+function createLivePeerConnection(){
+  if(state.livePc)state.livePc.close();
+  const pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});
+  state.livePc=pc;
+  if(state.liveRole==='host'&&state.camera)state.camera.getTracks().forEach(track=>pc.addTrack(track,state.camera));
+  pc.onicecandidate=async event=>{
+    if(!event.candidate||!state.liveRoomId||!state.liveSessionToken)return;
+    try{await sendLiveSignal('ice',{candidate:event.candidate.toJSON(),session:state.liveSessionToken},state.livePeerId||null)}catch(e){setLiveStatus('Gagal mengirim sinyal jaringan: '+liveErrorMessage(e));}
+  };
+  pc.ontrack=event=>{
+    const remote=$('liveRemoteVideo');
+    if(remote){remote.srcObject=event.streams[0]||new MediaStream([event.track]);$('liveRemoteWrap').classList.remove('hidden');remote.play().catch(()=>{});}
+    setLiveStatus(state.liveRole==='host'?'Penonton terhubung dan menerima siaran.':'Terhubung! Kamu sedang menonton QIVI Live.');
+  };
+  pc.onconnectionstatechange=()=>{
+    if(pc.connectionState==='connected')setLiveStatus(state.liveRole==='host'?'Live aktif · penonton terhubung.':'Berhasil terhubung ke siaran Live.');
+    else if(pc.connectionState==='failed')setLiveStatus('Koneksi video gagal. Jaringan mungkin memerlukan server TURN.');
+    else if(pc.connectionState==='disconnected')setLiveStatus('Koneksi terputus sementara; mencoba menyambung kembali…');
+  };
+  return pc;
+}
+async function addPendingIceForSession(session){
+  if(!state.livePc||!state.livePc.remoteDescription)return;
+  const keep=[];
+  for(const item of state.livePendingIce){
+    if(item.payload?.session!==session){if(!session||!item.payload?.session)keep.push(item);continue;}
+    try{await state.livePc.addIceCandidate(new RTCIceCandidate(item.payload.candidate));}catch(e){console.warn('QIVI Live ICE:',e);}
+  }
+  state.livePendingIce=keep;
+}
+async function handleLiveSignal(row){
+  if(!row||!row.id||!state.liveRoomId||row.room_id!==state.liveRoomId)return;
+  if(state.liveSeenSignals.has(row.id))return;
+  state.liveSeenSignals.add(row.id);
+  const user=await ensureSupabaseSession();
+  if(row.sender_id===user.id)return;
+  if(row.recipient_id&&row.recipient_id!==user.id)return;
+  const payload=row.payload||{};
+  if(row.signal_type==='stop'){
+    if(!state.liveSessionToken||payload.session===state.liveSessionToken){setLiveStatus('Host telah mengakhiri siaran.');if(state.livePc){state.livePc.close();state.livePc=null;}$('liveRemoteVideo').srcObject=null;$('liveRemoteWrap').classList.add('hidden');}
+    return;
+  }
+  if(row.signal_type==='offer'&&state.liveRole==='viewer'){
+    if(state.liveSessionToken&&state.liveSessionToken!==payload.session)return;
+    state.liveSessionToken=payload.session;state.livePeerId=row.sender_id;
+    const pc=state.livePc||createLivePeerConnection();
+    if(!pc.remoteDescription){await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));await addPendingIceForSession(state.liveSessionToken);const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await sendLiveSignal('answer',{sdp:pc.localDescription,session:state.liveSessionToken},state.livePeerId);setLiveStatus('Jawaban terkirim. Menghubungkan video host…');}
+    return;
+  }
+  if(row.signal_type==='answer'&&state.liveRole==='host'){
+    if(payload.session!==state.liveSessionToken||!state.livePc||state.livePc.remoteDescription)return;
+    state.livePeerId=row.sender_id;await state.livePc.setRemoteDescription(new RTCSessionDescription(payload.sdp));await addPendingIceForSession(state.liveSessionToken);setLiveStatus('Jawaban penonton diterima. Menyambungkan video…');return;
+  }
+  if(row.signal_type==='ice'){
+    if(state.liveSessionToken&&payload.session&&payload.session!==state.liveSessionToken)return;
+    if(!state.liveSessionToken||!state.livePc?.remoteDescription){state.livePendingIce.push(row);return;}
+    try{await state.livePc.addIceCandidate(new RTCIceCandidate(payload.candidate));}catch(e){console.warn('QIVI Live ICE:',e);}
+  }
+}
+async function startLiveHost(){
+  try{
+    await stopLive(false);
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error('Browser tidak mendukung kamera.');
+    const user=await ensureSupabaseSession();
+    state.liveRole='host';state.liveRoomId=makeLiveRoomCode();state.liveSessionToken=makeLiveSessionToken();state.livePeerId=null;
+    $('liveRoomCode').value=state.liveRoomId;$('liveRoomDisplay').textContent=state.liveRoomId;$('liveRoomShare').classList.remove('hidden');
+    setLiveStatus('Meminta izin kamera dan mikrofon…');
+    state.camera=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});
+    $('liveLocalVideo').srcObject=state.camera;$('liveLocalWrap').classList.remove('hidden');$('liveRemoteVideo').srcObject=null;$('liveRemoteWrap').classList.add('hidden');
+    await subscribeLiveRoom(state.liveRoomId);
+    await loadExistingLiveSignals();
+    const pc=createLivePeerConnection();const offer=await pc.createOffer();await pc.setLocalDescription(offer);
+    await sendLiveSignal('offer',{sdp:pc.localDescription,session:state.liveSessionToken,host_name:state.name.slice(0,40)},null);
+    setLiveStatus('Live siap. Bagikan kode '+state.liveRoomId+' kepada penonton. Biarkan halaman ini terbuka.');notify('QIVI Live dimulai. Bagikan kode ruang kepada penonton.');
+  }catch(e){setLiveStatus('Live belum berhasil dimulai: '+liveErrorMessage(e));notify('Live gagal: '+liveErrorMessage(e));await stopLive(false);}
+}
+async function joinLiveViewer(){
+  try{
+    await stopLive(false);
+    const room=$('liveRoomCode').value.trim().toUpperCase();
+    if(!room)return notify('Masukkan kode ruang dari host terlebih dahulu.');
+    await ensureSupabaseSession();state.liveRole='viewer';state.liveRoomId=room;state.liveSessionToken=null;state.livePeerId=null;
+    $('liveRoomShare').classList.add('hidden');$('liveLocalWrap').classList.add('hidden');$('liveRemoteWrap').classList.remove('hidden');$('liveRemoteVideo').srcObject=null;
+    setLiveStatus('Mencari siaran '+room+'…');await subscribeLiveRoom(room);await loadExistingLiveSignals();
+    if(!state.liveSessionToken)setLiveStatus('Belum ditemukan siaran aktif. Pastikan host sudah mulai Live dan kode ruang benar.');
+    else setLiveStatus('Menemukan siaran. Menghubungkan…');
+  }catch(e){setLiveStatus('Gagal bergabung ke Live: '+liveErrorMessage(e));notify('Gagal bergabung: '+liveErrorMessage(e));}
+}
+async function copyLiveRoomCode(){const code=state.liveRoomId||$('liveRoomCode').value.trim();if(!code)return notify('Kode ruang belum tersedia.');try{await navigator.clipboard.writeText(code);notify('Kode ruang disalin.')}catch{notify('Kode ruang: '+code)}}
+async function stopLive(notifyUser=true){
+  const room=state.liveRoomId,session=state.liveSessionToken,role=state.liveRole;
+  if(notifyUser&&room&&role==='host'&&qiviSupabase){try{await sendLiveSignal('stop',{session},null)}catch(e){console.warn('QIVI Live stop:',e);}}
+  if(state.livePc){state.livePc.onicecandidate=null;state.livePc.ontrack=null;state.livePc.close();state.livePc=null;}
+  if(state.camera){state.camera.getTracks().forEach(t=>t.stop());state.camera=null;}
+  if(state.liveChannel&&qiviSupabase){try{await qiviSupabase.removeChannel(state.liveChannel)}catch{}state.liveChannel=null;}
+  $('liveLocalVideo').srcObject=null;$('liveRemoteVideo').srcObject=null;$('liveLocalWrap').classList.add('hidden');$('liveRemoteWrap').classList.add('hidden');
+  state.liveRole=null;state.liveRoomId=null;state.liveSessionToken=null;state.livePeerId=null;state.liveSeenSignals=new Set();state.livePendingIce=[];
+  if(notifyUser){setLiveStatus('Kamu telah keluar dari Live.');notify('Live dihentikan.');}
+}
+function stopCamera(){stopLive(false)}
 function renderChatMessages(rows){const box=$('chatMessages');box.replaceChildren();if(!rows||!rows.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='Belum ada pesan. Jadilah yang pertama menyapa!';box.appendChild(empty);return}rows.forEach(row=>{const item=document.createElement('article');item.className='chat-bubble'+(state.supabaseUser&&row.sender_id===state.supabaseUser.id?' mine':'');const meta=document.createElement('div');meta.className='chat-meta';meta.textContent=(row.sender_name||'Pengguna QIVI')+' · '+(row.created_at?new Date(row.created_at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'baru saja');const body=document.createElement('div');body.textContent=row.content||'';item.append(meta,body);box.appendChild(item)});box.scrollTop=box.scrollHeight}
 async function loadChatMessages(showNotice=false){if(!qiviSupabase){$('chatStatus').textContent='Supabase belum termuat. Periksa koneksi internet.';return}try{const user=await ensureSupabaseSession();const {data,error}=await qiviSupabase.from(CHAT_TABLE).select('id,sender_id,sender_name,content,created_at').order('created_at',{ascending:true}).limit(100);if(error)throw error;renderChatMessages(data||[]);$('chatStatus').textContent='Chat online siap · '+(data||[]).length+' pesan terbaru dimuat.';state.chatLoaded=true;if(!state.chatChannel){state.chatChannel=qiviSupabase.channel('qivi-public-chat').on('postgres_changes',{event:'INSERT',schema:'public',table:CHAT_TABLE},payload=>{const row=payload.new;if(row){const box=$('chatMessages');const empty=box.querySelector('.empty');if(empty)box.replaceChildren();const item=document.createElement('article');item.className='chat-bubble'+(state.supabaseUser&&row.sender_id===state.supabaseUser.id?' mine':'');const meta=document.createElement('div');meta.className='chat-meta';meta.textContent=(row.sender_name||'Pengguna QIVI')+' · '+(row.created_at?new Date(row.created_at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'baru saja');const body=document.createElement('div');body.textContent=row.content||'';item.append(meta,body);box.appendChild(item);box.scrollTop=box.scrollHeight}}).subscribe(status=>{if(status==='SUBSCRIBED')$('chatStatus').textContent='Chat online terhubung · pesan baru akan muncul otomatis.'})}if(showNotice)notify('Pesan chat berhasil dimuat.')}catch(e){$('chatStatus').textContent='Chat online belum siap: '+(e?.message||'periksa tabel dan policy Supabase');if(showNotice)notify('Chat belum tersambung. Siapkan tabel Supabase sesuai panduan.');if(!$('chatMessages').children.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='Chat online belum dikonfigurasi. Buat tabel dan policy Supabase terlebih dahulu.';$('chatMessages').appendChild(empty)}}}
 async function sendMessage(){const value=$('chatInput').value.trim();if(!value)return notify('Tulis pesan terlebih dahulu.');const button=$('sendChatButton');button.disabled=true;try{const user=await ensureSupabaseSession();const {error}=await qiviSupabase.from(CHAT_TABLE).insert({sender_id:user.id,sender_name:state.name.slice(0,40),content:value});if(error)throw error;$('chatInput').value='';$('chatStatus').textContent='Pesan terkirim.';await loadChatMessages();notify('Pesan terkirim ke chat QIVI.')}catch(e){$('chatStatus').textContent='Pesan belum terkirim: '+(e?.message||'periksa tabel dan policy Supabase');notify('Chat belum siap. Periksa konfigurasi Supabase.')}finally{button.disabled=false}}
