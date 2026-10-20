@@ -114,6 +114,7 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
       <div id="liveRemoteWrap" class="hidden"><p class="note">Siaran yang diterima</p><video id="liveRemoteVideo" class="media" autoplay playsinline controls></video></div>
     </div>
     <button class="btn secondary" type="button" onclick="stopLive()">Matikan / Keluar Live</button>
+    <p class="note">Fitur Live menggunakan WebRTC. Kualitas koneksi bergantung pada jaringan; untuk penggunaan luas mungkin diperlukan server TURN.</p>
   </div>
 </section>
 
@@ -224,13 +225,32 @@ function createLivePeerConnection(){
   };
   pc.ontrack=event=>{
     const remote=$('liveRemoteVideo');
-    if(remote){remote.srcObject=event.streams[0]||new MediaStream([event.track]);$('liveRemoteWrap').classList.remove('hidden');remote.play().catch(()=>{});}
-    setLiveStatus(state.liveRole==='host'?'Penonton terhubung dan menerima siaran.':'Terhubung! Kamu sedang menonton QIVI Live.');
+    if(remote){
+      const incoming=event.streams&&event.streams[0]?event.streams[0]:new MediaStream([event.track]);
+      remote.srcObject=incoming;
+      $('liveRemoteWrap').classList.remove('hidden');
+      remote.muted=false;
+      remote.autoplay=true;
+      remote.playsInline=true;
+      const playRemote=()=>remote.play().then(()=>{
+        setLiveStatus('Video diterima. Jika layar masih hitam, periksa koneksi media.');
+      }).catch(()=>{
+        setLiveStatus('Sinyal tersambung, tetapi video belum dapat diputar. Ketuk video lalu tekan Putar.');
+      });
+      playRemote();
+      event.track.onunmute=playRemote;
+      event.track.onended=()=>setLiveStatus('Aliran video berhenti. Host mungkin mematikan kamera atau Live.');
+    }
+    setLiveStatus(state.liveRole==='host'?'Penonton terhubung dan menerima siaran.':'Sinyal tersambung. Menunggu aliran video…');
   };
   pc.onconnectionstatechange=()=>{
-    if(pc.connectionState==='connected')setLiveStatus(state.liveRole==='host'?'Live aktif · penonton terhubung.':'Berhasil terhubung ke siaran Live.');
-    else if(pc.connectionState==='failed')setLiveStatus('Koneksi video gagal. Jaringan mungkin memerlukan server TURN.');
+    if(pc.connectionState==='connected')setLiveStatus(state.liveRole==='host'?'Live aktif · penonton terhubung.':'Koneksi WebRTC aktif. Menunggu video…');
+    else if(pc.connectionState==='failed')setLiveStatus('Koneksi media gagal. Jaringan mungkin memerlukan server TURN.');
     else if(pc.connectionState==='disconnected')setLiveStatus('Koneksi terputus sementara; mencoba menyambung kembali…');
+  };
+  pc.oniceconnectionstatechange=()=>{
+    if(pc.iceConnectionState==='failed')setLiveStatus('Jalur media gagal. Jaringan mungkin memerlukan server TURN.');
+    else if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed')setLiveStatus('Jalur jaringan tersambung. Menunggu video…');
   };
   return pc;
 }
