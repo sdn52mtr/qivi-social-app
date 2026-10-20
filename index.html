@@ -114,7 +114,6 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
       <div id="liveRemoteWrap" class="hidden"><p class="note">Siaran yang diterima</p><video id="liveRemoteVideo" class="media" autoplay playsinline controls></video></div>
     </div>
     <button class="btn secondary" type="button" onclick="stopLive()">Matikan / Keluar Live</button>
-    <p class="note">Fitur Live menggunakan WebRTC. Kualitas koneksi bergantung pada jaringan; untuk penggunaan luas mungkin diperlukan server TURN.</p>
   </div>
 </section>
 
@@ -186,7 +185,7 @@ async function loadRemoteVideos(showNotice=false){if(!qiviSupabase){$('videoServ
 function renderVideos(){const feed=$('videoFeed');feed.replaceChildren();if(!state.videos.length)feed.innerHTML='<div class="empty">Belum ada video di server.</div>';state.videos.forEach(v=>{const c=document.createElement('article');c.className='panel video-card';const rawName=String(v.path||v.id||'');const rawTitle=String(v.title||'');const looksLikeOpaqueName=!rawTitle||rawTitle===rawName||/^lv_[a-zA-Z0-9_-]+\.(mp4|mov|webm|m4v)$/i.test(rawTitle);const h=document.createElement('h3');h.className='video-card-title';h.textContent=looksLikeOpaqueName?'Video QIVI':rawTitle;c.appendChild(h);if(looksLikeOpaqueName&&rawName){const fileLabel=document.createElement('p');fileLabel.className='note video-file-name';fileLabel.textContent='Nama file: '+rawName;c.appendChild(fileLabel)}const m=document.createElement('video');m.className='media';m.controls=true;m.playsInline=true;m.preload='metadata';m.src=v.url;m.addEventListener('error',()=>{let note=c.querySelector('.video-error');if(!note){note=document.createElement('p');note.className='note video-error';note.textContent='Video tidak dapat dimuat. Periksa izin baca bucket Supabase dan alamat file.';c.appendChild(note)}},{once:true});c.appendChild(m);feed.appendChild(c)});$('videoCount').textContent=state.videos.length}
 function makeLiveSessionToken(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)}
 function makeLiveRoomCode(){return 'QIVI-'+Math.random().toString(36).slice(2,8).toUpperCase()}
-function setLiveStatus(message){const el=$('liveStatus');if(el)el.textContent=message}
+function setLiveStatus(message){const el=$('liveStatus');if(el){const hide=['Koneksi WebRTC aktif. Menunggu video…','Jalur jaringan tersambung. Menunggu video…'];el.textContent=hide.includes(message)?'':message;el.classList.toggle('hidden',hide.includes(message)||!message)}}
 function liveErrorMessage(e){return e?.message||String(e||'kesalahan tidak diketahui')}
 async function sendLiveSignal(type,payload,recipientId=null){
   const user=await ensureSupabaseSession();
@@ -244,13 +243,13 @@ function createLivePeerConnection(){
     setLiveStatus(state.liveRole==='host'?'Penonton terhubung dan menerima siaran.':'Sinyal tersambung. Menunggu aliran video…');
   };
   pc.onconnectionstatechange=()=>{
-    if(pc.connectionState==='connected')setLiveStatus(state.liveRole==='host'?'Live aktif · penonton terhubung.':'Koneksi WebRTC aktif. Menunggu video…');
+    if(pc.connectionState==='connected')setLiveStatus(state.liveRole==='host'?'Live aktif · penonton terhubung.':'');
     else if(pc.connectionState==='failed')setLiveStatus('Koneksi media gagal. Jaringan mungkin memerlukan server TURN.');
     else if(pc.connectionState==='disconnected')setLiveStatus('Koneksi terputus sementara; mencoba menyambung kembali…');
   };
   pc.oniceconnectionstatechange=()=>{
     if(pc.iceConnectionState==='failed')setLiveStatus('Jalur media gagal. Jaringan mungkin memerlukan server TURN.');
-    else if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed')setLiveStatus('Jalur jaringan tersambung. Menunggu video…');
+    else if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed')setLiveStatus('');
   };
   return pc;
 }
