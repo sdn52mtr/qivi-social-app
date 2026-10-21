@@ -428,50 +428,46 @@ function karaokeTitleFromFilename(name){
 }
 async function loadRemoteKaraokeSongs(showNotice=false){
   const status=$('karaokeServerStatus');
+  const select=$('roomSongSelect');
   if(!qiviSupabase){
     if(status)status.textContent='Supabase belum termuat. Periksa koneksi internet.';
+    if(select){select.replaceChildren();const option=document.createElement('option');option.value='';option.textContent='Katalog belum tersambung';select.appendChild(option);}
     return;
   }
   if(status)status.textContent='Memuat katalog lagu dari penyimpanan QIVI…';
+  if(select){select.replaceChildren();const option=document.createElement('option');option.value='';option.textContent='Memuat katalog lagu…';select.appendChild(option);}
   try{
-    // The existing uploaded songs are stored in qivi-songs Storage.
-    // Read the bucket and its folders directly so the catalogue does not depend
-    // on a qivi_songs database table being created.
     const bucket=qiviSupabase.storage.from(KARAOKE_BUCKET);
-    const {data:rootItems,error:rootError}=await bucket.list('',{
-      limit:100,sortBy:{column:'name',order:'asc'}
-    });
-    if(rootError)throw rootError;
+    const audioExt=/\.(mp3|mpeg|mp4|m4a|aac|ogg|oga|wav|webm|flac|opus)$/i;
     const paths=[];
-    for(const item of (rootItems||[])){
-      if(!item.name||item.name.startsWith('.'))continue;
-      if(item.id===null || (!item.metadata && !item.updated_at && !item.created_at)){
-        const {data:children,error}=await bucket.list(item.name,{
-          limit:100,sortBy:{column:'name',order:'desc'}
-        });
-        if(error)throw error;
-        (children||[]).forEach(child=>{
-          if(child.name&&!child.name.startsWith('.'))paths.push(item.name+'/'+child.name);
-        });
-      }else{
-        paths.push(item.name);
+    const visited=new Set();
+    async function scanFolder(folder='',depth=0){
+      if(depth>5||visited.has(folder))return;
+      visited.add(folder);
+      const {data:items,error}=await bucket.list(folder,{
+        limit:1000,sortBy:{column:'name',order:'asc'}
+      });
+      if(error)throw error;
+      for(const item of (items||[])){
+        if(!item?.name||item.name.startsWith('.'))continue;
+        const path=folder?folder+'/'+item.name:item.name;
+        if(audioExt.test(item.name)){paths.push(path);continue;}
+        if(item.id===null||item.metadata==null)await scanFolder(path,depth+1);
       }
     }
-    const audioPaths=paths.filter(path=>/\.(mp3|mpeg|mp4|m4a|aac|ogg|oga|wav|webm|flac)$/i.test(path));
-    const remoteSongs=audioPaths.map((path,index)=>{
+    await scanFolder('');
+    const uniquePaths=[...new Set(paths)];
+    const remoteSongs=uniquePaths.map(path=>{
       const filename=path.split('/').pop();
       const {data:publicData}=bucket.getPublicUrl(path);
+      const existing=state.karaokeSongs.find(song=>song.audioPath===path);
       return {
-        id:'storage-song-'+path,
-        serverId:null,
-        title:karaokeTitleFromFilename(filename),
-        singer:'Katalog lagu QIVI',
-        lyrics:'',
-        lyricLines:[],
-        url:publicData.publicUrl,
-        audioPath:path,
-        remote:true,
-        storageSong:true
+        id:'storage-song-'+path,serverId:null,
+        title:existing?.title||karaokeTitleFromFilename(filename),
+        singer:existing?.singer||'Katalog lagu QIVI',
+        lyrics:existing?.lyrics||'',
+        lyricLines:existing?.lyricLines||[],
+        url:publicData.publicUrl,audioPath:path,remote:true,storageSong:true
       };
     });
     const localSongs=state.karaokeSongs.filter(song=>!song.remote);
@@ -479,10 +475,11 @@ async function loadRemoteKaraokeSongs(showNotice=false){
     renderKaraokeSongs();
     renderRoomSongOptions();
     if(status)status.textContent='Penyimpanan lagu tersambung · '+remoteSongs.length+' file audio ditemukan.';
-    if(!remoteSongs.length && status)status.textContent='Belum ditemukan file audio. Jika folder berisi lagu tetapi daftar kosong, periksa kebijakan SELECT pada Storage.';
+    if(!remoteSongs.length&&status)status.textContent='Belum ditemukan file audio di bucket qivi-songs. Periksa apakah lagu sudah diunggah ke bucket ini dan izin SELECT Storage.';
     if(showNotice)notify('Katalog lagu diperbarui: '+remoteSongs.length+' file audio ditemukan.');
   }catch(e){
     if(status)status.textContent='Katalog belum dapat dibaca: '+(e?.message||'periksa izin SELECT pada bucket qivi-songs.');
+    if(select){select.replaceChildren();const option=document.createElement('option');option.value='';option.textContent='Gagal memuat katalog lagu';select.appendChild(option);}
     if(showNotice)notify('Katalog lagu belum dapat dimuat. Periksa kebijakan Storage qivi-songs.');
   }
 }
