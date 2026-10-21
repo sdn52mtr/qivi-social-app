@@ -982,6 +982,12 @@ function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').tex
 window.addEventListener('pagehide',stopCamera);
 $('profileName').textContent=state.name;renderCoins();renderStatuses();renderVideos();loadRemoteVideos();loadRemoteKaraokeSongs();
 $('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/qivi-social-app/service-worker.js')
+      .catch(error => console.error('Service worker:', error));
+  });
+}
 </script>
 </body>
 </html>
