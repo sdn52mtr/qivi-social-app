@@ -211,7 +211,7 @@ const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHAB
 const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null};
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
-function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages()}
+function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs()}
 function updateStatusForm(){const type=$('statusType').value;$('textFields').classList.toggle('hidden',type!=='text');$('fileFields').classList.toggle('hidden',type==='text');clearStatusPreview()}
 function clearStatusPreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}$('statusPreview').replaceChildren()}
 $('statusFile').addEventListener('change',()=>{clearStatusPreview();const f=$('statusFile').files[0];if(!f)return;const type=$('statusType').value;if((type==='image'&&!f.type.startsWith('image/'))||(type==='video'&&!f.type.startsWith('video/')))return notify('Jenis file tidak sesuai pilihan.');if(f.size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');state.previewUrl=URL.createObjectURL(f);const m=document.createElement(type==='image'?'img':'video');m.className='media';m.src=state.previewUrl;if(type==='video'){m.controls=true;m.playsInline=true}else m.alt='Pratinjau foto status';$('statusPreview').appendChild(m)});
@@ -377,34 +377,104 @@ function renderChatMessages(rows){const box=$('chatMessages');box.replaceChildre
 async function loadChatMessages(showNotice=false){if(!qiviSupabase){$('chatStatus').textContent='Supabase belum termuat. Periksa koneksi internet.';return}try{const user=await ensureSupabaseSession();const {data,error}=await qiviSupabase.from(CHAT_TABLE).select('id,sender_id,sender_name,content,created_at').order('created_at',{ascending:true}).limit(100);if(error)throw error;renderChatMessages(data||[]);$('chatStatus').textContent='Chat online siap · '+(data||[]).length+' pesan terbaru dimuat.';state.chatLoaded=true;if(!state.chatChannel){state.chatChannel=qiviSupabase.channel('qivi-public-chat').on('postgres_changes',{event:'INSERT',schema:'public',table:CHAT_TABLE},payload=>{const row=payload.new;if(row){const box=$('chatMessages');const empty=box.querySelector('.empty');if(empty)box.replaceChildren();const item=document.createElement('article');item.className='chat-bubble'+(state.supabaseUser&&row.sender_id===state.supabaseUser.id?' mine':'');const meta=document.createElement('div');meta.className='chat-meta';meta.textContent=(row.sender_name||'Pengguna QIVI')+' · '+(row.created_at?new Date(row.created_at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'baru saja');const body=document.createElement('div');body.textContent=row.content||'';item.append(meta,body);box.appendChild(item);box.scrollTop=box.scrollHeight}}).subscribe(status=>{if(status==='SUBSCRIBED')$('chatStatus').textContent='Chat online terhubung · pesan baru akan muncul otomatis.'})}if(showNotice)notify('Pesan chat berhasil dimuat.')}catch(e){$('chatStatus').textContent='Chat online belum siap: '+(e?.message||'periksa tabel dan policy Supabase');if(showNotice)notify('Chat belum tersambung. Siapkan tabel Supabase sesuai panduan.');if(!$('chatMessages').children.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='Chat online belum dikonfigurasi. Buat tabel dan policy Supabase terlebih dahulu.';$('chatMessages').appendChild(empty)}}}
 async function sendMessage(){const value=$('chatInput').value.trim();if(!value)return notify('Tulis pesan terlebih dahulu.');const button=$('sendChatButton');button.disabled=true;try{const user=await ensureSupabaseSession();const {error}=await qiviSupabase.from(CHAT_TABLE).insert({sender_id:user.id,sender_name:state.name.slice(0,40),content:value});if(error)throw error;$('chatInput').value='';$('chatStatus').textContent='Pesan terkirim.';await loadChatMessages();notify('Pesan terkirim ke chat QIVI.')}catch(e){$('chatStatus').textContent='Pesan belum terkirim: '+(e?.message||'periksa tabel dan policy Supabase');notify('Chat belum siap. Periksa konfigurasi Supabase.')}finally{button.disabled=false}}
 
-function addKaraokeSong(){
+function karaokeAudioUrl(audioPath){
+  const value=String(audioPath||'').trim();
+  if(/^https?:\/\//i.test(value))return value;
+  const {data}=qiviSupabase.storage.from('qivi-songs').getPublicUrl(value);
+  return data.publicUrl;
+}
+async function loadRemoteKaraokeSongs(showNotice=false){
+  const status=$('karaokeServerStatus');
+  if(!qiviSupabase){if(status)status.textContent='Supabase belum termuat. Periksa koneksi internet.';return;}
+  try{
+    const {data,error}=await qiviSupabase.from('qivi_songs')
+      .select('id,title,singer,audio_path,lyrics')
+      .order('id',{ascending:false}).limit(100);
+    if(error)throw error;
+    const localSongs=state.karaokeSongs.filter(song=>!song.serverId);
+    const remoteSongs=(data||[]).map(row=>({
+      id:'server-song-'+row.id,
+      serverId:row.id,
+      title:row.title||'Lagu QIVI',
+      singer:row.singer||'Penyanyi tidak dicantumkan',
+      lyrics:row.lyrics||'',
+      lyricLines:parseKaraokeLyrics(row.lyrics||''),
+      url:karaokeAudioUrl(row.audio_path),
+      audioPath:row.audio_path,
+      remote:true
+    }));
+    state.karaokeSongs=[...localSongs,...remoteSongs];
+    renderKaraokeSongs();
+    if(status)status.textContent='Katalog server tersambung · '+remoteSongs.length+' lagu ditemukan.';
+    if(showNotice)notify('Katalog lagu server berhasil dimuat.');
+  }catch(e){
+    if(status)status.textContent='Katalog server belum dapat dimuat: '+(e?.message||'periksa izin tabel qivi_songs dan koneksi.');
+    if(showNotice)notify('Gagal memuat katalog lagu: '+(e?.message||'kesalahan koneksi'));
+  }
+}
+async function addKaraokeSong(){
   const file=$('karaokeAudio').files[0];
   if(!file)return notify('Pilih file audio dari HP terlebih dahulu.');
   if(!file.type.startsWith('audio/'))return notify('File yang dipilih bukan audio. Pilih file audio.');
   if(file.size>30*1024*1024)return notify('Ukuran audio maksimal 30 MB.');
+  if(!qiviSupabase)return notify('Supabase belum termuat. Periksa koneksi internet.');
   const title=$('karaokeTitle').value.trim()||file.name.replace(/\.[^.]+$/,'');
   const singer=$('karaokeSinger').value.trim()||'Penyanyi tidak dicantumkan';
   const lyrics=$('karaokeLyricsInput').value.trim();
-  const id='song-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
-  const url=URL.createObjectURL(file);
-  state.karaokeSongs.unshift({id,title,singer,lyrics,lyricLines:parseKaraokeLyrics(lyrics),url,fileName:file.name});
-  $('karaokeTitle').value='';$('karaokeSinger').value='';$('karaokeLyricsInput').value='';$('karaokeAudio').value='';
-  renderKaraokeSongs();playKaraokeSong(id);notify('Lagu ditambahkan ke daftar karaoke.');
+  const button=document.querySelector('#nyanyi .karaoke-cover .btn');
+  const oldText=button?button.textContent:'＋ Tambahkan ke daftar lagu';
+  if(button){button.disabled=true;button.textContent='Mengunggah lagu…';}
+  if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Menyiapkan sesi dan mengunggah audio…';
+  let uploadedPath=null;
+  try{
+    const user=await ensureSupabaseSession();
+    const cleanName=safeFilePart(file.name);
+    const ext=(file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'audio';
+    const path=user.id+'/'+Date.now()+'__'+safeFilePart(title)+'__'+cleanName.replace(/\.[^.]+$/,'')+'.'+ext;
+    const {data:uploadData,error:uploadError}=await qiviSupabase.storage
+      .from('qivi-songs').upload(path,file,{cacheControl:'3600',contentType:file.type||'application/octet-stream',upsert:false});
+    if(uploadError)throw new Error('Unggah audio gagal: '+uploadError.message);
+    uploadedPath=uploadData.path;
+    const {data:row,error:insertError}=await qiviSupabase.from('qivi_songs')
+      .insert({title,singer,audio_path:uploadedPath,lyrics})
+      .select('id,title,singer,audio_path,lyrics').single();
+    if(insertError)throw new Error('Audio sudah terunggah, tetapi metadata lagu gagal disimpan: '+insertError.message);
+    const song={
+      id:'server-song-'+row.id,serverId:row.id,title:row.title,singer:row.singer||singer,
+      lyrics:row.lyrics||'',lyricLines:parseKaraokeLyrics(row.lyrics||''),
+      url:karaokeAudioUrl(row.audio_path),audioPath:row.audio_path,remote:true
+    };
+    state.karaokeSongs=[song,...state.karaokeSongs.filter(item=>item.serverId!==row.id)];
+    $('karaokeTitle').value='';$('karaokeSinger').value='';$('karaokeLyricsInput').value='';$('karaokeAudio').value='';
+    renderKaraokeSongs();
+    if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Lagu berhasil disimpan ke server QIVI.';
+    playKaraokeSong(song.id);
+    notify('Lagu berhasil diunggah dan disimpan di katalog QIVI.');
+  }catch(e){
+    const message=e?.message||'kesalahan tidak diketahui';
+    if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Penyimpanan lagu gagal: '+message;
+    notify(message);
+    if(uploadedPath)console.warn('QIVI: audio terunggah tetapi metadata mungkin belum tersimpan.',uploadedPath);
+  }finally{
+    if(button){button.disabled=false;button.textContent=oldText;}
+  }
 }
 function renderKaraokeSongs(){
   const list=$('karaokeSongList');if(!list)return;list.replaceChildren();
-  if(!state.karaokeSongs.length){list.innerHTML='<div class="empty">Belum ada lagu. Tambahkan file audio dari HP kamu.</div>';return;}
+  if(!state.karaokeSongs.length){list.innerHTML='<div class="empty">Belum ada lagu di katalog. Pilih audio dari HP untuk mengunggah lagu ke server QIVI.</div>';return;}
   state.karaokeSongs.forEach(song=>{
     const row=document.createElement('div');row.className='karaoke-row';
     const info=document.createElement('div');info.className='song-info';
     const title=document.createElement('b');title.textContent=song.title;
-    const sub=document.createElement('small');sub.textContent=song.singer;
+    const sub=document.createElement('small');sub.textContent=(song.singer||'Penyanyi tidak dicantumkan')+(song.remote?' · tersimpan di server':' · lokal');
     info.append(title,sub);
     const play=document.createElement('button');play.className='btn small';play.type='button';play.textContent=state.karaokeCurrentId===song.id?'Dipilih':'▶ Putar';play.onclick=()=>playKaraokeSong(song.id);
-    const del=document.createElement('button');del.className='btn secondary small';del.type='button';del.textContent='Hapus';del.onclick=()=>removeKaraokeSong(song.id);
-    row.append(info,play,del);list.appendChild(row);
+    row.append(info,play);
+    if(!song.remote){const del=document.createElement('button');del.className='btn secondary small';del.type='button';del.textContent='Hapus';del.onclick=()=>removeKaraokeSong(song.id);row.appendChild(del);}
+    list.appendChild(row);
   });
 }
+
 function parseKaraokeLyrics(text){
   return String(text||'').split(/\r?\n/).map(line=>{
     const match=line.match(/^\s*\[(\d{1,2}):(\d{2})(?:[.:](\d{1,2}))?\]\s*(.*)$/);
@@ -445,14 +515,15 @@ function karaokeRestart(){
 $('karaokePlayer').addEventListener('timeupdate',()=>{const song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);if(song&&song.lyricLines?.some(line=>line.time!==null))renderKaraokeLyrics(song,$('karaokePlayer').currentTime);});
 function removeKaraokeSong(id){
   const song=state.karaokeSongs.find(item=>item.id===id);if(!song)return;
+  if(song.remote)return notify('Lagu server tidak dihapus dari sini agar katalog bersama tetap aman.');
   if(state.karaokeCurrentId===id){const player=$('karaokePlayer');player.pause();player.removeAttribute('src');player.load();state.karaokeCurrentId=null;$('karaokeNowPlaying').textContent='Pilih lagu dari daftar untuk mulai.';$('karaokeLyrics').textContent='Lirik akan tampil di sini. Untuk sinkronisasi, gunakan format [mm:ss] di awal setiap baris.';}
-  URL.revokeObjectURL(song.url);state.karaokeSongs=state.karaokeSongs.filter(item=>item.id!==id);renderKaraokeSongs();notify('Lagu dihapus dari daftar perangkat ini.');
+  if(song.url&&song.url.startsWith('blob:'))URL.revokeObjectURL(song.url);state.karaokeSongs=state.karaokeSongs.filter(item=>item.id!==id);renderKaraokeSongs();notify('Lagu dihapus dari daftar perangkat ini.');
 }
 
 function editProfile(){const value=prompt('Nama profil:',state.name);if(value&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;renderStatuses();notify('Nama profil diperbarui di perangkat ini.')}}
 function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins}
 window.addEventListener('pagehide',stopCamera);
-$('profileName').textContent=state.name;renderCoins();renderStatuses();renderVideos();loadRemoteVideos();
+$('profileName').textContent=state.name;renderCoins();renderStatuses();renderVideos();loadRemoteVideos();loadRemoteKaraokeSongs();
 $('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
 </script>
 </body>
