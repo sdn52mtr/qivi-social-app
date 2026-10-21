@@ -176,6 +176,68 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
 
+
+/* QIVI SOCIAL APP LAYER — redesigned home, profile, and compact navigation */
+.home-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 0 16px}
+.home-greeting{font-size:13px;color:var(--muted);margin:0 0 3px}
+.home-title{font-size:28px;font-weight:900;letter-spacing:-1px;margin:0}
+.home-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;
+ background:linear-gradient(135deg,#ff5edb,#8954ff 58%,#54a5ff);border:2px solid rgba(255,255,255,.7);
+ box-shadow:0 0 0 4px rgba(155,92,255,.13);font-size:21px}
+.home-search{display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:15px;
+ background:rgba(255,255,255,.045);padding:12px 14px;color:var(--muted);margin-bottom:17px}
+.home-search span:last-child{margin-left:auto;font-size:18px}
+.home-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 1px 10px}
+.home-section-head h3{margin:0;font-size:17px}
+.home-section-head button{border:0;background:none;color:#d8a4ff;font-size:12px;font-weight:750}
+.home-hero{position:relative;overflow:hidden;padding:22px;border-radius:24px;margin-bottom:18px;
+ background:radial-gradient(circle at 90% 12%,rgba(255,79,216,.34),transparent 35%),
+ radial-gradient(circle at 5% 100%,rgba(84,165,255,.28),transparent 38%),linear-gradient(135deg,#342052,#1d1831 62%,#1a2b4c);
+ border:1px solid rgba(255,255,255,.12);box-shadow:0 16px 35px #0003}
+.home-hero .eyebrow{font-size:10px;letter-spacing:2px;font-weight:850;color:#f4b8ff}
+.home-hero h1{max-width:270px;font-size:27px;margin:10px 0 7px;line-height:1.12}
+.home-hero p{font-size:13px;color:#e2d9f0;max-width:290px;margin:0 0 15px}
+.home-hero-art{position:absolute;right:10px;bottom:16px;font-size:65px;opacity:.24;filter:drop-shadow(0 0 15px #c65aff);pointer-events:none}
+.home-hero .btn{position:relative;z-index:1}
+.home-quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.home-quick{min-width:0;border:1px solid rgba(185,135,255,.16);border-radius:17px;padding:12px 5px;
+ background:linear-gradient(145deg,#28203c,#171323);text-align:center;color:var(--text)}
+.home-quick .quick-icon{width:43px;height:43px;margin:0 auto 7px;border-radius:14px;display:grid;place-items:center;
+ background:linear-gradient(145deg,rgba(255,79,216,.2),rgba(84,165,255,.18));font-size:22px}
+.home-quick b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-quick:active{transform:scale(.97)}
+.discovery-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.discovery-card{position:relative;min-height:145px;overflow:hidden;border-radius:19px;padding:14px;
+ background:linear-gradient(145deg,#2a2140,#171322);border:1px solid rgba(185,135,255,.17)}
+.discovery-card .discovery-icon{font-size:30px;margin-bottom:12px}
+.discovery-card b{display:block;font-size:15px}
+.discovery-card small{display:block;color:var(--muted);font-size:11px;margin-top:5px;line-height:1.4}
+.discovery-card button{margin-top:11px;border:1px solid #76549c;border-radius:10px;padding:7px 10px;background:#6d3cae;color:white;font-size:11px;font-weight:750}
+.home-wallet{display:flex;align-items:center;gap:12px;padding:15px;border-radius:18px;
+ background:linear-gradient(110deg,rgba(255,224,138,.12),rgba(155,92,255,.13));border:1px solid rgba(255,224,138,.2)}
+.home-wallet .wallet-icon{font-size:27px}
+.home-wallet .wallet-copy{flex:1;min-width:0}
+.home-wallet small{display:block;color:var(--muted);font-size:11px}
+.home-wallet strong{display:block;font-size:19px;color:var(--gold)}
+.home-wallet button{border:0;border-radius:11px;background:#4c356b;padding:9px 11px;font-weight:750;font-size:12px}
+.profile-cover{height:104px;border-radius:22px 22px 0 0;background:
+ radial-gradient(circle at 80% 10%,rgba(255,79,216,.6),transparent 32%),
+ radial-gradient(circle at 15% 90%,rgba(84,165,255,.5),transparent 40%),linear-gradient(120deg,#432366,#211934 65%,#182c4d);margin:-16px -16px 0}
+.profile-avatar{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;font-size:39px;
+ background:linear-gradient(135deg,#ff5edb,#8954ff,#54a5ff);border:4px solid var(--surface);margin-top:-43px;position:relative}
+.profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0}
+.profile-stat{padding:12px 4px;border-radius:14px;background:rgba(255,255,255,.035);text-align:center}
+.profile-stat strong{display:block;font-size:19px}.profile-stat span{font-size:11px;color:var(--muted)}
+.profile-menu-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.profile-menu{border:0;background:transparent;text-align:center;padding:8px 2px;color:var(--text);font-size:11px}
+.profile-menu span{display:grid;place-items:center;width:48px;height:48px;margin:0 auto 7px;border-radius:16px;
+ background:linear-gradient(145deg,rgba(155,92,255,.25),rgba(255,79,216,.12));font-size:23px}
+.bottom{justify-content:space-around;padding:8px 7px calc(8px + env(safe-area-inset-bottom));}
+.nav{font-size:10px;min-height:48px}
+.nav span{font-size:22px;line-height:1.2}
+.nav.active{background:rgba(155,92,255,.10)}
+@media(max-width:380px){.home-title{font-size:25px}.home-quick-grid{gap:6px}.home-quick{padding:10px 3px}.home-quick .quick-icon{width:39px;height:39px}.profile-menu-grid{gap:4px}.profile-menu span{width:43px;height:43px}}
+
 </style>
 </head>
 <body>
@@ -185,16 +247,38 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 </header>
 <main>
 <section class="page active" id="beranda">
-  <div class="hero"><div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#f7b8ff">✦ SING · SHARE · LIVE</div><h1>Selamat datang di QIVI!</h1><p>Tempat berbagi momen, bernyanyi, dan terhubung dengan teman-temanmu.</p><button class="btn" onclick="openPage('status')">＋ Buat Status</button></div>
-  <div class="panel"><h3>🔴 Status 24 Jam <button class="btn secondary small" style="float:right" onclick="openPage('status')">Lihat</button></h3><div class="story-row" id="homeStories"><div class="empty">Belum ada status.</div></div></div>
-  <div class="panel"><h3>✨ Jelajahi QIVI</h3><div class="grid">
-    <button class="feature" onclick="openPage('video')"><span>🎬</span><b>Video</b><small>Video pendek</small></button>
-    <button class="feature" onclick="openPage('live')"><span>🔴</span><b>Live</b><small>Siaran langsung</small></button>
-    <button class="feature" onclick="openPage('chat')"><span>💬</span><b>Chat</b><small>Obrolan teman</small></button>
-    <button class="feature" onclick="openPage('nyanyi')"><span>🎤</span><b>Bernyanyi</b><small>Panggung karaoke</small></button>
-    <button class="feature" onclick="openPage('rooms')"><span>🎧</span><b>Rooms</b><small>Ruang obrolan</small></button>
-    <button class="feature" onclick="openPage('koin')"><span>🪙</span><b>Koin</b><small>Dompet QIVI</small></button>
-  </div></div>
+  <div class="home-topline">
+    <div><p class="home-greeting">Selamat datang kembali,</p><div class="home-title">Jelajahi QIVI ✨</div></div>
+    <button class="home-avatar" aria-label="Buka profil" onclick="openPage('profil')">👤</button>
+  </div>
+  <div class="home-search" role="button" tabindex="0" onclick="openPage('chat')" onkeydown="if(event.key==='Enter')openPage('chat')">
+    <span>⌕</span><span style="flex:1">Temukan teman dan obrolan...</span><span>☷</span>
+  </div>
+  <div class="home-hero">
+    <div class="eyebrow">QIVI · SING · SHARE · LIVE</div>
+    <h1>Temukan teman. Bagikan ceritamu.</h1>
+    <p>Tempat seru untuk berbagi momen, bernyanyi, dan terhubung.</p>
+    <button class="btn" onclick="openPage('status')">＋ Buat Momen</button>
+    <div class="home-hero-art">✦</div>
+  </div>
+  <div class="home-wallet">
+    <div class="wallet-icon">🪙</div><div class="wallet-copy"><small>Dompet QIVI kamu</small><strong><span id="coinHome">100</span> Koin</strong></div>
+    <button onclick="openPage('koin')">Lihat dompet ›</button>
+  </div>
+  <div class="home-section-head"><h3>Momen teman</h3><button onclick="openPage('status')">Lihat semua ›</button></div>
+  <div class="story-row" id="homeStories"><div class="empty">Belum ada status.</div></div>
+  <div class="home-section-head"><h3>Jelajahi QIVI</h3><span class="note">Pilih aktivitas</span></div>
+  <div class="home-quick-grid">
+    <button class="home-quick" onclick="openPage('video')"><span class="quick-icon">🎬</span><b>Video</b></button>
+    <button class="home-quick" onclick="openPage('live')"><span class="quick-icon">🔴</span><b>Live</b></button>
+    <button class="home-quick" onclick="openPage('nyanyi')"><span class="quick-icon">🎤</span><b>Nyanyi</b></button>
+    <button class="home-quick" onclick="openPage('rooms')"><span class="quick-icon">🎧</span><b>Rooms</b></button>
+  </div>
+  <div class="home-section-head"><h3>Mulai berinteraksi</h3></div>
+  <div class="discovery-list">
+    <article class="discovery-card"><div class="discovery-icon">💬</div><b>Obrolan QIVI</b><small>Sapa teman dan ikut percakapan bersama.</small><button onclick="openPage('chat')">Buka chat ›</button></article>
+    <article class="discovery-card"><div class="discovery-icon">🌟</div><b>Bagikan momen</b><small>Ceritakan harimu lewat teks, foto, atau video.</small><button onclick="openPage('status')">Buat momen ›</button></article>
+  </div>
 </section>
 
 <section class="page" id="status">
@@ -327,18 +411,46 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 </section>
 
 <section class="page" id="profil">
-  <h2>👤 Profil</h2><div class="panel" style="text-align:center"><div style="font-size:60px">👤</div><h3 id="profileName">Pengguna QIVI</h3><p class="muted">Sing · Share · Live</p><button class="btn secondary" onclick="editProfile()">Edit Nama</button><div class="grid" style="margin-top:16px"><div class="panel"><b id="statusCount">0</b><small class="muted" style="display:block">Status lokal</small></div><div class="panel"><b id="videoCount">0</b><small class="muted" style="display:block">Video demo</small></div></div></div>
+  <div class="panel" style="padding-top:16px;overflow:hidden">
+    <div class="profile-cover"></div>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px">
+      <div class="profile-avatar">👤</div>
+      <button class="btn secondary small" onclick="editProfile()">✎ Edit profil</button>
+    </div>
+    <h2 id="profileName" style="margin:12px 0 3px">Pengguna QIVI</h2>
+    <p class="muted" style="margin:0;font-size:13px">Sing · Share · Live ✨</p>
+    <div class="profile-stats">
+      <div class="profile-stat"><strong>0</strong><span>Mengikuti</span></div>
+      <div class="profile-stat"><strong>0</strong><span>Teman</span></div>
+      <div class="profile-stat"><strong>0</strong><span>Pengikut</span></div>
+    </div>
+    <div class="home-wallet"><div class="wallet-icon">🪙</div><div class="wallet-copy"><small>Saldo demo</small><strong><span id="profileCoins">100</span> Koin</strong></div><button onclick="openPage('koin')">Dompet ›</button></div>
+  </div>
+  <div class="panel">
+    <h3 style="margin-bottom:14px">Fitur kamu</h3>
+    <div class="profile-menu-grid">
+      <button class="profile-menu" onclick="openPage('koin')"><span>🪙</span>Dompet</button>
+      <button class="profile-menu" onclick="openPage('status')"><span>✨</span>Momen</button>
+      <button class="profile-menu" onclick="openPage('video')"><span>🎬</span>Video saya</button>
+      <button class="profile-menu" onclick="openPage('rooms')"><span>🎧</span>Rooms</button>
+      <button class="profile-menu" onclick="openPage('nyanyi')"><span>🎤</span>Karaoke</button>
+      <button class="profile-menu" onclick="openPage('live')"><span>🔴</span>QIVI Live</button>
+      <button class="profile-menu" onclick="openPage('chat')"><span>💬</span>Pesan</button>
+      <button class="profile-menu" onclick="notify('Pengaturan akun akan kita kembangkan berikutnya.')"><span>⚙️</span>Pengaturan</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="panel"><b id="statusCount">0</b><small class="muted" style="display:block">Status lokal</small></div>
+    <div class="panel"><b id="videoCount">0</b><small class="muted" style="display:block">Video server</small></div>
+  </div>
 </section>
 </main>
 <nav class="bottom" aria-label="Navigasi utama">
-<button class="nav active" data-page="beranda" onclick="openPage('beranda')"><span>⌂</span>Beranda</button>
-<button class="nav" data-page="status" onclick="openPage('status')"><span>🔴</span>Status</button>
-<button class="nav" data-page="video" onclick="openPage('video')"><span>▶</span>Video</button>
-<button class="nav" data-page="live" onclick="openPage('live')"><span>🔴</span>Live</button>
-<button class="nav" data-page="chat" onclick="openPage('chat')"><span>💬</span>Chat</button>
-<button class="nav" data-page="nyanyi" onclick="openPage('nyanyi')"><span>🎤</span>Nyanyi</button>
-<button class="nav" data-page="rooms" onclick="openPage('rooms')"><span>🎧</span>Rooms</button>
-<button class="nav" data-page="profil" onclick="openPage('profil')"><span>👤</span>Profil</button>
+ <button class="nav active" data-page="beranda" onclick="openPage('beranda')"><span>⌂</span>Home</button>
+ <button class="nav" data-page="status" onclick="openPage('status')"><span>◉</span>Momen</button>
+ <button class="nav" data-page="rooms" onclick="openPage('rooms')"><span>♧</span>Room</button>
+ <button class="nav" data-page="chat" onclick="openPage('chat')"><span>▢</span>Pesan</button>
+ <button class="nav" data-page="profil" onclick="openPage('profil')"><span>☺</span>Saya</button>
 </nav>
 <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -978,7 +1090,7 @@ $('karaokePlayer').addEventListener('pause',()=>{
 });
 
 function editProfile(){const value=prompt('Nama profil:',state.name);if(value&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;renderStatuses();notify('Nama profil diperbarui di perangkat ini.')}}
-function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins}
+function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins;if($('coinHome'))$('coinHome').textContent=state.coins;if($('profileCoins'))$('profileCoins').textContent=state.coins}
 window.addEventListener('pagehide',stopCamera);
 $('profileName').textContent=state.name;renderCoins();renderStatuses();renderVideos();loadRemoteVideos();loadRemoteKaraokeSongs();
 $('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
