@@ -203,7 +203,8 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
     <select id="roomSongSelect"><option value="">Memuat katalog lagu…</option></select>
     <div class="grid">
       <button class="btn" type="button" onclick="shareRoomSong()">🎵 Bagikan lagu</button>
-      <button class="btn secondary" type="button" onclick="broadcastRoomPlayback()">▶ Bagikan posisi & putar</button>
+      <button class="btn secondary" type="button" onclick="broadcastRoomPlayback()">▶ Putar bersama</button>
+      <button class="btn secondary" type="button" onclick="broadcastRoomPause()">⏸ Jeda bersama</button>
     </div>
     <p class="note">Setiap HP tetap memutar audionya sendiri. Sinkronisasi waktu dapat sedikit berbeda tergantung jaringan dan browser.</p>
   </div>
@@ -653,17 +654,10 @@ async function joinMusicRoom(){
     });
     channel.on('broadcast',{event:'room-playback'},payload=>{
       const d=payload.payload||{};
-      const song=state.karaokeSongs.find(item=>item.audioPath===d.audioPath||item.title===d.title);
+      const song=state.karaokeSongs.find(item=>(d.audioPath&&item.audioPath===d.audioPath)||item.title===d.title);
       if(!song)return;
-      state.musicRoomApplyingRemote=true;
-      playKaraokeSong(song.id);
-      const player=$('karaokePlayer');
-      const setTime=()=>{try{player.currentTime=Math.max(0,Number(d.time)||0)}catch{}};
-      if(player.readyState>=1)setTime();else player.addEventListener('loadedmetadata',setTime,{once:true});
-      if(d.action==='pause'){player.pause();}
-      else if(d.action==='play'){player.play().catch(()=>notify('Lagu diterima. Tekan Putar di Karaoke jika belum berbunyi.'));}
-      setTimeout(()=>{state.musicRoomApplyingRemote=false},1200);
-      appendMusicRoomMessage(d.name,'Menyinkronkan lagu: '+song.title);
+      applyRoomPlayback(song,d).catch(()=>notify('Perintah lagu diterima. Jika audio belum berjalan, buka Nyanyi lalu tekan Putar.'));
+      appendMusicRoomMessage(d.name,(d.action==='pause'?'Menjeda lagu: ':'Memutar bersama: ')+song.title);
     });
     channel.subscribe(status=>{
       if(status==='SUBSCRIBED'){
@@ -713,19 +707,55 @@ async function shareRoomSong(){
     notify('Lagu dibagikan ke ruang. Teman dapat memilihnya di katalog Karaoke.');
   }catch(e){notify('Gagal membagikan lagu: '+(e?.message||'koneksi bermasalah'));}
 }
-async function broadcastRoomPlayback(){
+async function applyRoomPlayback(song,d){
+  const player=$('karaokePlayer');
+  state.musicRoomApplyingRemote=true;
+  try{
+    if(state.karaokeCurrentId!==song.id||!player.src){
+      state.karaokeCurrentId=song.id;
+      player.src=song.url;
+      player.load();
+      $('karaokeNowPlaying').textContent='🎵 '+song.title+' — '+(song.singer||'Penyanyi tidak dicantumkan');
+      renderKaraokeLyrics(song,0);
+      renderKaraokeSongs();
+    }
+    if(player.readyState<1){
+      await new Promise((resolve,reject)=>{
+        const done=()=>{cleanup();resolve()};
+        const fail=()=>{cleanup();reject(new Error('Audio tidak dapat dimuat'))};
+        const cleanup=()=>{player.removeEventListener('loadedmetadata',done);player.removeEventListener('error',fail)};
+        player.addEventListener('loadedmetadata',done,{once:true});
+        player.addEventListener('error',fail,{once:true});
+      });
+    }
+    try{player.currentTime=Math.max(0,Number(d.time)||0)}catch{}
+    if(d.action==='pause')player.pause();
+    else if(d.action==='play')await player.play();
+  }finally{
+    setTimeout(()=>{state.musicRoomApplyingRemote=false},700);
+  }
+}
+async function sendRoomPlayback(action){
   if(!state.musicRoomJoined||!state.musicRoomChannel)return notify('Gabung ke ruang terlebih dahulu.');
   const song=state.karaokeSongs.find(item=>item.id===$('roomSongSelect').value)||state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);
   if(!song)return notify('Pilih lagu terlebih dahulu.');
-  if(state.karaokeCurrentId!==song.id)playKaraokeSong(song.id);
   const player=$('karaokePlayer');
-  const action=player.paused?'play':'play';
+  if(state.karaokeCurrentId!==song.id){
+    state.karaokeCurrentId=song.id;player.src=song.url;player.load();
+    $('karaokeNowPlaying').textContent='🎵 '+song.title+' — '+(song.singer||'Penyanyi tidak dicantumkan');
+    renderKaraokeLyrics(song,0);renderKaraokeSongs();
+  }
+  if(action==='play'){
+    try{await player.play()}catch{notify('Lagu dipilih. Jika belum berbunyi, buka Nyanyi lalu tekan Putar.');}
+  }else player.pause();
   try{
     await state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number(player.currentTime)||0,action}});
-    appendMusicRoomMessage(state.name,'Membagikan posisi lagu: '+song.title);
-    notify('Perintah lagu dibagikan ke ruang.');
+    appendMusicRoomMessage(state.name,(action==='pause'?'Menjeda':'Memutar')+' bersama: '+song.title);
+    notify(action==='pause'?'Perintah jeda dibagikan ke ruang.':'Perintah putar dibagikan ke ruang.');
   }catch(e){notify('Gagal menyinkronkan lagu: '+(e?.message||'koneksi bermasalah'));}
 }
+function broadcastRoomPlayback(){return sendRoomPlayback('play')}
+function broadcastRoomPause(){return sendRoomPlayback('pause')}
 $('musicRoomMessage').addEventListener('keydown',event=>{
   if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMusicRoomMessage();}
 });
