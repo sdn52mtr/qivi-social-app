@@ -171,8 +171,10 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
     <div id="karaokeLyrics" class="karaoke-lyrics">Lirik akan tampil di sini. Untuk sinkronisasi, gunakan format [mm:ss] di awal setiap baris.</div><p class="note">Contoh: [00:05] Indonesia tanah airku — setiap baris akan menyala sesuai waktu audio.</p>
   </div>
   <div class="panel">
-    <h3>📚 Daftar lagu saya</h3>
-    <div id="karaokeSongList"><div class="empty">Belum ada lagu. Tambahkan file audio dari HP kamu.</div></div>
+    <h3>📚 Katalog lagu QIVI</h3>
+    <p id="karaokeServerStatus" class="note" aria-live="polite">Memuat lagu dari server…</p>
+    <button class="btn secondary small" type="button" onclick="loadRemoteKaraokeSongs(true)">↻ Muat ulang katalog lagu</button>
+    <div id="karaokeSongList"><div class="empty">Memuat lagu dari server…</div></div>
   </div>
 </section>
 
@@ -206,6 +208,7 @@ const $=id=>document.getElementById(id);
 const SUPABASE_URL='https://pcpskybnqrjiqpowcswh.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_qHqEoQgximH5TGC1oski0Q_N7k8rnff';
 const VIDEO_BUCKET='qivi-videos';
+const KARAOKE_BUCKET='qivi-songs';
 const CHAT_TABLE='qivi_chat_messages';
 const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) || null;
 const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null};
@@ -380,36 +383,72 @@ async function sendMessage(){const value=$('chatInput').value.trim();if(!value)r
 function karaokeAudioUrl(audioPath){
   const value=String(audioPath||'').trim();
   if(/^https?:\/\//i.test(value))return value;
-  const {data}=qiviSupabase.storage.from('qivi-songs').getPublicUrl(value);
+  const {data}=qiviSupabase.storage.from(KARAOKE_BUCKET).getPublicUrl(value);
   return data.publicUrl;
+}
+function karaokeTitleFromFilename(name){
+  let title=String(name||'Lagu QIVI').replace(/\.[^.]+$/,'');
+  title=title.replace(/^\d+__/,'').replace(/__/g,' — ').replace(/[_-]+/g,' ').trim();
+  title=title.replace(/\bKARAOKE\b/ig,'').replace(/\bTANPA VOKAL\b/ig,'').replace(/\s+/g,' ').trim();
+  return title||'Lagu QIVI';
 }
 async function loadRemoteKaraokeSongs(showNotice=false){
   const status=$('karaokeServerStatus');
-  if(!qiviSupabase){if(status)status.textContent='Supabase belum termuat. Periksa koneksi internet.';return;}
+  if(!qiviSupabase){
+    if(status)status.textContent='Supabase belum termuat. Periksa koneksi internet.';
+    return;
+  }
+  if(status)status.textContent='Memuat katalog lagu dari penyimpanan QIVI…';
   try{
-    const {data,error}=await qiviSupabase.from('qivi_songs')
-      .select('id,title,singer,audio_path,lyrics')
-      .order('id',{ascending:false}).limit(100);
-    if(error)throw error;
-    const localSongs=state.karaokeSongs.filter(song=>!song.serverId);
-    const remoteSongs=(data||[]).map(row=>({
-      id:'server-song-'+row.id,
-      serverId:row.id,
-      title:row.title||'Lagu QIVI',
-      singer:row.singer||'Penyanyi tidak dicantumkan',
-      lyrics:row.lyrics||'',
-      lyricLines:parseKaraokeLyrics(row.lyrics||''),
-      url:karaokeAudioUrl(row.audio_path),
-      audioPath:row.audio_path,
-      remote:true
-    }));
+    // The existing uploaded songs are stored in qivi-songs Storage.
+    // Read the bucket and its folders directly so the catalogue does not depend
+    // on a qivi_songs database table being created.
+    const bucket=qiviSupabase.storage.from(KARAOKE_BUCKET);
+    const {data:rootItems,error:rootError}=await bucket.list('',{
+      limit:100,sortBy:{column:'name',order:'asc'}
+    });
+    if(rootError)throw rootError;
+    const paths=[];
+    for(const item of (rootItems||[])){
+      if(!item.name||item.name.startsWith('.'))continue;
+      if(item.id===null || (!item.metadata && !item.updated_at && !item.created_at)){
+        const {data:children,error}=await bucket.list(item.name,{
+          limit:100,sortBy:{column:'name',order:'desc'}
+        });
+        if(error)throw error;
+        (children||[]).forEach(child=>{
+          if(child.name&&!child.name.startsWith('.'))paths.push(item.name+'/'+child.name);
+        });
+      }else{
+        paths.push(item.name);
+      }
+    }
+    const audioPaths=paths.filter(path=>/\.(mp3|mpeg|mp4|m4a|aac|ogg|oga|wav|webm|flac)$/i.test(path));
+    const remoteSongs=audioPaths.map((path,index)=>{
+      const filename=path.split('/').pop();
+      const {data:publicData}=bucket.getPublicUrl(path);
+      return {
+        id:'storage-song-'+path,
+        serverId:null,
+        title:karaokeTitleFromFilename(filename),
+        singer:'Katalog lagu QIVI',
+        lyrics:'',
+        lyricLines:[],
+        url:publicData.publicUrl,
+        audioPath:path,
+        remote:true,
+        storageSong:true
+      };
+    });
+    const localSongs=state.karaokeSongs.filter(song=>!song.remote);
     state.karaokeSongs=[...localSongs,...remoteSongs];
     renderKaraokeSongs();
-    if(status)status.textContent='Katalog server tersambung · '+remoteSongs.length+' lagu ditemukan.';
-    if(showNotice)notify('Katalog lagu server berhasil dimuat.');
+    if(status)status.textContent='Penyimpanan lagu tersambung · '+remoteSongs.length+' file audio ditemukan.';
+    if(!remoteSongs.length && status)status.textContent='Belum ditemukan file audio. Jika folder berisi lagu tetapi daftar kosong, periksa kebijakan SELECT pada Storage.';
+    if(showNotice)notify('Katalog lagu diperbarui: '+remoteSongs.length+' file audio ditemukan.');
   }catch(e){
-    if(status)status.textContent='Katalog server belum dapat dimuat: '+(e?.message||'periksa izin tabel qivi_songs dan koneksi.');
-    if(showNotice)notify('Gagal memuat katalog lagu: '+(e?.message||'kesalahan koneksi'));
+    if(status)status.textContent='Katalog belum dapat dibaca: '+(e?.message||'periksa izin SELECT pada bucket qivi-songs.');
+    if(showNotice)notify('Katalog lagu belum dapat dimuat. Periksa kebijakan Storage qivi-songs.');
   }
 }
 async function addKaraokeSong(){
@@ -425,36 +464,37 @@ async function addKaraokeSong(){
   const oldText=button?button.textContent:'＋ Tambahkan ke daftar lagu';
   if(button){button.disabled=true;button.textContent='Mengunggah lagu…';}
   if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Menyiapkan sesi dan mengunggah audio…';
-  let uploadedPath=null;
   try{
     const user=await ensureSupabaseSession();
     const cleanName=safeFilePart(file.name);
-    const ext=(file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'audio';
+    const ext=(file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'mp3';
     const path=user.id+'/'+Date.now()+'__'+safeFilePart(title)+'__'+cleanName.replace(/\.[^.]+$/,'')+'.'+ext;
     const {data:uploadData,error:uploadError}=await qiviSupabase.storage
-      .from('qivi-songs').upload(path,file,{cacheControl:'3600',contentType:file.type||'application/octet-stream',upsert:false});
+      .from(KARAOKE_BUCKET).upload(path,file,{cacheControl:'3600',contentType:file.type||'audio/mpeg',upsert:false});
     if(uploadError)throw new Error('Unggah audio gagal: '+uploadError.message);
-    uploadedPath=uploadData.path;
-    const {data:row,error:insertError}=await qiviSupabase.from('qivi_songs')
-      .insert({title,singer,audio_path:uploadedPath,lyrics})
-      .select('id,title,singer,audio_path,lyrics').single();
-    if(insertError)throw new Error('Audio sudah terunggah, tetapi metadata lagu gagal disimpan: '+insertError.message);
+    const {data:publicData}=qiviSupabase.storage.from(KARAOKE_BUCKET).getPublicUrl(uploadData.path);
     const song={
-      id:'server-song-'+row.id,serverId:row.id,title:row.title,singer:row.singer||singer,
-      lyrics:row.lyrics||'',lyricLines:parseKaraokeLyrics(row.lyrics||''),
-      url:karaokeAudioUrl(row.audio_path),audioPath:row.audio_path,remote:true
+      id:'storage-song-'+uploadData.path,
+      serverId:null,
+      title,
+      singer,
+      lyrics,
+      lyricLines:parseKaraokeLyrics(lyrics),
+      url:publicData.publicUrl,
+      audioPath:uploadData.path,
+      remote:true,
+      storageSong:true
     };
-    state.karaokeSongs=[song,...state.karaokeSongs.filter(item=>item.serverId!==row.id)];
+    state.karaokeSongs=[song,...state.karaokeSongs.filter(item=>item.id!==song.id)];
     $('karaokeTitle').value='';$('karaokeSinger').value='';$('karaokeLyricsInput').value='';$('karaokeAudio').value='';
     renderKaraokeSongs();
-    if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Lagu berhasil disimpan ke server QIVI.';
+    if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Lagu berhasil diunggah ke penyimpanan QIVI.';
     playKaraokeSong(song.id);
-    notify('Lagu berhasil diunggah dan disimpan di katalog QIVI.');
+    notify('Lagu berhasil diunggah ke penyimpanan QIVI.');
   }catch(e){
     const message=e?.message||'kesalahan tidak diketahui';
     if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Penyimpanan lagu gagal: '+message;
     notify(message);
-    if(uploadedPath)console.warn('QIVI: audio terunggah tetapi metadata mungkin belum tersimpan.',uploadedPath);
   }finally{
     if(button){button.disabled=false;button.textContent=oldText;}
   }
