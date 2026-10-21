@@ -72,6 +72,11 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
 .karaoke-row button{flex-shrink:0}
 .karaoke-lyrics{white-space:pre-wrap;overflow-wrap:anywhere;background:#100d1c;border:1px solid var(--border);border-radius:14px;padding:14px;min-height:90px;color:#f4d8ff;line-height:1.8;max-height:340px;overflow-y:auto;text-align:center}.karaoke-line{padding:5px 2px;color:var(--muted);transition:color .15s,transform .15s}.karaoke-line.active{color:#fff;font-weight:850;font-size:1.12em;text-shadow:0 0 16px #ed48d599;transform:scale(1.02)}
 .karaoke-progress{width:100%;accent-color:var(--pink)}
+.room-status{padding:10px 12px;border-radius:12px;background:#131020;border:1px solid var(--border);font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.room-chat{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;margin:10px 0}
+.room-chat-item{padding:9px 11px;border-radius:12px;background:var(--surface2);overflow-wrap:anywhere}
+.room-chat-item small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
+
 
 </style>
 </head>
@@ -179,7 +184,35 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
 </section>
 
 <section class="page" id="rooms">
-  <h2>🎧 QIVI Rooms</h2><div class="panel"><h3>Jelajahi ruangan</h3><button class="room" style="width:100%;text-align:left" onclick="notify('Ruang Musik masih demo. Fitur room online akan disambungkan berikutnya.')"><span class="room-icon">🎵</span><span class="room-info"><b>Ruang Musik</b><small class="muted" style="display:block">Bernyanyi bersama</small></span><span>›</span></button><button class="room" style="width:100%;text-align:left" onclick="notify('Ruang Teman masih demo. Fitur room online akan disambungkan berikutnya.')"><span class="room-icon">💬</span><span class="room-info"><b>Ruang Teman</b><small class="muted" style="display:block">Berkenalan dan mengobrol</small></span><span>›</span></button><button class="room" style="width:100%;text-align:left" onclick="notify('Ruang Games masih demo. Fitur room online akan disambungkan berikutnya.')"><span class="room-icon">🎮</span><span class="room-info"><b>Ruang Games</b><small class="muted" style="display:block">Main bersama teman</small></span><span>›</span></button></div>
+  <h2>🎧 QIVI Rooms</h2>
+  <div class="panel">
+    <h3>🎵 Bernyanyi bersama</h3>
+    <p class="muted">Masuk ke nama ruang yang sama dengan teman. Lagu yang dipilih, perintah putar/jeda, dan pesan ruang akan dibagikan melalui koneksi realtime QIVI.</p>
+    <label for="roomNameInput">Nama ruang</label>
+    <input id="roomNameInput" maxlength="40" autocomplete="off" placeholder="Contoh: Ruang Musik QIVI" value="Ruang Musik QIVI">
+    <div class="grid">
+      <button class="btn" type="button" id="joinMusicRoomButton" onclick="joinMusicRoom()">🎧 Gabung ruang</button>
+      <button class="btn secondary" type="button" onclick="leaveMusicRoom(true)">Keluar ruang</button>
+    </div>
+    <p id="musicRoomStatus" class="room-status" aria-live="polite">Belum bergabung ke ruang. Gunakan nama ruang yang sama di perangkat teman.</p>
+  </div>
+  <div class="panel">
+    <h3>🎤 Lagu bersama</h3>
+    <p class="note">Pilih lagu dari katalog QIVI, lalu tekan bagikan lagu. Teman di ruang yang sama dapat memilih lagu itu dan memulai pemutaran di perangkat mereka.</p>
+    <label for="roomSongSelect">Pilih lagu</label>
+    <select id="roomSongSelect"><option value="">Memuat katalog lagu…</option></select>
+    <div class="grid">
+      <button class="btn" type="button" onclick="shareRoomSong()">🎵 Bagikan lagu</button>
+      <button class="btn secondary" type="button" onclick="broadcastRoomPlayback()">▶ Bagikan posisi & putar</button>
+    </div>
+    <p class="note">Setiap HP tetap memutar audionya sendiri. Sinkronisasi waktu dapat sedikit berbeda tergantung jaringan dan browser.</p>
+  </div>
+  <div class="panel">
+    <h3>💬 Obrolan ruang</h3>
+    <div id="musicRoomChat" class="room-chat"><div class="empty">Gabung ruang untuk mulai mengobrol.</div></div>
+    <label for="musicRoomMessage">Pesan untuk teman di ruang</label>
+    <div class="chat-compose"><textarea id="musicRoomMessage" maxlength="500" rows="2" placeholder="Tulis pesan..." disabled></textarea><button class="btn" type="button" id="sendRoomMessageButton" onclick="sendMusicRoomMessage()" disabled>Kirim</button></div>
+  </div>
 </section>
 
 <section class="page" id="koin">
@@ -211,10 +244,10 @@ const VIDEO_BUCKET='qivi-videos';
 const KARAOKE_BUCKET='qivi-songs';
 const CHAT_TABLE='qivi_chat_messages';
 const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) || null;
-const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null};
+const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null,musicRoomChannel:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRemote:false};
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
-function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs()}
+function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
 function updateStatusForm(){const type=$('statusType').value;$('textFields').classList.toggle('hidden',type!=='text');$('fileFields').classList.toggle('hidden',type==='text');clearStatusPreview()}
 function clearStatusPreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}$('statusPreview').replaceChildren()}
 $('statusFile').addEventListener('change',()=>{clearStatusPreview();const f=$('statusFile').files[0];if(!f)return;const type=$('statusType').value;if((type==='image'&&!f.type.startsWith('image/'))||(type==='video'&&!f.type.startsWith('video/')))return notify('Jenis file tidak sesuai pilihan.');if(f.size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');state.previewUrl=URL.createObjectURL(f);const m=document.createElement(type==='image'?'img':'video');m.className='media';m.src=state.previewUrl;if(type==='video'){m.controls=true;m.playsInline=true}else m.alt='Pratinjau foto status';$('statusPreview').appendChild(m)});
@@ -443,6 +476,7 @@ async function loadRemoteKaraokeSongs(showNotice=false){
     const localSongs=state.karaokeSongs.filter(song=>!song.remote);
     state.karaokeSongs=[...localSongs,...remoteSongs];
     renderKaraokeSongs();
+    renderRoomSongOptions();
     if(status)status.textContent='Penyimpanan lagu tersambung · '+remoteSongs.length+' file audio ditemukan.';
     if(!remoteSongs.length && status)status.textContent='Belum ditemukan file audio. Jika folder berisi lagu tetapi daftar kosong, periksa kebijakan SELECT pada Storage.';
     if(showNotice)notify('Katalog lagu diperbarui: '+remoteSongs.length+' file audio ditemukan.');
@@ -559,6 +593,154 @@ function removeKaraokeSong(id){
   if(state.karaokeCurrentId===id){const player=$('karaokePlayer');player.pause();player.removeAttribute('src');player.load();state.karaokeCurrentId=null;$('karaokeNowPlaying').textContent='Pilih lagu dari daftar untuk mulai.';$('karaokeLyrics').textContent='Lirik akan tampil di sini. Untuk sinkronisasi, gunakan format [mm:ss] di awal setiap baris.';}
   if(song.url&&song.url.startsWith('blob:'))URL.revokeObjectURL(song.url);state.karaokeSongs=state.karaokeSongs.filter(item=>item.id!==id);renderKaraokeSongs();notify('Lagu dihapus dari daftar perangkat ini.');
 }
+
+function setMusicRoomStatus(message){
+  const el=$('musicRoomStatus');
+  if(el)el.textContent=message;
+}
+function renderRoomSongOptions(){
+  const select=$('roomSongSelect');
+  if(!select)return;
+  const previous=select.value;
+  select.replaceChildren();
+  const songs=state.karaokeSongs||[];
+  if(!songs.length){
+    const option=document.createElement('option');
+    option.value='';option.textContent='Belum ada lagu di katalog';
+    select.appendChild(option);return;
+  }
+  songs.forEach(song=>{
+    const option=document.createElement('option');
+    option.value=song.id;
+    option.textContent=song.title+(song.singer?' — '+song.singer:'');
+    select.appendChild(option);
+  });
+  if(songs.some(song=>song.id===previous))select.value=previous;
+  else if(state.karaokeCurrentId&&songs.some(song=>song.id===state.karaokeCurrentId))select.value=state.karaokeCurrentId;
+}
+function appendMusicRoomMessage(name,message,system=false){
+  const box=$('musicRoomChat');if(!box)return;
+  const empty=box.querySelector('.empty');if(empty)box.replaceChildren();
+  const item=document.createElement('div');item.className='room-chat-item';
+  const meta=document.createElement('small');meta.textContent=system?'QIVI Rooms':String(name||'Teman QIVI').slice(0,40);
+  const body=document.createElement('div');body.textContent=String(message||'').slice(0,500);
+  item.append(meta,body);box.appendChild(item);box.scrollTop=box.scrollHeight;
+  while(box.children.length>60)box.firstElementChild.remove();
+}
+async function joinMusicRoom(){
+  if(!qiviSupabase)return notify('Supabase belum termuat. Periksa koneksi internet.');
+  const raw=$('roomNameInput').value.trim();
+  if(!raw)return notify('Masukkan nama ruang terlebih dahulu.');
+  const roomKey=raw.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
+  if(!roomKey)return notify('Nama ruang tidak valid.');
+  const button=$('joinMusicRoomButton');button.disabled=true;
+  try{
+    await leaveMusicRoom(false);
+    await ensureSupabaseSession();
+    const channel=qiviSupabase.channel('qivi-music-room-'+roomKey,{
+      config:{broadcast:{self:false}}
+    });
+    channel.on('broadcast',{event:'room-message'},payload=>{
+      const d=payload.payload||{};
+      appendMusicRoomMessage(d.name,d.message,false);
+    });
+    channel.on('broadcast',{event:'room-song'},payload=>{
+      const d=payload.payload||{};
+      appendMusicRoomMessage(d.name,'Membagikan lagu: '+(d.title||'Lagu QIVI'));
+      const select=$('roomSongSelect');
+      const match=state.karaokeSongs.find(song=>song.audioPath===d.audioPath||song.title===d.title);
+      if(match&&select)select.value=match.id;
+    });
+    channel.on('broadcast',{event:'room-playback'},payload=>{
+      const d=payload.payload||{};
+      const song=state.karaokeSongs.find(item=>item.audioPath===d.audioPath||item.title===d.title);
+      if(!song)return;
+      state.musicRoomApplyingRemote=true;
+      playKaraokeSong(song.id);
+      const player=$('karaokePlayer');
+      const setTime=()=>{try{player.currentTime=Math.max(0,Number(d.time)||0)}catch{}};
+      if(player.readyState>=1)setTime();else player.addEventListener('loadedmetadata',setTime,{once:true});
+      if(d.action==='pause'){player.pause();}
+      else if(d.action==='play'){player.play().catch(()=>notify('Lagu diterima. Tekan Putar di Karaoke jika belum berbunyi.'));}
+      setTimeout(()=>{state.musicRoomApplyingRemote=false},1200);
+      appendMusicRoomMessage(d.name,'Menyinkronkan lagu: '+song.title);
+    });
+    channel.subscribe(status=>{
+      if(status==='SUBSCRIBED'){
+        state.musicRoomChannel=channel;state.musicRoomName=raw;state.musicRoomJoined=true;
+        $('musicRoomMessage').disabled=false;$('sendRoomMessageButton').disabled=false;
+        setMusicRoomStatus('Terhubung ke ruang “'+raw+'”. Minta teman bergabung dengan nama ruang yang sama.');
+        appendMusicRoomMessage('QIVI','Kamu bergabung ke ruang “'+raw+'”.',true);
+        renderRoomSongOptions();
+      }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+        setMusicRoomStatus('Koneksi ruang gagal ('+status+'). Periksa koneksi internet dan Supabase Realtime.');
+      }
+    });
+  }catch(e){
+    setMusicRoomStatus('Gagal bergabung: '+(e?.message||'kesalahan koneksi'));
+    notify('QIVI Rooms belum tersambung. Periksa koneksi Supabase.');
+  }finally{button.disabled=false;}
+}
+async function leaveMusicRoom(showNotice=true){
+  const channel=state.musicRoomChannel;
+  if(channel&&qiviSupabase){try{await qiviSupabase.removeChannel(channel)}catch{}}
+  const wasJoined=state.musicRoomJoined;
+  state.musicRoomChannel=null;state.musicRoomName=null;state.musicRoomJoined=false;
+  $('musicRoomMessage').disabled=true;$('sendRoomMessageButton').disabled=true;
+  if($('musicRoomChat'))$('musicRoomChat').innerHTML='<div class="empty">Gabung ruang untuk mulai mengobrol.</div>';
+  setMusicRoomStatus('Belum bergabung ke ruang. Gunakan nama ruang yang sama di perangkat teman.');
+  if(showNotice&&wasJoined)notify('Kamu keluar dari QIVI Rooms.');
+}
+async function sendMusicRoomMessage(){
+  const message=$('musicRoomMessage').value.trim();
+  if(!message)return notify('Tulis pesan untuk ruang terlebih dahulu.');
+  const channel=state.musicRoomChannel;
+  if(!state.musicRoomJoined||!channel)return notify('Gabung ke ruang terlebih dahulu.');
+  try{
+    await channel.send({type:'broadcast',event:'room-message',payload:{name:state.name,message:message.slice(0,500),sentAt:Date.now()}});
+    appendMusicRoomMessage(state.name,message);
+    $('musicRoomMessage').value='';
+  }catch(e){notify('Pesan ruang gagal dikirim: '+(e?.message||'koneksi bermasalah'));}
+}
+async function shareRoomSong(){
+  if(!state.musicRoomJoined||!state.musicRoomChannel)return notify('Gabung ke ruang terlebih dahulu.');
+  renderRoomSongOptions();
+  const song=state.karaokeSongs.find(item=>item.id===$('roomSongSelect').value);
+  if(!song)return notify('Belum ada lagu yang dapat dibagikan.');
+  try{
+    await state.musicRoomChannel.send({type:'broadcast',event:'room-song',payload:{name:state.name,title:song.title,singer:song.singer,audioPath:song.audioPath}});
+    appendMusicRoomMessage(state.name,'Membagikan lagu: '+song.title);
+    notify('Lagu dibagikan ke ruang. Teman dapat memilihnya di katalog Karaoke.');
+  }catch(e){notify('Gagal membagikan lagu: '+(e?.message||'koneksi bermasalah'));}
+}
+async function broadcastRoomPlayback(){
+  if(!state.musicRoomJoined||!state.musicRoomChannel)return notify('Gabung ke ruang terlebih dahulu.');
+  const song=state.karaokeSongs.find(item=>item.id===$('roomSongSelect').value)||state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);
+  if(!song)return notify('Pilih lagu terlebih dahulu.');
+  if(state.karaokeCurrentId!==song.id)playKaraokeSong(song.id);
+  const player=$('karaokePlayer');
+  const action=player.paused?'play':'play';
+  try{
+    await state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number(player.currentTime)||0,action}});
+    appendMusicRoomMessage(state.name,'Membagikan posisi lagu: '+song.title);
+    notify('Perintah lagu dibagikan ke ruang.');
+  }catch(e){notify('Gagal menyinkronkan lagu: '+(e?.message||'koneksi bermasalah'));}
+}
+$('musicRoomMessage').addEventListener('keydown',event=>{
+  if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMusicRoomMessage();}
+});
+$('karaokePlayer').addEventListener('play',()=>{
+  if(state.musicRoomApplyingRemote||!state.musicRoomJoined||!state.musicRoomChannel)return;
+  const song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);
+  if(!song)return;
+  state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number($('karaokePlayer').currentTime)||0,action:'play'}}).catch(()=>{});
+});
+$('karaokePlayer').addEventListener('pause',()=>{
+  if(state.musicRoomApplyingRemote||!state.musicRoomJoined||!state.musicRoomChannel)return;
+  const song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);
+  if(!song)return;
+  state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number($('karaokePlayer').currentTime)||0,action:'pause'}}).catch(()=>{});
+});
 
 function editProfile(){const value=prompt('Nama profil:',state.name);if(value&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;renderStatuses();notify('Nama profil diperbarui di perangkat ini.')}}
 function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins}
