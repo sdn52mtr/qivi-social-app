@@ -70,7 +70,7 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
 .karaoke-row .song-info{flex:1;min-width:0;overflow-wrap:anywhere}
 .karaoke-row .song-info small{display:block;color:var(--muted);margin-top:4px}
 .karaoke-row button{flex-shrink:0}
-.karaoke-lyrics{white-space:pre-wrap;overflow-wrap:anywhere;background:#100d1c;border:1px solid var(--border);border-radius:14px;padding:14px;min-height:90px;color:#f4d8ff;line-height:1.8}
+.karaoke-lyrics{white-space:pre-wrap;overflow-wrap:anywhere;background:#100d1c;border:1px solid var(--border);border-radius:14px;padding:14px;min-height:90px;color:#f4d8ff;line-height:1.8;max-height:340px;overflow-y:auto;text-align:center}.karaoke-line{padding:5px 2px;color:var(--muted);transition:color .15s,transform .15s}.karaoke-line.active{color:#fff;font-weight:850;font-size:1.12em;text-shadow:0 0 16px #ed48d599;transform:scale(1.02)}
 .karaoke-progress{width:100%;accent-color:var(--pink)}
 
 </style>
@@ -155,7 +155,7 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
     <label for="karaokeAudio">Pilih file audio dari HP</label>
     <input id="karaokeAudio" type="file" accept="audio/*">
     <label for="karaokeLyricsInput">Lirik lagu (opsional)</label>
-    <textarea id="karaokeLyricsInput" maxlength="8000" placeholder="Tempel lirik yang kamu miliki atau tulis sendiri..."></textarea>
+    <textarea id="karaokeLyricsInput" maxlength="8000" placeholder="Tulis lirik per baris. Untuk sinkronisasi, awali baris dengan waktu, misalnya [00:12]Indonesia tanah airku..."></textarea>
     <button class="btn" type="button" onclick="addKaraokeSong()">＋ Tambahkan ke daftar lagu</button>
     <p class="note">File audio diputar dari perangkat ini. Daftar lagu hanya tersimpan selama halaman masih terbuka; belum diunggah ke server.</p>
   </div>
@@ -168,7 +168,7 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
       <button class="btn secondary" type="button" onclick="openPage('rooms')">🎧 Jelajahi Rooms</button>
     </div>
     <h3 style="margin-top:16px">📝 Lirik</h3>
-    <div id="karaokeLyrics" class="karaoke-lyrics">Lirik lagu akan tampil di sini jika ditambahkan.</div>
+    <div id="karaokeLyrics" class="karaoke-lyrics">Lirik akan tampil di sini. Untuk sinkronisasi, gunakan format [mm:ss] di awal setiap baris.</div><p class="note">Contoh: [00:05] Indonesia tanah airku — setiap baris akan menyala sesuai waktu audio.</p>
   </div>
   <div class="panel">
     <h3>📚 Daftar lagu saya</h3>
@@ -387,7 +387,7 @@ function addKaraokeSong(){
   const lyrics=$('karaokeLyricsInput').value.trim();
   const id='song-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
   const url=URL.createObjectURL(file);
-  state.karaokeSongs.unshift({id,title,singer,lyrics,url,fileName:file.name});
+  state.karaokeSongs.unshift({id,title,singer,lyrics,lyricLines:parseKaraokeLyrics(lyrics),url,fileName:file.name});
   $('karaokeTitle').value='';$('karaokeSinger').value='';$('karaokeLyricsInput').value='';$('karaokeAudio').value='';
   renderKaraokeSongs();playKaraokeSong(id);notify('Lagu ditambahkan ke daftar karaoke.');
 }
@@ -405,12 +405,36 @@ function renderKaraokeSongs(){
     row.append(info,play,del);list.appendChild(row);
   });
 }
+function parseKaraokeLyrics(text){
+  return String(text||'').split(/\r?\n/).map(line=>{
+    const match=line.match(/^\s*\[(\d{1,2}):(\d{2})(?:[.:](\d{1,2}))?\]\s*(.*)$/);
+    if(!match)return {time:null,text:line.trim()};
+    const fraction=match[3]?Number('0.'+match[3]):0;
+    return {time:Number(match[1])*60+Number(match[2])+fraction,text:match[4]};
+  }).filter(line=>line.text||line.time!==null);
+}
+function renderKaraokeLyrics(song,time=0){
+  const box=$('karaokeLyrics');if(!box)return;box.replaceChildren();
+  if(!song||!song.lyrics){box.textContent='Lirik belum ditambahkan untuk lagu ini.';return;}
+  const lines=song.lyricLines||parseKaraokeLyrics(song.lyrics);
+  const hasTiming=lines.some(line=>line.time!==null);
+  if(!hasTiming){box.textContent=song.lyrics;return;}
+  let activeIndex=-1;
+  lines.forEach((line,index)=>{if(line.time!==null&&line.time<=time)activeIndex=index;});
+  lines.forEach((line,index)=>{
+    const row=document.createElement('div');row.className='karaoke-line'+(index===activeIndex?' active':'');row.textContent=line.text||'♪';
+    box.appendChild(row);
+    if(index===activeIndex)row.dataset.active='true';
+  });
+  const active=box.querySelector('[data-active="true"]');
+  if(active)active.scrollIntoView({block:'center',behavior:'smooth'});
+}
 function playKaraokeSong(id){
   const song=state.karaokeSongs.find(item=>item.id===id);if(!song)return;
   state.karaokeCurrentId=id;
   const player=$('karaokePlayer');player.src=song.url;player.load();
   $('karaokeNowPlaying').textContent='🎵 '+song.title+' — '+song.singer;
-  $('karaokeLyrics').textContent=song.lyrics||'Lirik belum ditambahkan untuk lagu ini.';
+  renderKaraokeLyrics(song,0);
   renderKaraokeSongs();
   player.play().catch(()=>notify('Lagu dipilih. Tekan tombol Putar pada pemutar audio jika belum berbunyi.'));
 }
@@ -418,9 +442,10 @@ function karaokeRestart(){
   const player=$('karaokePlayer');if(!player.src)return notify('Pilih lagu terlebih dahulu.');
   player.currentTime=0;player.play().catch(()=>notify('Tekan Putar untuk memulai lagu dari awal.'));
 }
+$('karaokePlayer').addEventListener('timeupdate',()=>{const song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);if(song&&song.lyricLines?.some(line=>line.time!==null))renderKaraokeLyrics(song,$('karaokePlayer').currentTime);});
 function removeKaraokeSong(id){
   const song=state.karaokeSongs.find(item=>item.id===id);if(!song)return;
-  if(state.karaokeCurrentId===id){const player=$('karaokePlayer');player.pause();player.removeAttribute('src');player.load();state.karaokeCurrentId=null;$('karaokeNowPlaying').textContent='Pilih lagu dari daftar untuk mulai.';$('karaokeLyrics').textContent='Lirik lagu akan tampil di sini jika ditambahkan.';}
+  if(state.karaokeCurrentId===id){const player=$('karaokePlayer');player.pause();player.removeAttribute('src');player.load();state.karaokeCurrentId=null;$('karaokeNowPlaying').textContent='Pilih lagu dari daftar untuk mulai.';$('karaokeLyrics').textContent='Lirik akan tampil di sini. Untuk sinkronisasi, gunakan format [mm:ss] di awal setiap baris.';}
   URL.revokeObjectURL(song.url);state.karaokeSongs=state.karaokeSongs.filter(item=>item.id!==id);renderKaraokeSongs();notify('Lagu dihapus dari daftar perangkat ini.');
 }
 
