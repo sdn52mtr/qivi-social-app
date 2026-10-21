@@ -238,6 +238,39 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 .nav.active{background:rgba(155,92,255,.10)}
 @media(max-width:380px){.home-title{font-size:25px}.home-quick-grid{gap:6px}.home-quick{padding:10px 3px}.home-quick .quick-icon{width:39px;height:39px}.profile-menu-grid{gap:4px}.profile-menu span{width:43px;height:43px}}
 
+
+/* QIVI ROOMS SOCIAL LOBBY — keeps original IDs and realtime handlers */
+#rooms .rooms-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 2px 18px}
+#rooms .rooms-heading h2{margin:0;font-size:27px}
+#rooms .rooms-live-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:30px;background:#203927;color:#a8f5bf;font-size:11px;font-weight:800;white-space:nowrap}
+#rooms .rooms-live-pill i{width:7px;height:7px;background:#54e889;border-radius:50%;display:inline-block;box-shadow:0 0 10px #54e889}
+#rooms .rooms-hero{position:relative;overflow:hidden;border-radius:24px;padding:20px;margin-bottom:16px;background:radial-gradient(circle at 88% 12%,rgba(255,79,216,.35),transparent 35%),radial-gradient(circle at 8% 100%,rgba(84,165,255,.26),transparent 42%),linear-gradient(140deg,#382052,#1d172f 62%,#1c2b49);border:1px solid rgba(218,170,255,.24)}
+#rooms .rooms-hero .rooms-hero-icon{font-size:36px;margin-bottom:10px}
+#rooms .rooms-hero h3{font-size:22px;margin:0 0 7px}
+#rooms .rooms-hero p{font-size:13px;color:#ded4ee;line-height:1.55;margin:0 0 15px;max-width:360px}
+#rooms .rooms-room-card{padding:17px;border-radius:22px;background:linear-gradient(145deg,rgba(30,24,46,.98),rgba(17,14,28,.98));border:1px solid rgba(177,142,226,.2);margin-bottom:15px}
+#rooms .rooms-card-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+#rooms .rooms-card-title .rooms-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,rgba(255,79,216,.22),rgba(84,165,255,.18));font-size:22px}
+#rooms .rooms-card-title h3{margin:0;font-size:17px}
+#rooms .rooms-card-title small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+#rooms .rooms-room-card label{display:block;margin:10px 0 5px}
+#rooms #roomNameInput{border-radius:14px;padding:14px;margin:7px 0 12px;background:#100d1c}
+#rooms .rooms-action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#rooms .rooms-action-row .btn{min-height:48px;border-radius:15px}
+#rooms .rooms-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:16px}
+#rooms .rooms-feature{border-radius:19px;padding:15px;background:linear-gradient(145deg,#29203c,#171322);border:1px solid rgba(177,142,226,.17);min-width:0}
+#rooms .rooms-feature .rooms-feature-icon{font-size:25px;margin-bottom:8px}
+#rooms .rooms-feature strong{display:block;font-size:14px}
+#rooms .rooms-feature p{font-size:11px;color:var(--muted);line-height:1.45;margin:5px 0 11px}
+#rooms .rooms-feature button{width:100%;padding:10px 8px;border-radius:12px;font-size:12px}
+#rooms #musicRoomStatus{margin:12px 0 0;padding:12px 13px;border-radius:14px;background:rgba(155,92,255,.08);border:1px solid rgba(155,92,255,.2);font-size:12px;line-height:1.5}
+#rooms #roomSongSelect{border-radius:13px}
+#rooms .rooms-chat-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#rooms .rooms-chat-head .rooms-count{font-size:11px;color:var(--muted);background:var(--surface2);border-radius:20px;padding:5px 9px}
+#rooms #musicRoomChat{max-height:300px;padding:4px 0}
+#rooms .room-chat-item{border-radius:14px;border:1px solid rgba(177,142,226,.12);background:#201a31}
+@media(max-width:380px){#rooms .rooms-heading h2{font-size:24px}#rooms .rooms-room-card{padding:13px}#rooms .rooms-feature-grid{gap:8px}#rooms .rooms-feature{padding:12px}}
+
 </style>
 </head>
 <body>
@@ -374,35 +407,32 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 </section>
 
 <section class="page" id="rooms">
-  <h2>🎧 QIVI Rooms</h2>
-  <div class="panel">
-    <h3>🎵 Bernyanyi bersama</h3>
-    <p class="muted">Masuk ke nama ruang yang sama dengan teman. Lagu yang dipilih, perintah putar/jeda, dan pesan ruang akan dibagikan melalui koneksi realtime QIVI.</p>
+  <div class="rooms-heading"><h2>🎧 QIVI Rooms</h2><span class="rooms-live-pill"><i></i> Ruang sosial</span></div>
+  <div class="rooms-hero"><div class="rooms-hero-icon">🎙️✨</div><h3>Temukan ruangmu</h3><p>Ngobrol, berbagi musik, dan bernyanyi bersama teman di QIVI. Masuk ke ruang yang sama agar bisa terhubung.</p><button class="btn" type="button" onclick="document.getElementById('roomNameInput').focus();document.getElementById('roomNameInput').scrollIntoView({behavior:'smooth',block:'center'})">＋ Gabung ruang</button></div>
+  <div class="rooms-room-card">
+    <div class="rooms-card-title"><div class="rooms-icon">🎧</div><div><h3>Ruang musik bersama</h3><small>Obrolan realtime dan berbagi lagu</small></div></div>
     <label for="roomNameInput">Nama ruang</label>
     <input id="roomNameInput" maxlength="40" autocomplete="off" placeholder="Contoh: Ruang Musik QIVI" value="Ruang Musik QIVI">
-    <div class="grid">
-      <button class="btn" type="button" id="joinMusicRoomButton" onclick="joinMusicRoom()">🎧 Gabung ruang</button>
-      <button class="btn secondary" type="button" onclick="leaveMusicRoom(true)">Keluar ruang</button>
-    </div>
+    <div class="rooms-action-row"><button class="btn" type="button" id="joinMusicRoomButton" onclick="joinMusicRoom()">🎧 Gabung</button><button class="btn secondary" type="button" onclick="leaveMusicRoom(true)">Keluar ruang</button></div>
     <p id="musicRoomStatus" class="room-status" aria-live="polite">Belum bergabung ke ruang. Gunakan nama ruang yang sama di perangkat teman.</p>
   </div>
-  <div class="panel">
-    <h3>🎤 Lagu bersama</h3>
-    <p class="note">Pilih lagu dari katalog QIVI, lalu tekan bagikan lagu. Teman di ruang yang sama dapat memilih lagu itu dan memulai pemutaran di perangkat mereka.</p>
-    <label for="roomSongSelect">Pilih lagu</label>
-    <select id="roomSongSelect"><option value="">Memuat katalog lagu…</option></select>
-    <div class="grid">
-      <button class="btn" type="button" onclick="shareRoomSong()">🎵 Bagikan lagu</button>
-      <button class="btn secondary" type="button" onclick="broadcastRoomPlayback()">▶ Putar bersama</button>
-      <button class="btn secondary" type="button" onclick="broadcastRoomPause()">⏸ Jeda bersama</button>
-    </div>
-    <p class="note">Setiap HP tetap memutar audionya sendiri. Sinkronisasi waktu dapat sedikit berbeda tergantung jaringan dan browser.</p>
+  <div class="rooms-feature-grid">
+    <div class="rooms-feature"><div class="rooms-feature-icon">🎵</div><strong>Lagu bersama</strong><p>Pilih dan bagikan lagu dari katalog QIVI.</p><button class="btn secondary" type="button" onclick="document.getElementById('roomSongSelect').scrollIntoView({behavior:'smooth',block:'center'})">Pilih lagu ↓</button></div>
+    <div class="rooms-feature"><div class="rooms-feature-icon">💬</div><strong>Obrolan ruang</strong><p>Kirim pesan ke teman yang berada di ruang sama.</p><button class="btn secondary" type="button" onclick="document.getElementById('musicRoomMessage').scrollIntoView({behavior:'smooth',block:'center'})">Buka chat ↓</button></div>
   </div>
-  <div class="panel">
-    <h3>💬 Obrolan ruang</h3>
+  <div class="rooms-room-card">
+    <div class="rooms-card-title"><div class="rooms-icon">🎤</div><div><h3>Putar musik bersama</h3><small>Kontrol pemutaran lagu di ruang</small></div></div>
+    <label for="roomSongSelect">Pilih lagu dari katalog</label>
+    <select id="roomSongSelect"><option value="">Memuat katalog lagu…</option></select>
+    <div class="rooms-action-row"><button class="btn" type="button" onclick="shareRoomSong()">🎵 Bagikan lagu</button><button class="btn secondary" type="button" onclick="broadcastRoomPlayback()">▶ Putar bersama</button></div>
+    <button class="btn secondary" style="width:100%;margin-top:9px" type="button" onclick="broadcastRoomPause()">⏸ Jeda bersama</button>
+    <p class="note">Setiap HP memutar audionya sendiri. Sinkronisasi dapat sedikit berbeda tergantung jaringan dan browser.</p>
+  </div>
+  <div class="rooms-room-card">
+    <div class="rooms-chat-head"><div class="rooms-card-title" style="margin:0"><div class="rooms-icon">💬</div><div><h3>Obrolan ruang</h3><small>Pesan untuk peserta ruang</small></div></div><span class="rooms-count">Realtime</span></div>
     <div id="musicRoomChat" class="room-chat"><div class="empty">Gabung ruang untuk mulai mengobrol.</div></div>
-    <label for="musicRoomMessage">Pesan untuk teman di ruang</label>
-    <div class="chat-compose"><textarea id="musicRoomMessage" maxlength="500" rows="2" placeholder="Tulis pesan..." disabled></textarea><button class="btn" type="button" id="sendRoomMessageButton" onclick="sendMusicRoomMessage()" disabled>Kirim</button></div>
+    <label for="musicRoomMessage">Tulis pesan</label>
+    <div class="chat-compose"><textarea id="musicRoomMessage" maxlength="500" rows="2" placeholder="Tulis pesan untuk teman..." disabled></textarea><button class="btn" type="button" id="sendRoomMessageButton" onclick="sendMusicRoomMessage()" disabled>Kirim</button></div>
   </div>
 </section>
 
