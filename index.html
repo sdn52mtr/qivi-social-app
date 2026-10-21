@@ -78,6 +78,103 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
 .room-chat-item small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
 
 
+
+/* QIVI PREMIUM REDESIGN — visual layer only; existing features and IDs retained */
+:root{
+  color-scheme:dark;
+  --bg:#090711;--surface:#151222;--surface2:#201a31;
+  --pink:#ff4fd8;--purple:#9b5cff;--blue:#54a5ff;
+  --text:#fff;--muted:#aaa3c0;--border:#332844;--gold:#ffe08a;
+}
+body{
+  background:
+    radial-gradient(ellipse at 12% -8%,rgba(155,92,255,.20),transparent 34rem),
+    radial-gradient(ellipse at 95% 22%,rgba(255,79,216,.09),transparent 28rem),
+    var(--bg);
+  letter-spacing:.01em;
+}
+header{
+  background:rgba(12,9,22,.88);border-bottom:1px solid rgba(185,135,255,.19);
+  box-shadow:0 8px 32px rgba(0,0,0,.18);
+}
+.brand{font-size:31px;filter:drop-shadow(0 0 14px rgba(255,79,216,.24))}
+.tagline{font-size:9px;letter-spacing:2.4px}
+.coin-button{
+  border:1px solid rgba(255,224,138,.35);
+  background:linear-gradient(135deg,rgba(255,224,138,.12),rgba(155,92,255,.15));
+  box-shadow:inset 0 1px rgba(255,255,255,.06);
+}
+main{padding:16px 14px 26px}
+h1{font-size:clamp(25px,6vw,34px);letter-spacing:-.035em;line-height:1.12}
+h2{font-size:25px;letter-spacing:-.025em}
+h3{letter-spacing:-.01em}
+.panel{
+  background:linear-gradient(145deg,rgba(28,22,44,.97),rgba(18,15,30,.97));
+  border:1px solid rgba(177,142,226,.16);border-radius:22px;
+  box-shadow:0 12px 32px rgba(0,0,0,.13);
+}
+.hero{
+  position:relative;overflow:hidden;padding:27px 22px;border:1px solid rgba(255,255,255,.13);
+  background:radial-gradient(circle at 100% 0,rgba(255,79,216,.28),transparent 42%),
+    radial-gradient(circle at 0 100%,rgba(84,165,255,.25),transparent 42%),
+    linear-gradient(135deg,#35205b,#211735 58%,#192a4c);
+  box-shadow:0 18px 42px rgba(87,40,139,.20);
+}
+.hero:after{content:"✦";position:absolute;right:18px;top:10px;font-size:60px;color:#fff;opacity:.08;pointer-events:none}
+.btn{
+  border-radius:14px;padding:12px 17px;
+  background:linear-gradient(110deg,#8954ff,#e64fd4 65%,#ff6da9);
+  box-shadow:0 7px 20px rgba(155,92,255,.17);
+  transition:transform .16s ease,filter .16s ease;
+}
+.btn:active,.feature:active,.nav:active{transform:scale(.98)}
+.btn.secondary{
+  background:linear-gradient(145deg,#29213d,#1b1729);
+  border:1px solid rgba(188,158,232,.22);box-shadow:none;
+}
+.feature{
+  position:relative;overflow:hidden;min-height:120px;border-radius:20px;
+  background:linear-gradient(145deg,rgba(43,32,65,.96),rgba(25,21,40,.98));
+  border:1px solid rgba(184,147,235,.19);box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+.feature span{font-size:29px;filter:drop-shadow(0 0 8px rgba(237,72,213,.18))}
+.feature b{font-size:17px}
+input,textarea,select{
+  background:#100d1b;border:1px solid #3b304f;border-radius:14px;
+  outline:none;transition:border-color .16s,box-shadow .16s;
+}
+input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3px rgba(155,92,255,.13)}
+.media{border:1px solid rgba(178,143,230,.17);border-radius:18px}
+.story-ring{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 5px 18px rgba(237,72,213,.15)}
+.bottom{
+  background:rgba(14,11,24,.94);border-top:1px solid rgba(185,135,255,.19);
+  box-shadow:0 -10px 30px rgba(0,0,0,.22);padding-top:9px;
+}
+.nav{border-radius:12px;transition:color .15s,transform .15s}
+.nav.active{color:#ff79e5;text-shadow:0 0 14px rgba(255,79,216,.25)}
+.nav.active span{filter:drop-shadow(0 0 7px rgba(255,79,216,.35))}
+.karaoke-cover{
+  background:radial-gradient(circle at 100% 0,rgba(237,72,213,.20),transparent 40%),
+    linear-gradient(145deg,#251938,#151120 75%);
+  border:1px solid rgba(190,133,255,.24);border-radius:24px;
+}
+.karaoke-lyrics{background:#0d0a16;border-color:#3a2a4e;border-radius:18px}
+.karaoke-line.active{color:#fff;text-shadow:0 0 18px rgba(237,72,213,.72)}
+.room-status{border-radius:14px}
+.room-chat-item{border:1px solid rgba(177,142,226,.12);border-radius:14px}
+.chat-bubble.mine{background:linear-gradient(135deg,rgba(111,62,158,.42),rgba(48,32,68,.95))}
+.toast{background:#21172f;border-color:#80539a;box-shadow:0 12px 35px rgba(0,0,0,.28)}
+@media(max-width:380px){
+  header{padding:12px}
+  .brand{font-size:28px}
+  main{padding:12px 10px 24px}
+  .hero{padding:23px 18px}
+  .feature{min-height:108px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -87,7 +184,7 @@ video{background:#050509}.live-videos{display:grid;grid-template-columns:minmax(
 </header>
 <main>
 <section class="page active" id="beranda">
-  <div class="hero"><div>✨ TEMPATNYA BERSINAR</div><h1>Selamat datang di QIVI!</h1><p>Bernyanyi, berbagi video, membuat status, dan bertemu teman baru.</p><button class="btn" onclick="openPage('status')">＋ Buat Status</button></div>
+  <div class="hero"><div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#f7b8ff">✦ SING · SHARE · LIVE</div><h1>Selamat datang di QIVI!</h1><p>Tempat berbagi momen, bernyanyi, dan terhubung dengan teman-temanmu.</p><button class="btn" onclick="openPage('status')">＋ Buat Status</button></div>
   <div class="panel"><h3>🔴 Status 24 Jam <button class="btn secondary small" style="float:right" onclick="openPage('status')">Lihat</button></h3><div class="story-row" id="homeStories"><div class="empty">Belum ada status.</div></div></div>
   <div class="panel"><h3>✨ Jelajahi QIVI</h3><div class="grid">
     <button class="feature" onclick="openPage('video')"><span>🎬</span><b>Video</b><small>Video pendek</small></button>
