@@ -437,7 +437,7 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 
   <div class="rooms-room-card qivi-mic-panel">
     <div class="rooms-card-title"><div class="rooms-icon">🎙️</div><div><h3>Kursi mikrofon</h3><small>Konsep room sosial QIVI</small></div></div>
-    <div class="qivi-mic-note">Pilih kursi untuk menandai posisi kamu di room. Ini tahap tampilan dan status kursi; audio mikrofon antarperangkat belum dihubungkan.</div>
+    <div class="qivi-mic-note">Gabung ke ruang yang sama di dua HP untuk melihat kursi yang ditempati peserta. Audio mikrofon antarperangkat belum dihubungkan.</div>
     <div class="qivi-mic-grid" id="qiviMicSeats">
       <button class="qivi-mic-seat" type="button" data-seat="1" onclick="toggleQiviMicSeat(1)"><span class="qivi-seat-avatar">👑</span><b>Kursi 1</b><small>Host</small></button>
       <button class="qivi-mic-seat" type="button" data-seat="2" onclick="toggleQiviMicSeat(2)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 2</b><small>Kosong</small></button>
@@ -526,27 +526,72 @@ let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
 function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
 
-const qiviMicSeatState={selected:null};
-function toggleQiviMicSeat(seat){
+const qiviMicSeatState={selected:null,sessionKey:'qivi-'+Math.random().toString(36).slice(2)+Date.now().toString(36)};
+function renderQiviMicSeats(){
   const wrap=$('qiviMicSeats');
   if(!wrap)return;
-  const btn=wrap.querySelector('[data-seat="'+seat+'"]');
-  if(!btn)return;
-  if(qiviMicSeatState.selected===seat){
-    qiviMicSeatState.selected=null;
-    btn.classList.remove('is-selected');
-    btn.querySelector('small').textContent='Kosong';
-    $('qiviMicSeatStatus').textContent='Kamu sudah melepas kursi mikrofon.';
-    return;
+  const channel=state.musicRoomChannel;
+  let people=[];
+  if(channel){
+    const presence=channel.presenceState()||{};
+    Object.values(presence).forEach(entries=>(entries||[]).forEach(entry=>{
+      if(entry&&entry.sessionKey!==qiviMicSeatState.sessionKey&&Number(entry.seat)>=2)people.push(entry);
+    }));
   }
-  wrap.querySelectorAll('.qivi-mic-seat').forEach(item=>{
-    item.classList.remove('is-selected');
-    item.querySelector('small').textContent='Kosong';
+  wrap.querySelectorAll('.qivi-mic-seat').forEach(btn=>{
+    const seat=Number(btn.dataset.seat);
+    const small=btn.querySelector('small');
+    const avatar=btn.querySelector('.qivi-seat-avatar');
+    const occupant=people.find(person=>Number(person.seat)===seat);
+    btn.classList.toggle('is-selected',qiviMicSeatState.selected===seat);
+    if(seat===1){
+      small.textContent='Host';
+      avatar.textContent='👑';
+      btn.disabled=false;
+      return;
+    }
+    if(qiviMicSeatState.selected===seat){
+      small.textContent='Kamu';
+      avatar.textContent='🎤';
+      btn.disabled=false;
+    }else if(occupant){
+      small.textContent=String(occupant.name||'Peserta').slice(0,16);
+      avatar.textContent='🎙️';
+      btn.disabled=true;
+    }else{
+      small.textContent='Kosong';
+      avatar.textContent='🎤';
+      btn.disabled=false;
+    }
   });
-  qiviMicSeatState.selected=seat;
-  btn.classList.add('is-selected');
-  btn.querySelector('small').textContent='Kamu';
-  $('qiviMicSeatStatus').textContent='Kamu memilih Kursi '+seat+'. Status ini hanya tampilan lokal, belum terlihat oleh pengguna lain.';
+  const status=$('qiviMicSeatStatus');
+  if(status){
+    if(!state.musicRoomJoined)status.textContent='Gabung ke ruang yang sama terlebih dahulu agar kursi terlihat oleh perangkat lain.';
+    else if(qiviMicSeatState.selected)status.textContent='Kamu memilih Kursi '+qiviMicSeatState.selected+'. Status kursi dibagikan ke peserta di ruang yang sama.';
+    else status.textContent='Terhubung ke room. Pilih kursi 2–6 untuk duduk di panggung.';
+  }
+}
+async function toggleQiviMicSeat(seat){
+  if(seat===1)return notify('Kursi 1 disediakan untuk host ruang.');
+  if(!state.musicRoomJoined||!state.musicRoomChannel){
+    $('qiviMicSeatStatus').textContent='Gabung ke ruang musik bersama terlebih dahulu.';
+    return notify('Tekan Gabung di Ruang Musik Bersama dahulu.');
+  }
+  const channel=state.musicRoomChannel;
+  const presence=channel.presenceState()||{};
+  const occupied=Object.values(presence).flat().find(entry=>entry&&entry.sessionKey!==qiviMicSeatState.sessionKey&&Number(entry.seat)===seat);
+  if(occupied)return notify('Kursi ini sudah ditempati pengguna lain.');
+  const next=qiviMicSeatState.selected===seat?null:seat;
+  try{
+    qiviMicSeatState.selected=next;
+    await channel.track({sessionKey:qiviMicSeatState.sessionKey,name:state.name||'Pengguna QIVI',avatar:state.profilePhotoUrl||'',seat:next||null,updatedAt:Date.now()});
+    renderQiviMicSeats();
+    notify(next?'Kamu duduk di Kursi '+next+'.':'Kamu meninggalkan kursi mikrofon.');
+  }catch(e){
+    qiviMicSeatState.selected=null;
+    renderQiviMicSeats();
+    notify('Kursi belum tersambung. Coba gabung ulang ke room.');
+  }
 }
 function updateStatusForm(){const type=$('statusType').value;$('textFields').classList.toggle('hidden',type!=='text');$('fileFields').classList.toggle('hidden',type==='text');clearStatusPreview()}
 function clearStatusPreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}$('statusPreview').replaceChildren()}
@@ -1053,8 +1098,11 @@ async function joinMusicRoom(){
     await leaveMusicRoom(false);
     await ensureSupabaseSession();
     const channel=qiviSupabase.channel('qivi-music-room-'+roomKey,{
-      config:{broadcast:{self:false}}
+      config:{broadcast:{self:false},presence:{key:qiviMicSeatState.sessionKey}}
     });
+    channel.on('presence',{event:'sync'},()=>renderQiviMicSeats());
+    channel.on('presence',{event:'join'},()=>renderQiviMicSeats());
+    channel.on('presence',{event:'leave'},()=>renderQiviMicSeats());
     channel.on('broadcast',{event:'room-message'},payload=>{
       const d=payload.payload||{};
       appendMusicRoomMessage(d.name,d.message,false);
@@ -1073,13 +1121,15 @@ async function joinMusicRoom(){
       applyRoomPlayback(song,d).catch(()=>notify('Perintah lagu diterima. Jika audio belum berjalan, buka Nyanyi lalu tekan Putar.'));
       appendMusicRoomMessage(d.name,(d.action==='pause'?'Menjeda lagu: ':'Memutar bersama: ')+song.title);
     });
-    channel.subscribe(status=>{
+    channel.subscribe(async status=>{
       if(status==='SUBSCRIBED'){
         state.musicRoomChannel=channel;state.musicRoomName=raw;state.musicRoomJoined=true;
         $('musicRoomMessage').disabled=false;$('sendRoomMessageButton').disabled=false;
         setMusicRoomStatus('Terhubung ke ruang “'+raw+'”. Minta teman bergabung dengan nama ruang yang sama.');
+        try{await channel.track({sessionKey:qiviMicSeatState.sessionKey,name:state.name||'Pengguna QIVI',avatar:state.profilePhotoUrl||'',seat:qiviMicSeatState.selected||null,updatedAt:Date.now()});}catch(e){console.warn('QIVI seat presence:',e);}
         appendMusicRoomMessage('QIVI','Kamu bergabung ke ruang “'+raw+'”.',true);
         renderRoomSongOptions();
+        renderQiviMicSeats();
       }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
         setMusicRoomStatus('Koneksi ruang gagal ('+status+'). Periksa koneksi internet dan Supabase Realtime.');
       }
@@ -1094,9 +1144,11 @@ async function leaveMusicRoom(showNotice=true){
   if(channel&&qiviSupabase){try{await qiviSupabase.removeChannel(channel)}catch{}}
   const wasJoined=state.musicRoomJoined;
   state.musicRoomChannel=null;state.musicRoomName=null;state.musicRoomJoined=false;
+  qiviMicSeatState.selected=null;
   $('musicRoomMessage').disabled=true;$('sendRoomMessageButton').disabled=true;
   if($('musicRoomChat'))$('musicRoomChat').innerHTML='<div class="empty">Gabung ruang untuk mulai mengobrol.</div>';
   setMusicRoomStatus('Belum bergabung ke ruang. Gunakan nama ruang yang sama di perangkat teman.');
+  renderQiviMicSeats();
   if(showNotice&&wasJoined)notify('Kamu keluar dari QIVI Rooms.');
 }
 async function sendMusicRoomMessage(){
