@@ -648,7 +648,7 @@ const VIDEO_BUCKET='qivi-videos';
 const KARAOKE_BUCKET='qivi-songs';
 const CHAT_TABLE='qivi_chat_messages';
 const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) || null;
-const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',profilePhotoUrl:'',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,liveChatChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null,musicRoomChannel:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRemote:false};
+const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',profilePhotoUrl:'',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,liveChatChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null,musicRoomChannel:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRemote:false,homePresenceChannel:null};
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
 function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
@@ -734,13 +734,61 @@ function renderQiviMicSeats(){
   }
   renderHomeOnlinePeople();
 }
+const qiviOnlineSessionKey='online-'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+async function startQiviHomePresence(){
+  if(!qiviSupabase||state.homePresenceChannel)return;
+  try{
+    await ensureSupabaseSession();
+    const channel=qiviSupabase.channel('qivi-global-online',{config:{presence:{key:qiviOnlineSessionKey}}});
+    const refresh=()=>renderHomeOnlinePeople();
+    channel.on('presence',{event:'sync'},refresh);
+    channel.on('presence',{event:'join'},refresh);
+    channel.on('presence',{event:'leave'},refresh);
+    channel.subscribe(async status=>{
+      if(status==='SUBSCRIBED'){
+        state.homePresenceChannel=channel;
+        try{
+          await channel.track({sessionKey:qiviOnlineSessionKey,userId:state.supabaseUser?.id||null,name:state.name||'Pengguna QIVI',avatar:state.profilePhotoUrl||'',updatedAt:Date.now()});
+          renderHomeOnlinePeople();
+        }catch(e){console.warn('QIVI home presence track:',e);}
+      }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){console.warn('QIVI home presence status:',status);}
+    });
+  }catch(e){console.warn('QIVI home presence:',e);}
+}
+async function refreshQiviHomePresence(){
+  const channel=state.homePresenceChannel;if(!channel)return;
+  try{await channel.track({sessionKey:qiviOnlineSessionKey,userId:state.supabaseUser?.id||null,name:state.name||'Pengguna QIVI',avatar:state.profilePhotoUrl||'',updatedAt:Date.now()});}
+  catch(e){console.warn('QIVI home presence update:',e);}
+}
 function renderHomeOnlinePeople(){
   const box=$('homeOnlinePeople');if(!box)return;box.replaceChildren();
-  const entries=[];const channel=state.musicRoomChannel;
-  if(state.musicRoomJoined&&channel){const presence=channel.presenceState()||{};Object.values(presence).flat().forEach(person=>{if(person&&person.sessionKey&&Number(person.seat)>=1)entries.push(person)});}
-  if(state.musicRoomJoined&&qiviMicSeatState.selected&&!entries.some(p=>p.sessionKey===qiviMicSeatState.sessionKey))entries.unshift({sessionKey:qiviMicSeatState.sessionKey,name:state.name||'Kamu',avatar:state.profilePhotoUrl||'',seat:qiviMicSeatState.selected});
-  if(!entries.length){const empty=document.createElement('div');empty.className='home-online-empty';empty.textContent='Belum ada teman online yang terdeteksi. Masuk ke Room agar kamu terlihat oleh teman lain.';box.appendChild(empty);return;}
-  const seen=new Set();entries.forEach(person=>{if(seen.has(person.sessionKey))return;seen.add(person.sessionKey);const card=document.createElement('div');card.className='home-online-person';const avatar=document.createElement('div');avatar.className='home-online-avatar';if(person.avatar&&/^https?:\/\//i.test(person.avatar)){const img=document.createElement('img');img.src=person.avatar;img.alt='Foto '+(person.name||'teman online');img.onerror=()=>{img.remove();avatar.textContent='👤'};avatar.appendChild(img)}else avatar.textContent=Number(person.seat)===1?'👑':'👤';const name=document.createElement('span');name.className='home-online-name';name.textContent=person.name||'Pengguna QIVI';card.append(avatar,name);box.appendChild(card)});
+  const entries=[];const globalChannel=state.homePresenceChannel;
+  if(globalChannel){
+    const presence=globalChannel.presenceState()||{};
+    Object.values(presence).flat().forEach(person=>{if(person&&person.sessionKey&&person.sessionKey!==qiviOnlineSessionKey)entries.push(person);});
+  }
+  const roomChannel=state.musicRoomChannel;
+  if(state.musicRoomJoined&&roomChannel){
+    const presence=roomChannel.presenceState()||{};
+    Object.values(presence).flat().forEach(person=>{if(person&&person.sessionKey&&person.sessionKey!==qiviMicSeatState.sessionKey&&Number(person.seat)>=1)entries.push(person);});
+  }
+  if(!entries.length){
+    const empty=document.createElement('div');empty.className='home-online-empty';
+    empty.textContent=globalChannel?'Belum ada pengguna lain yang online. Buka QIVI di HP lain untuk menguji daftar ini.':'Menghubungkan status online QIVI…';
+    box.appendChild(empty);return;
+  }
+  const seen=new Set();
+  entries.forEach(person=>{
+    const identity=person.sessionKey||person.userId||person.name;if(seen.has(identity))return;seen.add(identity);
+    const card=document.createElement('div');card.className='home-online-person';
+    const avatar=document.createElement('div');avatar.className='home-online-avatar';
+    if(person.avatar&&/^https?:\/\//i.test(person.avatar)){
+      const img=document.createElement('img');img.src=person.avatar;img.alt='Foto '+(person.name||'teman online');
+      img.onerror=()=>{img.remove();avatar.textContent='👤';};avatar.appendChild(img);
+    }else avatar.textContent='👤';
+    const name=document.createElement('span');name.className='home-online-name';name.textContent=person.name||'Pengguna QIVI';
+    card.append(avatar,name);box.appendChild(card);
+  });
 }
 async function toggleQiviMicSeat(seat){
   if(seat===1)return notify('Kursi 1 disediakan untuk host ruang.');
@@ -1430,7 +1478,7 @@ $('karaokePlayer').addEventListener('pause',()=>{
 
 function editProfile(){
  const value=prompt('Nama profil:',state.name);
- if(value!==null&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;try{localStorage.setItem('qiviProfileName',state.name)}catch(e){}renderStatuses();notify('Nama profil diperbarui.')}
+ if(value!==null&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;try{localStorage.setItem('qiviProfileName',state.name)}catch(e){}renderStatuses();refreshQiviHomePresence();notify('Nama profil diperbarui.')}
  chooseProfilePhoto();
 }
 function chooseProfilePhoto(){const input=$('qiviProfilePhotoInput');if(input)input.click()}
@@ -1448,6 +1496,7 @@ async function handleProfilePhoto(event){
   state.profilePhotoUrl=pub.publicUrl;
   try{localStorage.setItem('qiviProfileUrl',state.profilePhotoUrl);localStorage.setItem('qiviProfileName',state.name)}catch(e){}
   renderProfilePhoto();
+  refreshQiviHomePresence();
   notify('Foto berhasil diunggah. Kirim pesan baru untuk menampilkan foto di chat.');
  }catch(err){
   const msg=err&&err.message?err.message:'kesalahan penyimpanan';
@@ -1467,8 +1516,10 @@ window.addEventListener('pagehide',()=>{
   stopCamera();
   const channel=state.musicRoomChannel;
   if(channel){try{channel.untrack()}catch(e){console.warn('QIVI pagehide untrack:',e)}}
+  const onlineChannel=state.homePresenceChannel;
+  if(onlineChannel){try{onlineChannel.untrack()}catch(e){console.warn('QIVI online untrack:',e)}}
 });
-loadSavedProfile();renderCoins();renderStatuses();renderVideos();loadRemoteVideos();loadRemoteKaraokeSongs();
+loadSavedProfile();renderCoins();renderStatuses();renderVideos();startQiviHomePresence();loadRemoteVideos();loadRemoteKaraokeSongs();
 $('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
