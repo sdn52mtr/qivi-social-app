@@ -444,7 +444,7 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 
   <div class="rooms-room-card qivi-mic-panel">
     <div class="rooms-card-title"><div class="rooms-icon">🎙️</div><div><h3>Kursi mikrofon</h3><small>Konsep room sosial QIVI</small></div></div>
-    <div class="qivi-mic-note">Gabung ke ruang yang sama di dua HP untuk melihat kursi yang ditempati peserta. Audio mikrofon antarperangkat belum dihubungkan.</div>
+    <div class="qivi-mic-note">Gabung ke ruang yang sama di dua HP. Aktifkan mikrofon setelah memilih kursi untuk mencoba percakapan suara langsung.</div>
     <div class="qivi-mic-grid" id="qiviMicSeats">
       <button class="qivi-mic-seat" type="button" data-seat="1" onclick="toggleQiviMicSeat(1)"><span class="qivi-seat-avatar">👑</span><b>Kursi 1</b><small>Host</small></button>
       <button class="qivi-mic-seat" type="button" data-seat="2" onclick="toggleQiviMicSeat(2)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 2</b><small>Kosong</small></button>
@@ -454,6 +454,9 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
       <button class="qivi-mic-seat" type="button" data-seat="6" onclick="toggleQiviMicSeat(6)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 6</b><small>Kosong</small></button>
     </div>
     <p class="note" id="qiviMicSeatStatus" aria-live="polite">Belum memilih kursi mikrofon.</p>
+    <div class="rooms-action-row" style="margin-top:10px"><button class="btn" type="button" id="qiviAudioToggle" onclick="toggleQiviRoomAudio()">🎙️ Aktifkan mikrofon</button><button class="btn secondary" type="button" id="qiviAudioMute" onclick="toggleQiviRoomMute()" disabled>🔇 Bisukan</button></div>
+    <p class="note" id="qiviAudioStatus" aria-live="polite">Audio langsung belum aktif. Gunakan earphone untuk mengurangi gema.</p>
+    <div id="qiviRemoteAudio" hidden></div>
   </div>
   <div class="rooms-room-card">
     <div class="rooms-card-title"><div class="rooms-icon">🎤</div><div><h3>Putar musik bersama</h3><small>Kontrol pemutaran lagu di ruang</small></div></div>
@@ -622,6 +625,17 @@ async function toggleQiviMicSeat(seat){
     notify('Kursi belum tersambung. Coba gabung ulang ke room.');
   }
 }
+// QIVI Rooms audio WebRTC: signaling memakai Supabase Broadcast pada channel ruang yang sama.
+const qiviAudio={stream:null,pcs:new Map(),muted:false,enabled:false,roomKey:null};
+function qiviAudioStatus(msg){const el=$('qiviAudioStatus');if(el)el.textContent=msg;}
+function qiviAudioPeers(){const ch=state.musicRoomChannel;if(!ch)return [];const ps=ch.presenceState()||{};return Object.values(ps).flat().filter(x=>x&&x.sessionKey&&x.sessionKey!==qiviMicSeatState.sessionKey);}
+async function qiviAudioSend(event,payload){if(!state.musicRoomChannel)throw new Error('Gabung ke ruang terlebih dahulu.');await state.musicRoomChannel.send({type:'broadcast',event,payload:{...payload,from:qiviMicSeatState.sessionKey,room:qiviAudio.roomKey||state.musicRoomName||''}});}
+function qiviAudioCleanupPeer(id){const pc=qiviAudio.pcs.get(id);if(pc){try{pc.close()}catch{}qiviAudio.pcs.delete(id)}const el=$('qivi-audio-'+id);if(el)el.remove();}
+async function qiviAudioMakePeer(peer,createOffer){if(!qiviAudio.stream||!state.musicRoomChannel||!peer||peer===qiviMicSeatState.sessionKey)return;let pc=qiviAudio.pcs.get(peer);if(pc)return pc;pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});qiviAudio.pcs.set(peer,pc);qiviAudio.stream.getTracks().forEach(t=>pc.addTrack(t,qiviAudio.stream));pc.onicecandidate=e=>{if(e.candidate)qiviAudioSend('qivi-audio-ice',{to:peer,candidate:e.candidate.toJSON()}).catch(()=>{})};pc.ontrack=e=>{let audio=$('qivi-audio-'+peer);if(!audio){audio=document.createElement('audio');audio.id='qivi-audio-'+peer;audio.autoplay=true;audio.playsInline=true;$('qiviRemoteAudio').appendChild(audio)}audio.srcObject=e.streams[0];audio.play().catch(()=>qiviAudioStatus('Audio diterima. Jika belum terdengar, sentuh layar lalu naikkan volume media.'))};pc.onconnectionstatechange=()=>{if(pc.connectionState==='failed'||pc.connectionState==='closed'||pc.connectionState==='disconnected'){if(pc.connectionState==='failed')qiviAudioStatus('Koneksi suara ke peserta terputus. Coba matikan lalu aktifkan mikrofon kembali.');if(pc.connectionState==='closed')qiviAudioCleanupPeer(peer)}};if(createOffer){const offer=await pc.createOffer();await pc.setLocalDescription(offer);await qiviAudioSend('qivi-audio-offer',{to:peer,sdp:pc.localDescription})}return pc;}
+async function qiviAudioHandleSignal(event){const d=event?.payload||{};if(!d.from||d.from===qiviMicSeatState.sessionKey||d.to!==qiviMicSeatState.sessionKey)return;if(d.room&&qiviAudio.roomKey&&d.room!==qiviAudio.roomKey)return;try{if(d.kind==='ice'){const pc=qiviAudio.pcs.get(d.from);if(pc&&d.candidate)try{await pc.addIceCandidate(d.candidate)}catch(e){console.warn('QIVI audio ICE:',e)}return}if(!qiviAudio.stream)return;if(d.kind==='offer'){let pc=qiviAudio.pcs.get(d.from);if(pc)qiviAudioCleanupPeer(d.from);pc=await qiviAudioMakePeer(d.from,false);await pc.setRemoteDescription(d.sdp);const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await qiviAudioSend('qivi-audio-answer',{to:d.from,sdp:pc.localDescription})}else if(d.kind==='answer'){const pc=qiviAudio.pcs.get(d.from);if(pc&&pc.signalingState==='have-local-offer')await pc.setRemoteDescription(d.sdp)}}catch(e){console.warn('QIVI audio signal:',e);qiviAudioStatus('Sinyal suara gagal diproses: '+(e.message||'coba gabung ulang ruang.'))}}
+async function toggleQiviRoomAudio(){if(qiviAudio.enabled){await stopQiviRoomAudio();return}if(!state.musicRoomJoined||!state.musicRoomChannel)return notify('Gabung ke ruang yang sama terlebih dahulu.');if(!qiviMicSeatState.selected)return notify('Pilih Kursi 2–6 terlebih dahulu.');if(!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection)return notify('Browser HP ini belum mendukung audio WebRTC.');const btn=$('qiviAudioToggle');btn.disabled=true;try{qiviAudio.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});qiviAudio.enabled=true;qiviAudio.muted=false;qiviAudio.roomKey=state.musicRoomName; qiviAudio.stream.getAudioTracks().forEach(t=>t.enabled=true);btn.textContent='⏹ Matikan mikrofon';$('qiviAudioMute').disabled=false;$('qiviAudioMute').textContent='🔇 Bisukan';qiviAudioStatus('Mikrofon aktif. Izinkan akses mikrofon jika diminta; gunakan earphone. Menghubungkan peserta…');for(const peer of qiviAudioPeers()){if(qiviMicSeatState.sessionKey.localeCompare(peer.sessionKey)<0)await qiviAudioMakePeer(peer.sessionKey,true)}notify('Mikrofon aktif.');}catch(e){qiviAudio.enabled=false;qiviAudio.stream?.getTracks().forEach(t=>t.stop());qiviAudio.stream=null;qiviAudioStatus('Mikrofon gagal diaktifkan: '+(e.message||'periksa izin mikrofon dan buka melalui HTTPS.'));notify('Mikrofon belum aktif. Periksa izin mikrofon browser.')}finally{btn.disabled=false}}
+function toggleQiviRoomMute(){if(!qiviAudio.stream)return; qiviAudio.muted=!qiviAudio.muted;qiviAudio.stream.getAudioTracks().forEach(t=>t.enabled=!qiviAudio.muted);$('qiviAudioMute').textContent=qiviAudio.muted?'🎙️ Nyalakan suara':'🔇 Bisukan';qiviAudioStatus(qiviAudio.muted?'Mikrofon dibisukan.':'Mikrofon aktif.');}
+async function stopQiviRoomAudio(){qiviAudio.stream?.getTracks().forEach(t=>t.stop());qiviAudio.stream=null;for(const id of [...qiviAudio.pcs.keys()])qiviAudioCleanupPeer(id);qiviAudio.enabled=false;qiviAudio.muted=false;$('qiviAudioToggle').textContent='🎙️ Aktifkan mikrofon';$('qiviAudioMute').disabled=true;$('qiviAudioMute').textContent='🔇 Bisukan';qiviAudioStatus('Audio langsung dimatikan.');}
 function updateStatusForm(){const type=$('statusType').value;$('textFields').classList.toggle('hidden',type!=='text');$('fileFields').classList.toggle('hidden',type==='text');clearStatusPreview()}
 function clearStatusPreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}$('statusPreview').replaceChildren()}
 $('statusFile').addEventListener('change',()=>{clearStatusPreview();const f=$('statusFile').files[0];if(!f)return;const type=$('statusType').value;if((type==='image'&&!f.type.startsWith('image/'))||(type==='video'&&!f.type.startsWith('video/')))return notify('Jenis file tidak sesuai pilihan.');if(f.size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');state.previewUrl=URL.createObjectURL(f);const m=document.createElement(type==='image'?'img':'video');m.className='media';m.src=state.previewUrl;if(type==='video'){m.controls=true;m.playsInline=true}else m.alt='Pratinjau foto status';$('statusPreview').appendChild(m)});
@@ -1132,6 +1146,8 @@ async function joinMusicRoom(){
     channel.on('presence',{event:'sync'},()=>{renderQiviMicSeats();});
     channel.on('presence',{event:'join'},()=>{renderQiviMicSeats();});
     channel.on('presence',{event:'leave'},()=>{renderQiviMicSeats();});
+    ['qivi-audio-offer','qivi-audio-answer','qivi-audio-ice'].forEach(ev=>channel.on('broadcast',{event:ev},payload=>{const d=payload.payload||{};qiviAudioHandleSignal({...payload.payload, payload:{...d,kind:ev==='qivi-audio-offer'?'offer':ev==='qivi-audio-answer'?'answer':'ice'}})}));
+    channel.on('presence',{event:'sync'},()=>{renderQiviMicSeats();if(qiviAudio.enabled){for(const peer of qiviAudioPeers()){if(qiviMicSeatState.sessionKey.localeCompare(peer.sessionKey)<0&&!qiviAudio.pcs.has(peer.sessionKey))qiviAudioMakePeer(peer.sessionKey,true).catch(e=>qiviAudioStatus('Tidak dapat memulai koneksi suara: '+e.message));}}});
     channel.on('broadcast',{event:'room-message'},payload=>{
       const d=payload.payload||{};
       appendMusicRoomMessage(d.name,d.message,false);
@@ -1169,6 +1185,7 @@ async function joinMusicRoom(){
   }finally{button.disabled=false;}
 }
 async function leaveMusicRoom(showNotice=true){
+  if(qiviAudio.enabled||qiviAudio.stream)await stopQiviRoomAudio();
   const channel=state.musicRoomChannel;
   const wasJoined=state.musicRoomJoined;
   // Hapus status kursi dari Presence sebelum menutup channel agar perangkat lain
