@@ -411,6 +411,36 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
  #beranda .home-wallet strong{font-size:17px!important}
 }
 
+
+/* QIVI INBOX redesign — UI-only layer; preserves the existing shared-chat backend */
+#chat{padding-top:5px}
+#chat .inbox-top{display:flex;align-items:center;gap:18px;margin:0 0 14px;padding:2px 1px}
+#chat .inbox-tabs{display:flex;align-items:center;gap:24px;flex:1;min-width:0}
+#chat .inbox-main-tab{position:relative;border:0;background:transparent;color:var(--muted);font-size:22px;font-weight:750;padding:8px 0 12px}
+#chat .inbox-main-tab.active{color:var(--text)}
+#chat .inbox-main-tab.active:after{content:"";position:absolute;left:0;bottom:3px;width:42px;height:3px;border-radius:5px;background:linear-gradient(90deg,var(--purple),var(--pink))}
+#chat .inbox-icon-btn{width:38px;height:40px;flex:0 0 38px;border:0;border-radius:12px;background:rgba(255,255,255,.045);font-size:25px;color:#eee8f8}
+#chat .inbox-search{margin:0 0 14px;border-radius:15px;min-height:46px;padding:12px 15px}
+#chat .inbox-filters{display:flex;gap:9px;overflow-x:auto;padding:0 0 13px;scrollbar-width:none}
+#chat .inbox-filters::-webkit-scrollbar{display:none}
+#chat .inbox-filter{flex:0 0 auto;border:1px solid transparent;border-radius:30px;padding:9px 17px;background:rgba(255,255,255,.055);color:var(--muted);font-size:13px;white-space:nowrap}
+#chat .inbox-filter.active{background:#fff;color:#21182d;border-color:#fff;font-weight:750}
+#chat .inbox-list{display:flex;flex-direction:column;gap:2px}
+#chat .inbox-row{display:flex;align-items:center;gap:13px;width:100%;padding:13px 2px;border:0;border-bottom:1px solid rgba(255,255,255,.055);background:transparent;text-align:left;min-width:0}
+#chat .inbox-avatar{position:relative;display:grid;place-items:center;flex:0 0 58px;width:58px;height:58px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#5c367e,#24203c);border:1px solid rgba(255,255,255,.12);font-size:26px}
+#chat .inbox-avatar img{width:100%;height:100%;object-fit:cover}
+#chat .inbox-row-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+#chat .inbox-row-copy strong{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#chat .inbox-row-copy small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#chat .inbox-row-time{align-self:flex-start;padding-top:4px;font-size:11px;color:var(--muted);white-space:nowrap}
+#chat .inbox-empty-note{padding:19px 14px;margin-top:12px;border:1px dashed rgba(185,135,255,.2);border-radius:15px;color:var(--muted);font-size:12px;line-height:1.5}
+#chat .public-chat-panel{margin-top:15px}
+#chat .public-chat-heading{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#chat .public-chat-heading h3{margin:0}
+#chat .public-chat-heading .note{margin:4px 0 0}
+#chat .chat-list{max-height:48vh}
+@media(max-width:380px){#chat .inbox-main-tab{font-size:20px}#chat .inbox-tabs{gap:20px}#chat .inbox-avatar{flex-basis:52px;width:52px;height:52px}#chat .inbox-filter{padding:8px 13px}}
+
 </style>
 </head>
 <body>
@@ -494,10 +524,30 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 </section>
 
 <section class="page" id="chat">
-  <h2>💬 QIVI Chat</h2>
-  <div class="panel">
-    <h3>Obrolan Umum QIVI</h3>
-    <p class="muted">Pesan dikirim ke ruang chat bersama jika tabel dan izin Supabase sudah disiapkan.</p>
+  <div class="inbox-top">
+    <div class="inbox-tabs" role="tablist" aria-label="Pesan dan kontak">
+      <button type="button" class="inbox-main-tab active" id="inboxMessagesTab" onclick="setInboxTab('messages')">Pesan</button>
+      <button type="button" class="inbox-main-tab" id="inboxContactsTab" onclick="setInboxTab('contacts')">Kontak</button>
+    </div>
+    <button class="inbox-icon-btn" type="button" aria-label="Cari pesan" onclick="document.getElementById('inboxSearch').focus()">⌕</button>
+    <button class="inbox-icon-btn" type="button" aria-label="Pilihan pesan" onclick="notify('Pengaturan Pesan QIVI akan ditambahkan setelah chat pribadi tersedia.')">☰</button>
+  </div>
+  <input id="inboxSearch" class="inbox-search" type="search" placeholder="Cari nama atau pesan..." oninput="filterInboxRows()" aria-label="Cari nama atau pesan">
+  <div class="inbox-filters" id="inboxFilters">
+    <button type="button" class="inbox-filter active" data-inbox-filter="all" onclick="setInboxFilter('all',this)">Semua</button>
+    <button type="button" class="inbox-filter" data-inbox-filter="online" onclick="setInboxFilter('online',this)">Online</button>
+    <button type="button" class="inbox-filter" data-inbox-filter="frequent" onclick="setInboxFilter('frequent',this)">Sering Chat</button>
+  </div>
+  <div id="inboxList" class="inbox-list">
+    <button type="button" class="inbox-row" data-search="obrolan umum qivi chat bersama" onclick="openPublicChat()">
+      <span class="inbox-avatar inbox-group-avatar">✦</span>
+      <span class="inbox-row-copy"><strong>Obrolan Umum QIVI</strong><small>Ruang obrolan bersama pengguna QIVI</small></span>
+      <span class="inbox-row-time">QIVI</span>
+    </button>
+    <div class="inbox-empty-note">Chat pribadi dan status online kontak akan muncul di sini setelah fitur pesan pribadi tersambung.</div>
+  </div>
+  <div id="publicChatPanel" class="panel public-chat-panel hidden">
+    <div class="public-chat-heading"><button type="button" class="btn secondary small" onclick="closePublicChat()">‹ Kembali</button><div><h3>Obrolan Umum QIVI</h3><p class="note">Pesan bersama pengguna QIVI</p></div></div>
     <p id="chatStatus" class="note" aria-live="polite">Menyiapkan chat online…</p>
     <div id="chatMessages" class="chat-list"><div class="empty">Memuat pesan…</div></div>
     <label for="chatInput">Pesan</label>
@@ -651,7 +701,45 @@ const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHAB
 const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',profilePhotoUrl:'',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,liveChatChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null,musicRoomChannel:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRemote:false,homePresenceChannel:null};
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
-function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
+
+function setInboxTab(tab){
+  const messages=$('inboxMessagesTab'), contacts=$('inboxContactsTab');
+  messages.classList.toggle('active',tab==='messages');
+  contacts.classList.toggle('active',tab==='contacts');
+  if(tab==='contacts'){
+    $('inboxFilters').classList.add('hidden');
+    $('inboxList').innerHTML='<div class="inbox-empty-note">Kontak akan ditampilkan setelah data pengguna dan status online QIVI tersambung. Untuk sekarang, obrolan umum tetap bisa dibuka melalui tab Pesan.</div>';
+  }else{
+    $('inboxFilters').classList.remove('hidden');
+    $('inboxList').innerHTML='<button type="button" class="inbox-row" data-search="obrolan umum qivi chat bersama" onclick="openPublicChat()"><span class="inbox-avatar inbox-group-avatar">✦</span><span class="inbox-row-copy"><strong>Obrolan Umum QIVI</strong><small>Ruang obrolan bersama pengguna QIVI</small></span><span class="inbox-row-time">QIVI</span></button><div class="inbox-empty-note">Chat pribadi dan status online kontak akan muncul di sini setelah fitur pesan pribadi tersambung.</div>';
+    setInboxFilter('all',document.querySelector('[data-inbox-filter="all"]'));
+    filterInboxRows();
+  }
+}
+function setInboxFilter(filter,button){
+  document.querySelectorAll('#inboxFilters .inbox-filter').forEach(el=>el.classList.toggle('active',el===button));
+  document.querySelectorAll('#inboxList .inbox-row').forEach(row=>{
+    row.classList.toggle('hidden',filter==='online'||filter==='frequent');
+  });
+  const note=$('inboxList').querySelector('.inbox-empty-note');
+  if(note&&filter!=='all')note.textContent=filter==='online'?'Belum ada data status online kontak untuk ditampilkan.':'Daftar Sering Chat akan tersedia setelah pesan pribadi QIVI tersambung.';
+  else if(note)note.textContent='Chat pribadi dan status online kontak akan muncul di sini setelah fitur pesan pribadi tersambung.';
+}
+function filterInboxRows(){
+  const q=($('inboxSearch')?.value||'').trim().toLowerCase();
+  document.querySelectorAll('#inboxList .inbox-row').forEach(row=>row.classList.toggle('hidden',!String(row.dataset.search||'').includes(q)));
+}
+function openPublicChat(){
+  $('publicChatPanel').classList.remove('hidden');
+  $('publicChatPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  loadChatMessages();
+}
+function closePublicChat(){
+  $('publicChatPanel').classList.add('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat'){closePublicChat();}if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
 
 const qiviMicSeatState={selected:null,sessionKey:'qivi-'+Math.random().toString(36).slice(2)+Date.now().toString(36)};
 function setDiscoverTab(tab,button){
@@ -1440,103 +1528,4 @@ async function applyRoomPlayback(song,d){
         const cleanup=()=>{player.removeEventListener('loadedmetadata',done);player.removeEventListener('error',fail)};
         player.addEventListener('loadedmetadata',done,{once:true});
         player.addEventListener('error',fail,{once:true});
-      });
-    }
-    try{player.currentTime=Math.max(0,Number(d.time)||0)}catch{}
-    if(d.action==='pause')player.pause();
-    else if(d.action==='play')await player.play();
-  }finally{
-    setTimeout(()=>{state.musicRoomApplyingRemote=false},700);
-  }
-}
-async function sendRoomPlayback(action){
-  if(!state.musicRoomJoined||!state.musicRoomChannel)return notify('Gabung ke ruang terlebih dahulu.');
-  const song=state.karaokeSongs.find(item=>item.id===$('roomSongSelect').value)||state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);
-  if(!song)return notify('Pilih lagu terlebih dahulu.');
-  const player=$('karaokePlayer');
-  if(state.karaokeCurrentId!==song.id){
-    state.karaokeCurrentId=song.id;player.src=song.url;player.load();
-    $('karaokeNowPlaying').textContent='🎵 '+song.title+' — '+(song.singer||'Penyanyi tidak dicantumkan');
-    renderKaraokeLyrics(song,0);renderKaraokeSongs();
-  }
-  if(action==='play'){
-    try{await player.play()}catch{notify('Lagu dipilih. Jika belum berbunyi, buka Nyanyi lalu tekan Putar.');}
-  }else player.pause();
-  try{
-    await state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number(player.currentTime)||0,action}});
-    appendMusicRoomMessage(state.name,(action==='pause'?'Menjeda':'Memutar')+' bersama: '+song.title);
-    notify(action==='pause'?'Perintah jeda dibagikan ke ruang.':'Perintah putar dibagikan ke ruang.');
-  }catch(e){notify('Gagal menyinkronkan lagu: '+(e?.message||'koneksi bermasalah'));}
-}
-function broadcastRoomPlayback(){return sendRoomPlayback('play')}
-function broadcastRoomPause(){return sendRoomPlayback('pause')}
-$('musicRoomMessage').addEventListener('keydown',event=>{
-  if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMusicRoomMessage();}
-});
-$('karaokePlayer').addEventListener('play',()=>{
-  if(state.musicRoomApplyingRemote||!state.musicRoomJoined||!state.musicRoomChannel)return;
-  const song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);
-  if(!song)return;
-  state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number($('karaokePlayer').currentTime)||0,action:'play'}}).catch(()=>{});
-});
-$('karaokePlayer').addEventListener('pause',()=>{
-  if(state.musicRoomApplyingRemote||!state.musicRoomJoined||!state.musicRoomChannel)return;
-  const song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);
-  if(!song)return;
-  state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number($('karaokePlayer').currentTime)||0,action:'pause'}}).catch(()=>{});
-});
-
-function editProfile(){
- const value=prompt('Nama profil:',state.name);
- if(value!==null&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;try{localStorage.setItem('qiviProfileName',state.name)}catch(e){}renderStatuses();refreshQiviHomePresence();notify('Nama profil diperbarui.')}
- chooseProfilePhoto();
-}
-function chooseProfilePhoto(){const input=$('qiviProfilePhotoInput');if(input)input.click()}
-async function handleProfilePhoto(event){
- const file=event.target.files&&event.target.files[0];if(!file)return;
- if(!file.type.startsWith('image/')){notify('Pilih file foto/gambar.');event.target.value='';return}
- if(file.size>5*1024*1024){notify('Ukuran foto maksimal 5 MB.');event.target.value='';return}
- try{
-  const user=await ensureSupabaseSession();
-  const ext=(file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'jpg';
-  const path='avatars/'+user.id+'.'+ext;
-  const {data,error}=await qiviSupabase.storage.from(VIDEO_BUCKET).upload(path,file,{upsert:true,cacheControl:'3600',contentType:file.type||'image/jpeg'});
-  if(error)throw error;
-  const {data:pub}=qiviSupabase.storage.from(VIDEO_BUCKET).getPublicUrl(data.path);
-  state.profilePhotoUrl=pub.publicUrl;
-  try{localStorage.setItem('qiviProfileUrl',state.profilePhotoUrl);localStorage.setItem('qiviProfileName',state.name)}catch(e){}
-  renderProfilePhoto();
-  refreshQiviHomePresence();
-  notify('Foto berhasil diunggah. Kirim pesan baru untuk menampilkan foto di chat.');
- }catch(err){
-  const msg=err&&err.message?err.message:'kesalahan penyimpanan';
-  notify('Foto belum tersimpan ke server: '+msg);
- }finally{event.target.value=''}
-}
-function renderProfilePhoto(){
- const targets=[$('profileAvatarButton'),document.querySelector('.home-avatar')];
- targets.forEach(el=>{if(!el)return;el.replaceChildren();if(state.profilePhotoUrl){const img=document.createElement('img');img.src=state.profilePhotoUrl;img.alt='Foto profil';el.appendChild(img)}else el.textContent='👤'});
-}
-function loadSavedProfile(){
- try{const n=localStorage.getItem('qiviProfileName');const u=localStorage.getItem('qiviProfileUrl');if(n)state.name=n.slice(0,40);if(u)state.profilePhotoUrl=u}catch(e){}
- $('profileName').textContent=state.name;renderProfilePhoto();
-}
-function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins;if($('coinHome'))$('coinHome').textContent=state.coins;if($('profileCoins'))$('profileCoins').textContent=state.coins}
-window.addEventListener('pagehide',()=>{
-  stopCamera();
-  const channel=state.musicRoomChannel;
-  if(channel){try{channel.untrack()}catch(e){console.warn('QIVI pagehide untrack:',e)}}
-  const onlineChannel=state.homePresenceChannel;
-  if(onlineChannel){try{onlineChannel.untrack()}catch(e){console.warn('QIVI online untrack:',e)}}
-});
-loadSavedProfile();renderCoins();renderStatuses();renderVideos();startQiviHomePresence();loadRemoteVideos();loadRemoteKaraokeSongs();
-$('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/qivi-social-app/service-worker.js')
-      .catch(error => console.error('Service worker:', error));
-  });
-}
-</script>
-</body>
-</html>
+     
