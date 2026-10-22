@@ -292,6 +292,38 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 #rooms .room-chat-item{border-radius:14px;border:1px solid rgba(177,142,226,.12);background:#201a31}
 @media(max-width:380px){#rooms .rooms-heading h2{font-size:24px}#rooms .rooms-room-card{padding:13px}#rooms .rooms-feature-grid{gap:8px}#rooms .rooms-feature{padding:12px}}
 
+
+/* QIVI Rooms visual polish: consistent spacing, readable seats and compact audio controls */
+#rooms .qivi-mic-panel{padding:16px!important;overflow:hidden}
+#rooms .qivi-mic-panel .rooms-card-title{align-items:center;gap:12px;margin-bottom:14px}
+#rooms .qivi-mic-panel .rooms-card-title h3{font-size:18px;line-height:1.25}
+#rooms .qivi-mic-panel .rooms-card-title small{font-size:12px;line-height:1.4}
+#rooms .qivi-mic-note{font-size:13px;line-height:1.55;padding:13px 14px;margin:0 0 15px;border-radius:16px}
+#rooms .qivi-mic-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+#rooms .qivi-mic-seat{min-height:136px;padding:13px 5px 11px;gap:7px;border-radius:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+#rooms .qivi-seat-avatar{flex-basis:54px;width:54px;height:54px;min-width:54px;min-height:54px;font-size:24px}
+#rooms .qivi-mic-seat b{font-size:13px;line-height:1.25;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+#rooms .qivi-mic-seat small{font-size:11px;line-height:1.35}
+#rooms .qivi-seat-presence{font-size:11px;min-height:15px;margin-top:2px}
+#rooms #qiviMicSeatStatus,#rooms #qiviAudioStatus{display:block;margin:13px 0 0;padding:12px 13px;border:1px solid rgba(177,142,226,.17);border-radius:14px;background:rgba(155,92,255,.07);font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+#rooms .qivi-mic-panel .rooms-action-row{gap:10px;margin-top:12px!important;align-items:stretch}
+#rooms .qivi-mic-panel .rooms-action-row .btn{min-width:0;min-height:54px;padding:12px 10px;border-radius:16px;font-size:14px;line-height:1.3;white-space:normal;overflow-wrap:anywhere}
+#rooms .qivi-mic-panel .rooms-action-row .btn:disabled{opacity:.55;cursor:not-allowed}
+#rooms .rooms-room-card{margin-bottom:16px}
+#rooms .rooms-feature-grid{gap:10px;margin-bottom:14px}
+#rooms .rooms-feature{padding:14px;border-radius:18px}
+#rooms .rooms-feature p{font-size:12px;line-height:1.5}
+#rooms #roomSongSelect{width:100%;max-width:100%;box-sizing:border-box;min-height:50px}
+#rooms #qiviRemoteAudio{display:none!important}
+@media(max-width:380px){
+ #rooms .qivi-mic-panel{padding:12px!important}
+ #rooms .qivi-mic-grid{gap:7px}
+ #rooms .qivi-mic-seat{min-height:126px;padding:11px 3px 9px;border-radius:16px}
+ #rooms .qivi-seat-avatar{flex-basis:46px;width:46px;height:46px;min-width:46px;min-height:46px}
+ #rooms .qivi-mic-panel .rooms-action-row{grid-template-columns:1fr 1fr;gap:7px}
+ #rooms .qivi-mic-panel .rooms-action-row .btn{font-size:12px;padding:10px 6px;min-height:50px}
+}
+
 </style>
 </head>
 <body>
