@@ -1157,15 +1157,20 @@ async function joinMusicRoom(){
 }
 async function leaveMusicRoom(showNotice=true){
   const channel=state.musicRoomChannel;
-  if(channel&&qiviSupabase){try{await qiviSupabase.removeChannel(channel)}catch{}}
   const wasJoined=state.musicRoomJoined;
+  // Hapus status kursi dari Presence sebelum menutup channel agar perangkat lain
+  // segera menerima event leave dan mengosongkan kursi yang ditinggalkan.
+  if(channel){
+    try{await channel.untrack()}catch(e){console.warn('QIVI seat untrack:',e)}
+    if(qiviSupabase){try{await qiviSupabase.removeChannel(channel)}catch(e){console.warn('QIVI room cleanup:',e)}}
+  }
   state.musicRoomChannel=null;state.musicRoomName=null;state.musicRoomJoined=false;
   qiviMicSeatState.selected=null;
   $('musicRoomMessage').disabled=true;$('sendRoomMessageButton').disabled=true;
   if($('musicRoomChat'))$('musicRoomChat').innerHTML='<div class="empty">Gabung ruang untuk mulai mengobrol.</div>';
-  setMusicRoomStatus('Belum bergabung ke ruang. Gunakan nama ruang yang sama di perangkat teman.');
+  setMusicRoomStatus('Belum bergabung ke ruang. Kursi akan kosong setelah peserta keluar.');
   renderQiviMicSeats();
-  if(showNotice&&wasJoined)notify('Kamu keluar dari QIVI Rooms.');
+  if(showNotice&&wasJoined)notify('Kamu keluar dari QIVI Rooms. Kursi sudah dilepas.');
 }
 async function sendMusicRoomMessage(){
   const message=$('musicRoomMessage').value.trim();
@@ -1289,7 +1294,11 @@ function loadSavedProfile(){
  $('profileName').textContent=state.name;renderProfilePhoto();
 }
 function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins;if($('coinHome'))$('coinHome').textContent=state.coins;if($('profileCoins'))$('profileCoins').textContent=state.coins}
-window.addEventListener('pagehide',stopCamera);
+window.addEventListener('pagehide',()=>{
+  stopCamera();
+  const channel=state.musicRoomChannel;
+  if(channel){try{channel.untrack()}catch(e){console.warn('QIVI pagehide untrack:',e)}}
+});
 loadSavedProfile();renderCoins();renderStatuses();renderVideos();loadRemoteVideos();loadRemoteKaraokeSongs();
 $('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
 if ('serviceWorker' in navigator) {
