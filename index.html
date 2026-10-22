@@ -270,6 +270,18 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 #rooms .rooms-chat-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 #rooms .rooms-chat-head .rooms-count{font-size:11px;color:var(--muted);background:var(--surface2);border-radius:20px;padding:5px 9px}
 #rooms #musicRoomChat{max-height:300px;padding:4px 0}
+
+/* QIVI microphone seats: responsive visual prototype */
+#rooms .qivi-mic-note{font-size:12px;line-height:1.5;color:#d8c9ed;background:rgba(155,92,255,.09);border:1px solid rgba(177,142,226,.18);padding:10px 12px;border-radius:13px;margin:0 0 13px}
+#rooms .qivi-mic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#rooms .qivi-mic-seat{min-width:0;padding:12px 5px;border-radius:17px;border:1px solid rgba(177,142,226,.2);background:linear-gradient(145deg,#241c35,#171322);color:var(--text);display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .15s,border-color .15s,background .15s}
+#rooms .qivi-mic-seat:active{transform:scale(.97)}
+#rooms .qivi-seat-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:23px;background:linear-gradient(145deg,rgba(255,79,216,.22),rgba(84,165,255,.2));border:1px solid rgba(218,170,255,.22)}
+#rooms .qivi-mic-seat b{font-size:12px}
+#rooms .qivi-mic-seat small{font-size:10px;color:var(--muted)}
+#rooms .qivi-mic-seat.is-selected{border-color:#bd8aff;background:linear-gradient(145deg,rgba(155,92,255,.27),rgba(84,165,255,.12));box-shadow:0 0 0 1px rgba(189,138,255,.15),0 8px 24px rgba(92,42,150,.14)}
+#rooms .qivi-mic-seat.is-selected .qivi-seat-avatar{background:linear-gradient(145deg,#9b5cff,#e14ac8);color:white}
+@media(max-width:360px){#rooms .qivi-mic-grid{gap:7px}#rooms .qivi-mic-seat{padding:10px 3px}#rooms .qivi-seat-avatar{width:42px;height:42px}}
 #rooms .room-chat-item{border-radius:14px;border:1px solid rgba(177,142,226,.12);background:#201a31}
 @media(max-width:380px){#rooms .rooms-heading h2{font-size:24px}#rooms .rooms-room-card{padding:13px}#rooms .rooms-feature-grid{gap:8px}#rooms .rooms-feature{padding:12px}}
 
@@ -422,6 +434,20 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
     <div class="rooms-feature"><div class="rooms-feature-icon">🎵</div><strong>Lagu bersama</strong><p>Pilih dan bagikan lagu dari katalog QIVI.</p><button class="btn secondary" type="button" onclick="document.getElementById('roomSongSelect').scrollIntoView({behavior:'smooth',block:'center'})">Pilih lagu ↓</button></div>
     <div class="rooms-feature"><div class="rooms-feature-icon">💬</div><strong>Obrolan ruang</strong><p>Kirim pesan ke teman yang berada di ruang sama.</p><button class="btn secondary" type="button" onclick="document.getElementById('musicRoomMessage').scrollIntoView({behavior:'smooth',block:'center'})">Buka chat ↓</button></div>
   </div>
+
+  <div class="rooms-room-card qivi-mic-panel">
+    <div class="rooms-card-title"><div class="rooms-icon">🎙️</div><div><h3>Kursi mikrofon</h3><small>Konsep room sosial QIVI</small></div></div>
+    <div class="qivi-mic-note">Pilih kursi untuk menandai posisi kamu di room. Ini tahap tampilan dan status kursi; audio mikrofon antarperangkat belum dihubungkan.</div>
+    <div class="qivi-mic-grid" id="qiviMicSeats">
+      <button class="qivi-mic-seat" type="button" data-seat="1" onclick="toggleQiviMicSeat(1)"><span class="qivi-seat-avatar">👑</span><b>Kursi 1</b><small>Host</small></button>
+      <button class="qivi-mic-seat" type="button" data-seat="2" onclick="toggleQiviMicSeat(2)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 2</b><small>Kosong</small></button>
+      <button class="qivi-mic-seat" type="button" data-seat="3" onclick="toggleQiviMicSeat(3)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 3</b><small>Kosong</small></button>
+      <button class="qivi-mic-seat" type="button" data-seat="4" onclick="toggleQiviMicSeat(4)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 4</b><small>Kosong</small></button>
+      <button class="qivi-mic-seat" type="button" data-seat="5" onclick="toggleQiviMicSeat(5)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 5</b><small>Kosong</small></button>
+      <button class="qivi-mic-seat" type="button" data-seat="6" onclick="toggleQiviMicSeat(6)"><span class="qivi-seat-avatar">🎤</span><b>Kursi 6</b><small>Kosong</small></button>
+    </div>
+    <p class="note" id="qiviMicSeatStatus" aria-live="polite">Belum memilih kursi mikrofon.</p>
+  </div>
   <div class="rooms-room-card">
     <div class="rooms-card-title"><div class="rooms-icon">🎤</div><div><h3>Putar musik bersama</h3><small>Kontrol pemutaran lagu di ruang</small></div></div>
     <label for="roomSongSelect">Pilih lagu dari katalog</label>
@@ -499,6 +525,29 @@ const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',profilePhoto
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
 function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
+
+const qiviMicSeatState={selected:null};
+function toggleQiviMicSeat(seat){
+  const wrap=$('qiviMicSeats');
+  if(!wrap)return;
+  const btn=wrap.querySelector('[data-seat="'+seat+'"]');
+  if(!btn)return;
+  if(qiviMicSeatState.selected===seat){
+    qiviMicSeatState.selected=null;
+    btn.classList.remove('is-selected');
+    btn.querySelector('small').textContent='Kosong';
+    $('qiviMicSeatStatus').textContent='Kamu sudah melepas kursi mikrofon.';
+    return;
+  }
+  wrap.querySelectorAll('.qivi-mic-seat').forEach(item=>{
+    item.classList.remove('is-selected');
+    item.querySelector('small').textContent='Kosong';
+  });
+  qiviMicSeatState.selected=seat;
+  btn.classList.add('is-selected');
+  btn.querySelector('small').textContent='Kamu';
+  $('qiviMicSeatStatus').textContent='Kamu memilih Kursi '+seat+'. Status ini hanya tampilan lokal, belum terlihat oleh pengguna lain.';
+}
 function updateStatusForm(){const type=$('statusType').value;$('textFields').classList.toggle('hidden',type!=='text');$('fileFields').classList.toggle('hidden',type==='text');clearStatusPreview()}
 function clearStatusPreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}$('statusPreview').replaceChildren()}
 $('statusFile').addEventListener('change',()=>{clearStatusPreview();const f=$('statusFile').files[0];if(!f)return;const type=$('statusType').value;if((type==='image'&&!f.type.startsWith('image/'))||(type==='video'&&!f.type.startsWith('video/')))return notify('Jenis file tidak sesuai pilihan.');if(f.size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');state.previewUrl=URL.createObjectURL(f);const m=document.createElement(type==='image'?'img':'video');m.className='media';m.src=state.previewUrl;if(type==='video'){m.controls=true;m.playsInline=true}else m.alt='Pratinjau foto status';$('statusPreview').appendChild(m)});
