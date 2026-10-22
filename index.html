@@ -359,6 +359,24 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 #beranda .ad-slot-content p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
 #beranda .ad-slot-button{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-radius:12px;background:rgba(155,92,255,.18);color:#e7c4ff;padding:11px 13px;font-weight:700}
 
+
+/* Home discovery tabs — compact mobile-first layout */
+.discover-topbar{display:flex;align-items:center;gap:12px;margin:3px 0 16px;min-width:0}
+.discover-tabs{display:flex;align-items:center;gap:17px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.discover-tabs::-webkit-scrollbar{display:none}
+.discover-tab{position:relative;flex:0 0 auto;border:0;background:transparent;color:#aaa3c0;padding:10px 0 12px;font-size:15px;font-weight:750;white-space:nowrap}
+.discover-tab.active{color:#fff}
+.discover-tab.active:after{content:"";position:absolute;left:15%;right:15%;bottom:3px;height:3px;border-radius:5px;background:linear-gradient(90deg,#a85cff,#ff4fd8)}
+.discover-icon-btn{flex:0 0 34px;width:34px;height:38px;border:0;background:transparent;color:#eee8f8;font-size:25px;display:grid;place-items:center;padding:0}
+.discover-search{display:flex;align-items:center;gap:10px;padding:13px 15px;border:1px solid rgba(185,135,255,.18);border-radius:17px;background:rgba(255,255,255,.045);color:var(--muted);margin-bottom:17px;font-size:14px}
+.discover-search span:nth-child(2){flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.discover-search .search-trailing{font-size:18px}
+#beranda .home-online{margin-top:0}
+#beranda .home-ad-slot{min-height:175px;margin:18px 0 22px}
+#beranda .home-online-list{scrollbar-width:none}
+#beranda .home-online-list::-webkit-scrollbar{display:none}
+@media(max-width:380px){.discover-topbar{gap:7px}.discover-tabs{gap:12px}.discover-tab{font-size:13px}.discover-icon-btn{flex-basis:28px;width:28px;font-size:22px}.discover-search{padding:11px 12px}}
+
 </style>
 </head>
 <body>
@@ -368,16 +386,21 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 </header>
 <main>
 <section class="page active" id="beranda">
-  <div class="home-topline">
-    <div><p class="home-greeting">Selamat datang kembali,</p><div class="home-title">Jelajahi QIVI ✨</div></div>
-    <button class="home-avatar" aria-label="Buka profil" onclick="openPage('profil')">👤</button>
+  <div class="discover-topbar" aria-label="Penemuan teman">
+    <div class="discover-tabs" role="tablist" aria-label="Kategori teman">
+      <button class="discover-tab active" type="button" role="tab" aria-selected="true" data-discover="recommended" onclick="setDiscoverTab('recommended',this)">Disarankan</button>
+      <button class="discover-tab" type="button" role="tab" aria-selected="false" data-discover="nearby" onclick="setDiscoverTab('nearby',this)">Dekat</button>
+      <button class="discover-tab" type="button" role="tab" aria-selected="false" data-discover="new" onclick="setDiscoverTab('new',this)">Orang baru</button>
+    </div>
+    <button class="discover-icon-btn" type="button" aria-label="Cari teman" onclick="openPage('chat')">⌕</button>
+    <button class="discover-icon-btn" type="button" aria-label="Filter teman" onclick="notify('Filter teman akan tersedia setelah profil dan data pengguna QIVI tersambung.')">☷</button>
   </div>
-  <div class="home-search" role="button" tabindex="0" onclick="openPage('chat')" onkeydown="if(event.key==='Enter')openPage('chat')">
-    <span>⌕</span><span style="flex:1">Temukan teman dan obrolan...</span><span>☷</span>
+  <div class="discover-search" role="button" tabindex="0" onclick="openPage('chat')" onkeydown="if(event.key==='Enter')openPage('chat')">
+    <span>⌕</span><span>Temukan teman dan obrolan...</span><span class="search-trailing">☷</span>
   </div>
   <section class="home-online panel" aria-labelledby="homeOnlineTitle">
     <div class="home-online-head"><div><span class="online-eyebrow">QIVI · TEMAN ONLINE</span><h2 id="homeOnlineTitle">Siapa yang sedang online?</h2></div><span class="online-live-pill"><i></i> LANGSUNG</span></div>
-    <p class="home-online-note">Peserta yang sedang aktif di Room yang sama akan tampil di sini.</p>
+    <p class="home-online-note" id="homeOnlineNote">Teman yang sedang aktif di Room akan muncul dengan foto profil dan tanda online.</p>
     <div id="homeOnlinePeople" class="home-online-list"><div class="home-online-empty">Masuk ke Room untuk melihat teman yang online.</div></div>
     <button class="home-online-action" onclick="openPage('rooms')">Masuk ke Room <span>›</span></button>
   </section>
@@ -601,6 +624,20 @@ function notify(message){const t=$('toast');t.textContent=message;t.classList.re
 function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
 
 const qiviMicSeatState={selected:null,sessionKey:'qivi-'+Math.random().toString(36).slice(2)+Date.now().toString(36)};
+function setDiscoverTab(tab,button){
+  document.querySelectorAll('.discover-tab').forEach(item=>{
+    const active=item===button;
+    item.classList.toggle('active',active);
+    item.setAttribute('aria-selected',active?'true':'false');
+  });
+  const note=$('homeOnlineNote');
+  if(note){
+    if(tab==='nearby')note.textContent='Daftar ini menampilkan pengguna yang terlihat online di Room. Fitur jarak terdekat memerlukan data lokasi yang dibagikan pengguna.';
+    else if(tab==='new')note.textContent='Pengguna online ditampilkan dari Room yang sedang kamu ikuti. Urutan pengguna baru membutuhkan data tanggal bergabung.';
+    else note.textContent='Teman yang sedang aktif di Room akan muncul dengan foto profil dan tanda online.';
+  }
+  renderHomeOnlinePeople();
+}
 function renderQiviMicSeats(){
   const wrap=$('qiviMicSeats');
   if(!wrap)return;
