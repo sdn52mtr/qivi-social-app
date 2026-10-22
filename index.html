@@ -1,1 +1,1674 @@
-
+<!DOCTYPE html> 
+<html lang="id"> 
+<head> 
+<link rel="manifest" href="manifest.json"> 
+<meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"> 
+<meta name="theme-color" content="#100d1c"> 
+<meta name="description" content="QIVI - Sing, Share, Live"> 
+<title>QIVI — Sing, Share, Live</title> 
+<style> 
+:root{color-scheme:dark;--bg:#100d1c;--surface:#1b1729;--
+surface2:#252039;--pink:#ed48d5;--purple:#9346ff;--blue:#438cff;--text:#fff;-muted:#aaa5bd;--border:#363047;--gold:#ffdc7b} 
+*{box-sizing:border-box} html{scroll-behavior:smooth} 
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;paddingbottom:88px} 
+button,input,textarea,select{font:inherit} button{cursor:pointer;color:inherit} button:disabled{opacity:.55;cursor:not-allowed} 
+header{position:sticky;top:0;z-index:10;display:flex;justify-content:spacebetween;align-items:center;gap:12px;padding:14px 
+16px;background:#15111feF;border-bottom:1px solid var(--border);backdropfilter:blur(14px)} 
+.brand{font-size:29px;font-weight:900;letter-spacing:1px;background:lineargradient(100deg,#ff75e7,#a71aff,#70aaff);color:transparent;backgroundclip:text} 
+.tagline{font-size:10px;letter-spacing:2px;color:var(--muted)} 
+.coin-button{border:1px solid #655083;border-radius:24px;background:var(-surface2);padding:9px 12px;color:var(--gold);font-weight:800} main{max-width:720px;margin:auto;padding:16px} .page{display:none;animation:appear .18s ease-out} 
+.page.active{display:block} 
+@keyframes appear{from{opacity:.5;transform:translateY(3px)} to{opacity:1;transform:translateY(0)}} 
+h1{font-size:25px;margin:6px 0 10px}h2{font-size:23px;margin:8px 0 12px} h3{font-size:17px;margin:0 0 8px} 
+p{line-height:1.55}.muted,.note{color:var(--muted)}.note{font-size:12px} .panel{background:var(--surface);border:1px solid var(--border);borderradius:20px;padding:16px;margin-bottom:14px;min-width:0} .hero{padding:23px 20px;border-radius:24px;margin-
+bottom:15px;background:linear-gradient(135deg,#351d5d,#251c45 
+55%,#344f86)} 
+.btn{border:0;border-radius:13px;padding:12px 16px;background:lineargradient(105deg,var(--purple),var(--pink));color:#fff;font-weight:750} .btn.secondary{background:var(--surface2);border:1px solid var(--border)} .btn.small{padding:8px 11px;font-size:13px} 
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .feature{text-align:left;min-height:112px;padding:15px;background:var(-surface2);border:1px solid var(--border);border-radius:18px} 
+.feature span{display:block;font-size:26px;margin-bottom:6px}.feature b{display:block;font-size:18px}.feature small{display:block;margintop:4px;color:var(--muted)} 
+input,textarea,select{display:block;width:100%;min-width:0;margin:8px 0 12px;padding:12px;background:#131020;color:white;border:1px solid var(-border);border-radius:12px} textarea{min-height:90px;resize:vertical} label{font-size:13px;color:#ded8ec} 
+.hidden{display:none!important} 
+.empty{text-align:center;padding:20px 8px;color:var(--muted)} 
+.media{display:block;width:100%;max-width:100%;max-height:420px;objectfit:contain;background:#08070d;border-radius:15px;margin:10px 0} 
+.video-card{width:100%;min-width:0;overflow:hidden} 
+.video-card-title{min-width:0;max-width:100%;white-space:normal;overflowwrap:anywhere;word-break:break-word;line-height:1.35;margin:0 0 10px} 
+.video-card video{width:100%;max-width:100%} 
+.chat-list{max-height:52vh;overflow-y:auto;display:flex;flexdirection:column;gap:8px;padding:4px 0} 
+.chat-bubble{background:var(--surface2);border:1px solid var(--border);borderradius:14px;padding:10px 12px;overflow-wrap:anywhere} .chat-bubble.mine{border-color:#8d4bce;background:#302044} 
+.chat-meta{font-size:11px;color:var(--muted);margin-bottom:4px} 
+.chat-compose{display:flex;gap:8px;align-items:flex-end} .chat-compose textarea{flex:1;min-width:0;margin-bottom:0;minheight:48px;max-height:120px} .chat-compose button{flex-shrink:0} 
+.story-row{display:flex;gap:12px;overflow-x:auto;padding:8px 0 12px} .story{flex:0 0 72px;border:0;background:none;padding:0;textalign:center;color:var(--muted);font-size:12px} 
+.story-ring{width:66px;height:66px;padding:3px;margin:0 auto 6px;borderradius:50%;background:linear-gradient(135deg,var(--pink),var(--purple),var(-blue))} 
+.story-inner{width:100%;height:100%;border:3px solid var(--surface);borderradius:50%;display:grid;place-
+items:center;background:#29223d;overflow:hidden;font-size:23px} 
+.story-inner img{width:100%;height:100%;object-fit:cover} 
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;justifycontent:space-around;gap:2px;padding:8px 3px calc(8px + env(safe-areainset-bottom));background:#171326f5;border-top:1px solid var(-border);backdrop-filter:blur(14px)} 
+.nav{flex:1;min-width:0;padding:5px 0;border:0;background:none;color:var(-muted);font-size:10px} 
+.nav span{display:block;font-size:20px;marginbottom:3px}.nav.active{color:#ff78e6;font-weight:800} .toast{position:fixed;left:16px;right:16px;bottom:90px;zindex:30;background:#302641;border:1px solid #765681;borderradius:12px;padding:12px;text-align:center} 
+.room{display:flex;align-
+items:center;gap:12px;padding:12px;background:var(--surface2);borderradius:14px;margin:8px 0} 
+.room-icon{font-size:25px}.room-info{flex:1} .status-card{background:var(--surface2);borderradius:14px;padding:12px;margin:8px 0} 
+video{background:#050509}.live-videos{display:grid;grid-templatecolumns:minmax(0,1fr);gap:8px}.live-videos video{min-height:150px;maxheight:360px;object-fit:contain} 
+@media(max-width:380px)
+{main{padding:12px}.panel{padding:13px}.nav{font-size:9px}.nav span{fontsize:18px}.feature{padding:12px}} 
+/* QIVI Karaoke */ 
+.karaoke-cover{background:radial-gradient(circle at top right,#563080 0,#211831 48%,#171323 100%);border:1px solid #4a365f;borderradius:22px;padding:18px;margin-bottom:14px} .karaoke-cover .mic{font-size:48px;text-align:center} 
+.karaoke-row{display:flex;gap:10px;align-items:center;background:var(-surface2);border:1px solid var(--border);padding:12px;borderradius:14px;margin:8px 0} 
+.karaoke-row .song-info{flex:1;min-width:0;overflow-wrap:anywhere} .karaoke-row .song-info small{display:block;color:var(--muted);margintop:4px} 
+.karaoke-row button{flex-shrink:0} 
+.karaoke-lyrics{white-space:pre-wrap;overflow-
+wrap:anywhere;background:#100d1c;border:1px solid var(--border);borderradius:14px;padding:14px;min-height:90px;color:#f4d8ff;line-height:1.8;maxheight:340px;overflow-y:auto;text-align:center}.karaoke-line{padding:5px 2px;color:var(--muted);transition:color .15s,transform .15s}.karaokeline.active{color:#fff;font-weight:850;font-size:1.12em;text-shadow:0 0 16px 
+#ed48d599;transform:scale(1.02)} 
+.karaoke-progress{width:100%;accent-color:var(--pink)} 
+.room-status{padding:10px 12px;border-
+radius:12px;background:#131020;border:1px solid var(--border);fontsize:13px;color:var(--muted);overflow-wrap:anywhere} .room-chat{display:flex;flex-direction:column;gap:8px;maxheight:260px;overflow-y:auto;margin:10px 0} 
+.room-chat-item{padding:9px 11px;border-radius:12px;background:var(-surface2);overflow-wrap:anywhere} 
+.room-chat-item small{display:block;color:var(--muted);font-size:11px;marginbottom:3px} 
+/* QIVI PREMIUM REDESIGN — visual layer only; existing features and IDs retained */ 
+:root{ 
+color-scheme:dark; 
+--bg:#090711;--surface:#151222;--surface2:#201a31; 
+--pink:#ff4fd8;--purple:#9b5cff;--blue:#54a5ff; 
+--text:#fff;--muted:#aaa3c0;--border:#332844;--gold:#ffe08a; 
+} 
+body{ 
+background: 
+radial-gradient(ellipse at 12% -8%,rgba(155,92,255,.20),transparent 34rem), radial-gradient(ellipse at 95% 22%,rgba(255,79,216,.09),transparent 28rem), var(--bg); 
+letter-spacing:.01em; 
+} 
+header{ 
+background:rgba(12,9,22,.88);border-bottom:1px solid rgba(185,135,255,.19); box-shadow:0 8px 32px rgba(0,0,0,.18); 
+} 
+.brand{font-size:31px;filter:drop-shadow(0 0 14px rgba(255,79,216,.24))} 
+.tagline{font-size:9px;letter-spacing:2.4px} 
+.coin-button{ border:1px solid rgba(255,224,138,.35); 
+  background:linear-
+gradient(135deg,rgba(255,224,138,.12),rgba(155,92,255,.15)); 
+box-shadow:inset 0 1px rgba(255,255,255,.06); 
+} 
+main{padding:16px 14px 26px} 
+h1{font-size:clamp(25px,6vw,34px);letter-spacing:-.035em;line-height:1.12} h2{font-size:25px;letter-spacing:-.025em} h3{letter-spacing:-.01em} 
+.panel{ background:linear-gradient(145deg,rgba(28,22,44,.97),rgba(18,15,30,.97)); border:1px solid rgba(177,142,226,.16);border-radius:22px; box-shadow:0 12px 32px rgba(0,0,0,.13); 
+} 
+.hero{ 
+  position:relative;overflow:hidden;padding:27px 22px;border:1px solid rgba(255,255,255,.13); 
+  background:radial-gradient(circle at 100% 
+0,rgba(255,79,216,.28),transparent 42%), radial-gradient(circle at 0 100%,rgba(84,165,255,.25),transparent 42%), linear-gradient(135deg,#35205b,#211735 58%,#192a4c); 
+box-shadow:0 18px 42px rgba(87,40,139,.20); 
+} 
+.hero:after{content:" ";position:absolute;right:18px;top:10px;fontsize:60px;color:#fff;opacity:.08;pointer-events:none} 
+.btn{ 
+border-radius:14px;padding:12px 17px; 
+background:linear-gradient(110deg,#8954ff,#e64fd4 65%,#ff6da9); box-shadow:0 7px 20px rgba(155,92,255,.17); 
+transition:transform .16s ease,filter .16s ease; 
+} 
+.btn:active,.feature:active,.nav:active{transform:scale(.98)} 
+.btn.secondary{ background:linear-gradient(145deg,#29213d,#1b1729); border:1px solid rgba(188,158,232,.22);box-shadow:none; 
+} 
+.feature{ position:relative;overflow:hidden;min-height:120px;border-radius:20px; background:linear-gradient(145deg,rgba(43,32,65,.96),rgba(25,21,40,.98)); 
+  border:1px solid rgba(184,147,235,.19);box-shadow:0 8px 20px rgba(0,0,0,.12); 
+} 
+.feature span{font-size:29px;filter:drop-shadow(0 0 8px rgba(237,72,213,.18))} 
+.feature b{font-size:17px} 
+input,textarea,select{ 
+background:#100d1b;border:1px solid #3b304f;border-radius:14px; outline:none;transition:border-color .16s,box-shadow .16s; 
+} 
+input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 
+0 3px rgba(155,92,255,.13)} 
+.media{border:1px solid rgba(178,143,230,.17);border-radius:18px} .story-ring{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 5px 18px rgba(237,72,213,.15)} 
+.bottom{ background:rgba(14,11,24,.94);border-top:1px solid rgba(185,135,255,.19); box-shadow:0 -10px 30px rgba(0,0,0,.22);padding-top:9px; 
+} 
+.nav{border-radius:12px;transition:color .15s,transform .15s} 
+.nav.active{color:#ff79e5;text-shadow:0 0 14px rgba(255,79,216,.25)} 
+.nav.active span{filter:drop-shadow(0 0 7px rgba(255,79,216,.35))} 
+.karaoke-cover{ 
+  background:radial-gradient(circle at 100% 
+0,rgba(237,72,213,.20),transparent 40%), linear-gradient(145deg,#251938,#151120 75%); 
+border:1px solid rgba(190,133,255,.24);border-radius:24px; 
+} 
+.karaoke-lyrics{background:#0d0a16;border-color:#3a2a4e;borderradius:18px} 
+.karaoke-line.active{color:#fff;text-shadow:0 0 18px rgba(237,72,213,.72)} 
+.room-status{border-radius:14px} 
+.room-chat-item{border:1px solid rgba(177,142,226,.12);border-radius:14px} 
+.chat-bubble.mine{background:linear-
+gradient(135deg,rgba(111,62,158,.42),rgba(48,32,68,.95))} 
+.toast{background:#21172f;border-color:#80539a;box-shadow:0 12px 35px rgba(0,0,0,.28)} 
+@media(max-width:380px){ header{padding:12px} .brand{font-size:28px} main{padding:12px 10px 24px} .hero{padding:23px 18px} 
+.feature{min-height:108px} 
+} 
+@media(prefers-reduced-motion:reduce){ 
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!
+important;animation:none!important} 
+} 
+/* QIVI SOCIAL APP LAYER — redesigned home, profile, and compact navigation */ 
+.home-topline{display:flex;align-items:center;justify-content:spacebetween;gap:12px;margin:2px 0 16px} 
+.home-greeting{font-size:13px;color:var(--muted);margin:0 0 3px} 
+.home-title{font-size:28px;font-weight:900;letter-spacing:-1px;margin:0} .home-avatar{width:44px;height:44px;border-radius:50%;display:grid;placeitems:center;flex-shrink:0; 
+ background:linear-gradient(135deg,#ff5edb,#8954ff 
+58%,#54a5ff);border:2px solid rgba(255,255,255,.7); box-shadow:0 0 0 4px rgba(155,92,255,.13);font-size:21px} 
+.home-search{display:flex;align-items:center;gap:9px;border:1px solid var(-border);border-radius:15px; 
+ background:rgba(255,255,255,.045);padding:12px 14px;color:var(-muted);margin-bottom:17px} 
+.home-search span:last-child{margin-left:auto;font-size:18px} 
+.home-section-head{display:flex;align-items:center;justify-content:spacebetween;gap:8px;margin:20px 1px 10px} .home-section-head h3{margin:0;font-size:17px} 
+.home-section-head button{border:0;background:none;color:#d8a4ff;fontsize:12px;font-weight:750} 
+.home-hero{position:relative;overflow:hidden;padding:22px;borderradius:24px;margin-bottom:18px;  background:radial-gradient(circle at 90% 12%,rgba(255,79,216,.34),transparent 35%), 
+ radial-gradient(circle at 5% 100%,rgba(84,165,255,.28),transparent 
+38%),linear-gradient(135deg,#342052,#1d1831 62%,#1a2b4c); border:1px solid rgba(255,255,255,.12);box-shadow:0 16px 35px #0003} 
+.home-hero .eyebrow{font-size:10px;letter-spacing:2px;fontweight:850;color:#f4b8ff} 
+.home-hero h1{max-width:270px;font-size:27px;margin:10px 0 7px;lineheight:1.12} 
+.home-hero p{font-size:13px;color:#e2d9f0;max-width:290px;margin:0 0 15px} 
+.home-hero-art{position:absolute;right:10px;bottom:16px;fontsize:65px;opacity:.24;filter:drop-shadow(0 0 15px #c65aff);pointerevents:none} 
+.home-hero .btn{position:relative;z-index:1} .home-quick-grid{display:grid;grid-templatecolumns:repeat(3,minmax(0,1fr));gap:9px} 
+.home-quick{min-width:0;border:1px solid rgba(185,135,255,.16);borderradius:17px;padding:12px 5px; 
+ background:linear-gradient(145deg,#28203c,#171323);textalign:center;color:var(--text)} 
+.home-quick .quick-icon{width:43px;height:43px;margin:0 auto 7px;borderradius:14px;display:grid;place-items:center;  background:linear-
+gradient(145deg,rgba(255,79,216,.2),rgba(84,165,255,.18));font-size:22px} 
+.home-quick b{display:block;font-size:11px;whitespace:nowrap;overflow:hidden;text-overflow:ellipsis} 
+.home-quick:active{transform:scale(.97)} .discovery-list{display:grid;grid-templatecolumns:repeat(2,minmax(0,1fr));gap:11px} 
+.discovery-card{position:relative;min-height:145px;overflow:hidden;borderradius:19px;padding:14px; 
+ background:linear-gradient(145deg,#2a2140,#171322);border:1px solid rgba(185,135,255,.17)} 
+.discovery-card .discovery-icon{font-size:30px;margin-bottom:12px} 
+.discovery-card b{display:block;font-size:15px} 
+.discovery-card small{display:block;color:var(--muted);font-size:11px;margintop:5px;line-height:1.4} 
+.discovery-card button{margin-top:11px;border:1px solid #76549c;borderradius:10px;padding:7px 10px;background:#6d3cae;color:white;fontsize:11px;font-weight:750} 
+.home-wallet{display:flex;align-items:center;gap:12px;padding:15px;borderradius:18px;  background:linear-
+gradient(110deg,rgba(255,224,138,.12),rgba(155,92,255,.13));border:1px solid rgba(255,224,138,.2)} 
+.home-wallet .wallet-icon{font-size:27px} 
+.home-wallet .wallet-copy{flex:1;min-width:0} 
+.home-wallet small{display:block;color:var(--muted);font-size:11px} 
+.home-wallet strong{display:block;font-size:19px;color:var(--gold)} 
+.home-wallet button{border:0;border-
+radius:11px;background:#4c356b;padding:9px 11px;font-weight:750;fontsize:12px} 
+.profile-cover{height:104px;border-radius:22px 22px 0 0;background: radial-gradient(circle at 80% 10%,rgba(255,79,216,.6),transparent 32%), 
+ radial-gradient(circle at 15% 90%,rgba(84,165,255,.5),transparent 40%),lineargradient(120deg,#432366,#211934 65%,#182c4d);margin:-16px -16px 0} 
+.profile-avatar{overflow:hidden;cursor:pointer;width:88px;height:88px;borderradius:50%;display:grid;place-items:center;font-size:39px; 
+ background:linear-gradient(135deg,#ff5edb,#8954ff,#54a5ff);border:4px solid var(--surface);margin-top:-43px;position:relative} 
+.profile-avatar img,.home-avatar img{width:100%;height:100%;objectfit:cover;border-radius:50%}.profile-avatar 
+img{position:absolute;inset:0}.profile-avatar{position:relative}.profile-photoinput{display:none!important} 
+.chat-row{display:flex;align-items:flex-start;gap:9px;margin:8px 0}.chatrow .chat-bubble{flex:1;min-width:0}.chat-
+avatar{width:38px;height:38px;flex:0 0 38px;border-radius:50%;objectfit:cover;background:#29223d;border:1px solid var(--border)} 
+.profile-stats{display:grid;grid-template-
+columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0} 
+.profile-stat{padding:12px 4px;border-
+radius:14px;background:rgba(255,255,255,.035);text-align:center} .profile-stat strong{display:block;font-size:19px}.profile-stat span{fontsize:11px;color:var(--muted)} 
+.profile-menu-grid{display:grid;grid-templatecolumns:repeat(4,minmax(0,1fr));gap:9px} 
+.profile-menu{border:0;background:transparent;text-align:center;padding:8px 
+2px;color:var(--text);font-size:11px} .profile-menu span{display:grid;place-
+items:center;width:48px;height:48px;margin:0 auto 7px;border-radius:16px;  background:linear-
+gradient(145deg,rgba(155,92,255,.25),rgba(255,79,216,.12));font-size:23px} .bottom{justify-content:space-around;padding:8px 7px calc(8px + env(safearea-inset-bottom));} 
+.nav{font-size:10px;min-height:48px} 
+.nav span{font-size:22px;line-height:1.2} 
+.nav.active{background:rgba(155,92,255,.10)} 
+@media(max-width:380px){.home-title{font-size:25px}.home-quickgrid{gap:6px}.home-quick{padding:10px 3px}.home-quick .quickicon{width:39px;height:39px}.profile-menu-grid{gap:4px}.profile-menu span{width:43px;height:43px}} 
+/* QIVI ROOMS SOCIAL LOBBY — keeps original IDs and realtime handlers */ #rooms .rooms-heading{display:flex;align-items:center;justify-content:spacebetween;gap:12px;margin:4px 2px 18px} 
+#rooms .rooms-heading h2{margin:0;font-size:27px} #rooms .rooms-live-pill{display:inline-flex;alignitems:center;gap:6px;padding:7px 10px;border-
+radius:30px;background:#203927;color:#a8f5bf;font-size:11px;fontweight:800;white-space:nowrap} 
+#rooms .rooms-live-pill i{width:7px;height:7px;background:#54e889;borderradius:50%;display:inline-block;box-shadow:0 0 10px #54e889} #rooms .rooms-hero{position:relative;overflow:hidden;borderradius:24px;padding:20px;margin-bottom:16px;background:radialgradient(circle at 88% 12%,rgba(255,79,216,.35),transparent 35%),radialgradient(circle at 8% 100%,rgba(84,165,255,.26),transparent 42%),lineargradient(140deg,#382052,#1d172f 62%,#1c2b49);border:1px solid rgba(218,170,255,.24)} 
+#rooms .rooms-hero .rooms-hero-icon{font-size:36px;margin-bottom:10px} 
+#rooms .rooms-hero h3{font-size:22px;margin:0 0 7px} 
+#rooms .rooms-hero p{font-size:13px;color:#ded4ee;line-height:1.55;margin:0 
+0 15px;max-width:360px} 
+#rooms .rooms-room-card{padding:17px;borderradius:22px;background:linear-
+gradient(145deg,rgba(30,24,46,.98),rgba(17,14,28,.98));border:1px solid rgba(177,142,226,.2);margin-bottom:15px} 
+#rooms .rooms-card-title{display:flex;align-items:center;gap:10px;marginbottom:12px} 
+#rooms .rooms-card-title .rooms-
+icon{width:43px;height:43px;display:grid;place-items:center;borderradius:15px;background:linear-
+gradient(145deg,rgba(255,79,216,.22),rgba(84,165,255,.18));font-size:22px} 
+#rooms .rooms-card-title h3{margin:0;font-size:17px} 
+#rooms .rooms-card-title small{display:block;color:var(--muted);fontsize:11px;margin-top:3px} 
+#rooms .rooms-room-card label{display:block;margin:10px 0 5px} 
+#rooms #roomNameInput{border-radius:14px;padding:14px;margin:7px 0 
+12px;background:#100d1c} 
+#rooms .rooms-action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px} 
+#rooms .rooms-action-row .btn{min-height:48px;border-radius:15px} 
+#rooms .rooms-feature-grid{display:grid;grid-templatecolumns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:16px} 
+#rooms .rooms-feature{border-radius:19px;padding:15px;background:lineargradient(145deg,#29203c,#171322);border:1px solid 
+rgba(177,142,226,.17);min-width:0} 
+#rooms .rooms-feature .rooms-feature-icon{font-size:25px;marginbottom:8px} 
+#rooms .rooms-feature strong{display:block;font-size:14px} #rooms .rooms-feature p{font-size:11px;color:var(--muted);lineheight:1.45;margin:5px 0 11px} 
+#rooms .rooms-feature button{width:100%;padding:10px 8px;borderradius:12px;font-size:12px} 
+#rooms #musicRoomStatus{margin:12px 0 0;padding:12px 13px;borderradius:14px;background:rgba(155,92,255,.08);border:1px solid rgba(155,92,255,.2);font-size:12px;line-height:1.5} 
+#rooms #roomSongSelect{border-radius:13px} 
+#rooms .rooms-chat-head{display:flex;align-items:center;justifycontent:space-between;gap:8px} 
+#rooms .rooms-chat-head .rooms-count{font-size:11px;color:var(-muted);background:var(--surface2);border-radius:20px;padding:5px 9px} #rooms #musicRoomChat{max-height:300px;padding:4px 0} 
+/* QIVI microphone seats: responsive visual prototype */ 
+#rooms .qivi-mic-note{font-size:12px;line-
+height:1.5;color:#d8c9ed;background:rgba(155,92,255,.09);border:1px solid rgba(177,142,226,.18);padding:10px 12px;border-radius:13px;margin:0 0 
+13px} 
+#rooms .qivi-mic-grid{display:grid;grid-templatecolumns:repeat(3,minmax(0,1fr));gap:10px} 
+#rooms .qivi-mic-seat{min-width:0;padding:12px 5px;borderradius:17px;border:1px solid rgba(177,142,226,.2);background:lineargradient(145deg,#241c35,#171322);color:var(--text);display:flex;flexdirection:column;align-
+items:center;gap:5px;cursor:pointer;transition:transform .15s,border-color 
+.15s,background .15s} 
+#rooms .qivi-mic-seat:active{transform:scale(.97)} 
+#rooms .qivi-seat-avatar{position:relative;flex:0 0 
+48px;width:48px;height:48px;min-width:48px;min-height:48px;boxsizing:border-box;overflow:hidden;border-radius:50%;display:grid;placeitems:center;font-size:23px;background:linear-
+gradient(145deg,rgba(255,79,216,.22),rgba(84,165,255,.2));border:1px solid rgba(218,170,255,.35);isolation:isolate} 
+#rooms .qivi-seat-avatar 
+img{position:absolute;inset:0;display:block;width:100%;height:100%;maxwidth:100%;max-height:100%;object-fit:cover;object-position:center;borderradius:50%;} 
+#rooms .qivi-mic-seat b{display:block;max-width:100%;text-align:center;lineheight:1.25;white-space:nowrap} 
+#rooms .qivi-mic-seat small{display:block;max-
+width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;textalign:center;line-height:1.3} 
+#rooms .qivi-mic-seat b{font-size:12px} 
+#rooms .qivi-mic-seat small{font-size:10px;color:var(--muted)} #rooms .qivi-seat-presence{display:inline-flex!important;visibility:visible! important;opacity:1!important;align-items:center;justify-
+content:center;gap:5px;font-size:10px;line-height:1.35;color:#aaa4b7;whitespace:nowrap;min-height:13px;margin-top:1px} 
+#rooms .qivi-seat-presence::before{content:'';width:7px;height:7px;borderradius:50%;background:#777180;display:inline-block;flex:0 0 7px} #rooms .qivi-seat-presence.is-online{color:#7ce7b1;font-weight:600} #rooms .qivi-seat-presence.is-online::before{background:#35d58a;boxshadow:0 0 6px rgba(53,213,138,.4)} 
+#rooms .qivi-mic-seat.is-selected{border-color:#bd8aff;background:lineargradient(145deg,rgba(155,92,255,.27),rgba(84,165,255,.12));box-shadow:0 0 
+0 1px rgba(189,138,255,.15),0 8px 24px rgba(92,42,150,.14)} #rooms .qivi-mic-seat.is-selected .qivi-seat-avatar{background:lineargradient(145deg,#9b5cff,#e14ac8);color:white} 
+@media(max-width:360px){#rooms .qivi-mic-grid{gap:7px}#rooms .qivi-micseat{padding:10px 3px}#rooms .qivi-seat-avatar{flex-
+basis:42px;width:42px;height:42px;min-width:42px;min-height:42px}} 
+#rooms .room-chat-item{border-radius:14px;border:1px solid rgba(177,142,226,.12);background:#201a31} 
+@media(max-width:380px){#rooms .rooms-heading h2{font-size:24px} #rooms .rooms-room-card{padding:13px}#rooms .rooms-featuregrid{gap:8px}#rooms .rooms-feature{padding:12px}} 
+/* QIVI Rooms visual polish: consistent spacing, readable seats and compact audio controls */ 
+#rooms .qivi-mic-panel{padding:16px!important;overflow:hidden} 
+#rooms .qivi-mic-panel .rooms-card-title{align-items:center;gap:12px;marginbottom:14px} 
+#rooms .qivi-mic-panel .rooms-card-title h3{font-size:18px;line-height:1.25} 
+#rooms .qivi-mic-panel .rooms-card-title small{font-size:12px;line-height:1.4} 
+#rooms .qivi-mic-note{font-size:13px;line-height:1.55;padding:13px 
+14px;margin:0 0 15px;border-radius:16px} #rooms .qivi-mic-grid{grid-templatecolumns:repeat(3,minmax(0,1fr));gap:9px} 
+#rooms .qivi-mic-seat{min-height:136px;padding:13px 5px 11px;gap:7px;border-radius:19px;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)} 
+#rooms .qivi-seat-avatar{flex-basis:54px;width:54px;height:54px;minwidth:54px;min-height:54px;font-size:24px} 
+#rooms .qivi-mic-seat b{font-size:13px;line-height:1.25;maxwidth:100%;overflow:hidden;text-overflow:ellipsis} #rooms .qivi-mic-seat small{font-size:11px;line-height:1.35} 
+#rooms .qivi-seat-presence{font-size:11px;min-height:15px;margin-top:2px} 
+#rooms #qiviMicSeatStatus,#rooms 
+#qiviAudioStatus{display:block;margin:13px 0 0;padding:12px 13px;border:1px solid rgba(177,142,226,.17);borderradius:14px;background:rgba(155,92,255,.07);font-size:12px;lineheight:1.5;overflow-wrap:anywhere} 
+#rooms .qivi-mic-panel .rooms-action-row{gap:10px;margin-top:12px!
+important;align-items:stretch} 
+#rooms .qivi-mic-panel .rooms-action-row .btn{min-width:0;minheight:54px;padding:12px 10px;border-radius:16px;font-size:14px;lineheight:1.3;white-space:normal;overflow-wrap:anywhere} 
+#rooms .qivi-mic-panel .rooms-actionrow .btn:disabled{opacity:.55;cursor:not-allowed} 
+#rooms .rooms-room-card{margin-bottom:16px} 
+#rooms .rooms-feature-grid{gap:10px;margin-bottom:14px} 
+#rooms .rooms-feature{padding:14px;border-radius:18px} 
+#rooms .rooms-feature p{font-size:12px;line-height:1.5} 
+#rooms #roomSongSelect{width:100%;max-width:100%;box-sizing:borderbox;min-height:50px} 
+#rooms #qiviRemoteAudio{display:none!important} 
+@media(max-width:380px){ 
+#rooms .qivi-mic-panel{padding:12px!important} 
+#rooms .qivi-mic-grid{gap:7px} 
+ #rooms .qivi-mic-seat{min-height:126px;padding:11px 3px 9px;borderradius:16px} 
+ #rooms .qivi-seat-avatar{flex-basis:46px;width:46px;height:46px;minwidth:46px;min-height:46px} 
+ #rooms .qivi-mic-panel .rooms-action-row{grid-template-columns:1fr 
+1fr;gap:7px} 
+ #rooms .qivi-mic-panel .rooms-action-row .btn{font-size:12px;padding:10px 
+6px;min-height:50px} 
+} 
+/* QIVI HOME HERO: compact, tidy mobile layout */ 
+#beranda .home-hero{padding:17px 18px 18px!important;margin:0 0 14px!
+important;min-height:0!important;border-radius:22px!important;boxsizing:border-box} 
+#beranda .home-hero .eyebrow{font-size:9px!important;letter-spacing:1.5px! important;margin:0 0 7px!important} 
+#beranda .home-hero h1{font-size:clamp(21px,6vw,25px)!important;lineheight:1.12!important;max-width:78%!important;margin:0 0 8px!important} #beranda .home-hero p{font-size:12px!important;line-height:1.45! important;max-width:82%!important;margin:0 0 12px!important} #beranda .home-hero .btn{min-height:42px!important;padding:10px 16px!
+important;font-size:13px!important;border-radius:14px!important} #beranda .home-hero-art{font-size:46px!important;right:12px!
+important;bottom:12px!important;opacity:.15!important} 
+#beranda .home-wallet{margin-top:0!important} 
+@media(max-width:380px){#beranda .home-hero{padding:15px!important}
+#beranda .home-hero h1{font-size:21px!important;max-width:82%!important}
+#beranda .home-hero p{font-size:11px!important}} 
+/* Home: live people strip and reserved ad slot */ 
+#beranda .home-online{padding:17px;border-radius:22px;margin:0 0 
+20px;background:linear-
+gradient(135deg,rgba(46,30,70,.96),rgba(20,16,34,.98));border:1px solid rgba(183,137,245,.25)} 
+#beranda .home-online-head{display:flex;align-items:flex-start;justifycontent:space-between;gap:10px} 
+#beranda .online-eyebrow{font-size:10px;letterspacing:1.6px;color:#e6a5ff;font-weight:800} 
+#beranda .home-online h2{font-size:21px;line-height:1.2;margin:6px 0 0} 
+#beranda .online-live-pill{display:inline-flex;alignitems:center;gap:6px;padding:6px 9px;border-
+radius:99px;background:#18372e;color:#8cf0bc;font-size:9px;fontweight:800;white-space:nowrap} 
+#beranda .online-live-pill i{width:7px;height:7px;borderradius:50%;background:#42e69a;box-shadow:0 0 8px #42e69a} 
+#beranda .home-online-note{font-size:12px;line-height:1.45;color:var(-muted);margin:9px 0 13px} 
+#beranda .home-online-list{display:flex;gap:12px;overflow-x:auto;padding:3px 
+2px 8px;min-height:78px;scrollbar-width:thin} 
+#beranda .home-online-person{flex:0 0 64px;display:flex;flexdirection:column;align-
+items:center;gap:5px;background:transparent;border:0;color:var(-text);padding:0;min-width:0} 
+#beranda .home-online-avatar{width:50px;height:50px;border-
+radius:50%;display:grid;place-items:center;overflow:hidden;background:lineargradient(135deg,#503074,#22203b);border:2px solid #44e69b;box-shadow:0 
+0 0 3px rgba(68,230,155,.10);font-size:22px} 
+#beranda .home-online-avatar img{width:100%;height:100%;object-fit:cover} 
+#beranda .home-online-name{font-size:11px;max-
+width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} #beranda .home-online-empty{display:flex;align-items:center;minheight:60px;color:var(--muted);font-size:12px;padding:8px 0} #beranda .home-online-action{width:100%;display:flex;alignitems:center;justify-content:space-between;border:1px solid rgba(183,137,245,.22);border-radius:12px;padding:10px 
+13px;background:rgba(155,92,255,.13);color:#e7c4ff;font-weight:700} #beranda .home-ad-slot{margin:20px 0 22px;min-height:190px;border:1px dashed rgba(188,160,225,.38);borderradius:20px;padding:14px;background:linear-
+gradient(135deg,rgba(35,27,49,.72),rgba(17,14,27,.85));display:flex;flexdirection:column;justify-content:space-between} 
+#beranda .ad-slot-top{display:flex;justify-content:space-between;alignitems:center;color:#a9a0bc;font-size:10px;letter-spacing:1.5px;fontweight:800} 
+#beranda .ad-label{padding:4px 7px;border:1px solid rgba(188,160,225,.3);border-radius:6px;letter-spacing:.8px} 
+#beranda .ad-slot-content{display:flex;alignitems:center;gap:12px;padding:18px 0} 
+#beranda .ad-slot-icon{width:44px;height:44px;display:grid;placeitems:center;border-
+radius:14px;background:rgba(155,92,255,.18);color:#e5a5ff;font-size:27px} 
+#beranda .ad-slot-content strong{font-size:15px} 
+#beranda .ad-slot-content p{margin:5px 0 0;color:var(--muted);fontsize:12px;line-height:1.45} 
+#beranda .ad-slot-button{display:flex;justify-content:space-between;alignitems:center;width:100%;border:0;border-
+radius:12px;background:rgba(155,92,255,.18);color:#e7c4ff;padding:11px 13px;font-weight:700} 
+/* Home discovery tabs — compact mobile-first layout */ 
+.discover-topbar{display:flex;align-items:center;gap:12px;margin:3px 0 
+16px;min-width:0} 
+.discover-tabs{display:flex;align-items:center;gap:17px;flex:1;minwidth:0;overflow-x:auto;scrollbar-width:none} .discover-tabs::-webkit-scrollbar{display:none} .discover-tab{position:relative;flex:0 0 
+auto;border:0;background:transparent;color:#aaa3c0;padding:10px 0 
+12px;font-size:15px;font-weight:750;white-space:nowrap} 
+.discover-tab.active{color:#fff} 
+.discover-
+tab.active:after{content:"";position:absolute;left:15%;right:15%;bottom:3px;hei ght:3px;border-radius:5px;background:linear-gradient(90deg,#a85cff,#ff4fd8)} 
+.discover-icon-btn{flex:0 0 
+34px;width:34px;height:38px;border:0;background:transparent;color:#eee8f8;f ont-size:25px;display:grid;place-items:center;padding:0} 
+.discover-search{display:flex;align-items:center;gap:10px;padding:13px 
+15px;border:1px solid rgba(185,135,255,.18);border-
+radius:17px;background:rgba(255,255,255,.045);color:var(--muted);marginbottom:17px;font-size:14px} 
+.discover-search span:nth-child(2){flex:1;min-width:0;whitespace:nowrap;overflow:hidden;text-overflow:ellipsis} 
+.discover-search .search-trailing{font-size:18px} 
+#beranda .home-online{margin-top:0} 
+#beranda .home-ad-slot{min-height:175px;margin:18px 0 22px} 
+#beranda .home-online-list{scrollbar-width:none} 
+#beranda .home-online-list::-webkit-scrollbar{display:none} @media(max-width:380px){.discover-topbar{gap:7px}.discovertabs{gap:12px}.discover-tab{font-size:13px}.discover-icon-btn{flexbasis:28px;width:28px;font-size:22px}.discover-search{padding:11px 12px}} 
+/* QIVI HOME PREMIUM POLISH v2 — compact, real-data-first */ 
+#beranda{padding-top:8px!important} 
+#beranda .discover-topbar{position:relative;gap:9px;margin:0 0 
+10px;padding:0 2px} 
+#beranda .discover-tabs{gap:clamp(10px,3.5vw,17px)} 
+#beranda .discover-tab{font-size:clamp(12px,3.5vw,15px);padding:9px 0 
+11px} 
+#beranda .discover-icon-btn{border-
+radius:12px;background:rgba(255,255,255,.045);font-size:22px} 
+#beranda .discover-search{margin-bottom:13px;padding:11px 13px;borderradius:15px;min-height:44px} 
+#beranda .home-online{padding:15px!important;margin:0 0 14px! important;border-radius:21px!important;min-height:0!important;height:auto! important;box-sizing:border-box;background:radial-gradient(circle at 95% 
+0%,rgba(191,84,255,.15),transparent 42%),linear-
+gradient(145deg,rgba(42,29,62,.98),rgba(20,16,31,.98))!important} 
+#beranda .home-online-head{align-items:center;gap:8px} 
+#beranda .home-online h2{font-size:clamp(17px,5vw,21px)!important;lineheight:1.18!important;margin:5px 0 0!important;max-width:250px} #beranda .online-eyebrow{font-size:9px!important;letter-spacing:1.5px! important} 
+#beranda .online-live-pill{font-size:9px!important;padding:6px 8px!
+important;white-space:nowrap} 
+#beranda .home-online-note{font-size:12px!important;line-height:1.45! important;margin:8px 0 8px!important;max-width:100%} #beranda .home-online-list{min-height:0!important;height:auto! important;padding:5px 1px 8px!important;gap:13px!important;overflowx:auto;overscroll-behavior-x:contain} 
+#beranda .home-online-person{flex-basis:62px!important;gap:6px!important} #beranda .home-online-avatar{width:48px!important;height:48px! important;flex:0 0 48px!important} 
+#beranda .home-online-empty{display:flex;align-items:center;min-height:0! important;padding:10px 12px!important;border-
+radius:13px;background:rgba(255,255,255,.035);border:1px dashed rgba(185,135,255,.2);font-size:11px!important;line-height:1.4! important;width:100%;box-sizing:border-box} 
+#beranda .home-online-action{margin-top:9px!important;padding:10px 12px! important;border-radius:13px!important;min-height:42px;font-size:12px} #beranda .home-wallet{margin-bottom:14px;padding:13px!important;borderradius:17px!important} 
+#beranda .home-ad-slot{min-height:120px!important;margin:14px 0 18px! important;padding:13px!important;border-radius:18px!important} 
+#beranda .ad-slot-content{padding:12px 0!important} 
+#beranda .ad-slot-content p{font-size:11px!important} 
+#beranda .ad-slot-button{padding:9px 12px!important;font-size:12px} #beranda .home-section-head{margin:17px 1px 10px!important} #beranda .home-quick{padding:11px 5px!important;border-radius:16px!
+important} 
+@media(max-width:380px){ 
+#beranda .home-online{padding:13px!important} 
+#beranda .home-online h2{font-size:17px!important} 
+#beranda .home-online-note{font-size:11px!important} 
+#beranda .online-live-pill{font-size:8px!important} 
+#beranda .home-wallet strong{font-size:17px!important} 
+} 
+/* QIVI INBOX redesign — UI-only layer; preserves the existing shared-chat backend */ 
+#chat{padding-top:5px} 
+#chat .inbox-top{display:flex;align-items:center;gap:18px;margin:0 0 
+14px;padding:2px 1px} 
+#chat .inbox-tabs{display:flex;align-items:center;gap:24px;flex:1;min-width:0} 
+#chat .inbox-main-
+tab{position:relative;border:0;background:transparent;color:var(--muted);fontsize:22px;font-weight:750;padding:8px 0 12px} 
+#chat .inbox-main-tab.active{color:var(--text)} 
+#chat .inbox-main-
+tab.active:after{content:"";position:absolute;left:0;bottom:3px;width:42px;heig ht:3px;border-radius:5px;background:linear-gradient(90deg,var(--purple),var(-pink))} 
+#chat .inbox-icon-btn{width:38px;height:40px;flex:0 0 38px;border:0;borderradius:12px;background:rgba(255,255,255,.045);font-size:25px;color:#eee8f8} 
+#chat .inbox-search{margin:0 0 14px;border-radius:15px;minheight:46px;padding:12px 15px} 
+#chat .inbox-filters{display:flex;gap:9px;overflow-x:auto;padding:0 0 
+13px;scrollbar-width:none} 
+#chat .inbox-filters::-webkit-scrollbar{display:none} 
+#chat .inbox-filter{flex:0 0 auto;border:1px solid transparent;borderradius:30px;padding:9px 17px;background:rgba(255,255,255,.055);color:var(-muted);font-size:13px;white-space:nowrap} 
+#chat .inbox-filter.active{background:#fff;color:#21182d;bordercolor:#fff;font-weight:750} 
+#chat .inbox-list{display:flex;flex-direction:column;gap:2px} 
+#chat .inbox-row{display:flex;align-
+items:center;gap:13px;width:100%;padding:13px 2px;border:0;borderbottom:1px solid rgba(255,255,255,.055);background:transparent;textalign:left;min-width:0} 
+#chat .inbox-avatar{position:relative;display:grid;place-items:center;flex:0 0 
+58px;width:58px;height:58px;borderradius:50%;overflow:hidden;background:lineargradient(135deg,#5c367e,#24203c);border:1px solid rgba(255,255,255,.12);font-size:26px} 
+#chat .inbox-avatar img{width:100%;height:100%;object-fit:cover} #chat .inbox-row-copy{display:flex;flex:1;min-width:0;flexdirection:column;gap:5px} 
+#chat .inbox-row-copy strong{font-size:15px;whitespace:nowrap;overflow:hidden;text-overflow:ellipsis} 
+#chat .inbox-row-copy small{font-size:12px;color:var(--muted);whitespace:nowrap;overflow:hidden;text-overflow:ellipsis} 
+#chat .inbox-row-time{align-self:flex-start;padding-top:4px;fontsize:11px;color:var(--muted);white-space:nowrap} 
+#chat .inbox-empty-note{padding:19px 14px;margin-top:12px;border:1px dashed rgba(185,135,255,.2);border-radius:15px;color:var(--muted);fontsize:12px;line-height:1.5} 
+#chat .public-chat-panel{margin-top:15px} 
+#chat .public-chat-heading{display:flex;align-items:center;gap:12px;marginbottom:12px} 
+#chat .public-chat-heading h3{margin:0} 
+#chat .public-chat-heading .note{margin:4px 0 0} 
+#chat .chat-list{max-height:48vh} 
+@media(max-width:380px){#chat .inbox-main-tab{font-size:20px}
+#chat .inbox-tabs{gap:20px}#chat .inbox-avatar{flex-
+basis:52px;width:52px;height:52px}#chat .inbox-filter{padding:8px 13px}} 
+</style> 
+</head> 
+<body> 
+<header> 
+  <div><div class="brand">QIVI </div><div class="tagline">SING · SHARE · LIVE</div></div> 
+  <button class="coin-button" onclick="openPage('koin')" aria-label="Buka dompet koin">	<span id="coinTop">100</span></button> 
+</header> 
+<main> 
+<section class="page active" id="beranda"> 
+<div class="discover-topbar" aria-label="Penemuan teman"> 
+<div class="discover-tabs" role="tablist" aria-label="Kategori teman">       <button class="discover-tab active" type="button" role="tab" ariaselected="true" data-discover="recommended" 
+onclick="setDiscoverTab('recommended',this)">Disarankan</button>       <button class="discover-tab" type="button" role="tab" aria-selected="false" data-discover="nearby" onclick="setDiscoverTab('nearby',this)">Dekat</ button> 
+      <button class="discover-tab" type="button" role="tab" aria-selected="false" data-discover="new" onclick="setDiscoverTab('new',this)">Orang baru</ button> 
+</div> 
+    <button class="discover-icon-btn" type="button" aria-label="Cari teman" onclick="openPage('chat')"> </button> 
+    <button class="discover-icon-btn" type="button" aria-label="Filter teman" onclick="notify('Filter teman akan tersedia setelah profil dan data pengguna 
+QIVI tersambung.')">	</button> 
+</div> 
+  <div class="discover-search" role="button" tabindex="0" onclick="openPage('chat')" 
+onkeydown="if(event.key==='Enter')openPage('chat')"> 
+    <span> </span><span>Temukan teman dan obrolan...</span><span class="search-trailing">	</span> 
+</div> 
+<section class="home-online panel" aria-labelledby="homeOnlineTitle"> 
+    <div class="home-online-head"><div><span class="online-eyebrow">QIVI · 
+TEMAN ONLINE</span><h2 id="homeOnlineTitle">Siapa yang sedang online?
+</h2></div><span class="online-live-pill"><i></i> LANGSUNG</span></div>     <p class="home-online-note" id="homeOnlineNote">Teman yang sedang aktif di Room akan muncul dengan foto profil dan tanda online.</p> 
+    <div id="homeOnlinePeople" class="home-online-list"><div class="homeonline-empty">Belum ada teman online yang terdeteksi. Masuk ke Room agar kamu terlihat oleh teman lain.</div></div> 
+    <button class="home-online-action" onclick="openPage('rooms')">Masuk ke Room <span>›</span></button> 
+</section> 
+<section class="home-ad-slot" aria-label="Tempat iklan"> 
+    <div class="ad-slot-top"><span>RUANG IKLAN</span><span class="adlabel">IKLAN</span></div> 
+    <div class="ad-slot-content"><span class="ad-slot-icon"> </ span><div><strong>Tempat promosi Anda</strong><p>Area ini disediakan untuk iklan atau promosi QIVI.</p></div></div> 
+    <button type="button" class="ad-slot-button" onclick="notify('Area iklan QIVI siap diisi ketika fitur iklan diaktifkan.')">Tempatkan iklan <span>›</span></ button> 
+</section> 
+  <div class="home-section-head"><h3>Jelajahi QIVI</h3><span class="note">Pilih aktivitas</span></div> <div class="home-quick-grid"> 
+    <button class="home-quick" onclick="openPage('video')"><span class="quick-icon">	</span><b>Video</b></button> 
+    <button class="home-quick" onclick="openPage('live')"><span class="quickicon">	</span><b>Live</b></button> 
+    <button class="home-quick" onclick="openPage('nyanyi')"><span class="quick-icon">	</span><b>Nyanyi</b></button> 
+</div> 
+</section> 
+<section class="page" id="status"> 
+  <h2> Status 24 Jam</h2><p class="muted">Bagikan foto, video, atau teks. Status ini disimpan di perangkat selama halaman masih berjalan.</p>   <div class="panel"><h3>Buat Status</h3><label for="statusType">Jenis status</label><select id="statusType" 
+onchange="updateStatusForm()"><option value="text">Teks</option><option value="image">Foto</option><option value="video">Video</option></select> 
+  <div id="textFields"><textarea id="statusText" maxlength="300" placeholder="Apa yang ingin kamu bagikan?"></textarea></div> 
+  <div id="fileFields" class="hidden"><input id="statusFile" type="file" accept="image/*,video/*"><p class="note">Pilih file dari HP untuk pratinjau.</ p></div><div id="statusPreview"></div> 
+  <button class="btn" onclick="publishStatus()">Bagikan Status </ button><p class="note">Versi awal menyimpan status di perangkat, belum ke server.</p></div> 
+  <h3>Status saya</h3><div id="myStatuses"></div><h3>Status terbaru</ h3><div id="allStatuses"></div> </section> 
+<section class="page" id="video"> 
+  <h2> QIVI Video</h2><div class="panel"><h3>Tambahkan video</ h3><label for="videoTitle">Judul video</label><input id="videoTitle" maxlength="100" placeholder="Judul video"><input id="videoFile" typ e="file" accept="video/*"><div id="videoPreview"></div><button class="btn" onclick="previewVideo()"> 
+Pratinjau Video</button><p class="note">Pilih video, pratinjau, lalu unggah ke server agar bisa dibu 
+ka dari perangkat lain.</p><button class="btn secondary small" type="button" onclick="loadRemoteVide 
+os(true)"> Muat Ulang Video Server</button><p id="videoServerStatus" class="note" aria-live="polite 
+">Menghubungkan penyimpanan video…</p></div><div id="videoFeed"><div class="empty">Belum ada video.< /div></div> 
+</section> 
+<section class="page" id="live"> 
+<h2>	QIVI Live</h2> 
+<div class="panel"> 
+<h3>Ruang siaran langsung</h3> 
+    <p class="muted">Host mulai siaran dan bagikan kode ruang kepada penonton. Penonton memasukkan kode yang sama untuk bergabung.</p> <label for="liveRoomCode">Kode ruang Live</label> 
+    <input id="liveRoomCode" maxlength="40" autocomplete="off" placeholder="Kode muncul saat host mulai siaran"> <div class="grid"> 
+      <button class="btn" type="button" onclick="startLiveHost()"> Mulai 
+Live</button> 
+      <button class="btn secondary" type="button" 
+onclick="joinLiveViewer()">	Gabung Live</button> 
+</div> 
+<p id="liveStatus" class="note" aria-live="polite">Live belum dimulai.</p>     <div id="liveRoomShare" class="status-card hidden"><b>Bagikan kode ini kepada penonton:</b><p id="liveRoomDisplay" style="font-size:22px;fontweight:800;letter-spacing:1px;overflow-wrap:anywhere"></p><button class="btn secondary small" type="button" 
+onclick="copyLiveRoomCode()">Salin kode</button></div> <div class="live-videos"> 
+      <div id="liveLocalWrap" class="hidden"><p class="note">Kamera host</ p><video id="liveLocalVideo" class="media" autoplay muted playsinline></ video></div> 
+      <div id="liveRemoteWrap" class="hidden"><p class="note">Siaran yang diterima</p><video id="liveRemoteVideo" class="media" autoplay playsinline controls></video></div> 
+</div> 
+<div class="panel" style="margin-top:14px;margin-bottom:14px"> 
+	<h3>	Pesan Live</h3> 
+      <p class="note">Pesan untuk host dan penonton di kode ruang Live yang sama.</p> 
+      <div id="liveChatMessages" class="room-chat" aria-live="polite"><div class="empty">Mulai atau gabung Live untuk membuka chat.</div></div> <label for="liveChatInput">Tulis pesan</label> 
+      <div class="chat-compose"><textarea id="liveChatInput" maxlength="500" rows="2" placeholder="Tulis pesan saat Live..." disabled></textarea><button class="btn" type="button" id="sendLiveChatButton" onclick="sendLiveChatMessage()" disabled>Kirim</button></div> 
+      <p id="liveChatStatus" class="note" aria-live="polite">Chat Live belum tersambung.</p> </div> 
+    <button class="btn secondary" type="button" 
+onclick="stopLive()">Matikan / Keluar Live</button> </div> 
+</section> 
+<section class="page" id="chat"> 
+<div class="inbox-top"> 
+<div class="inbox-tabs" role="tablist" aria-label="Pesan dan kontak"> 
+      <button type="button" class="inbox-main-tab active" 
+id="inboxMessagesTab" onclick="setInboxTab('messages')">Pesan</button>       <button type="button" class="inbox-main-tab" id="inboxContactsTab" onclick="setInboxTab('contacts')">Kontak</button> </div> 
+    <button class="inbox-icon-btn" type="button" aria-label="Cari pesan" onclick="document.getElementById('inboxSearch').focus()"> </button>     <button class="inbox-icon-btn" type="button" aria-label="Pilihan pesan" onclick="notify('Pengaturan Pesan QIVI akan ditambahkan setelah chat pribadi tersedia.')">	</button> </div> 
+  <input id="inboxSearch" class="inbox-search" type="search" placeholder="Cari nama atau pesan..." oninput="filterInboxRows()" arialabel="Cari nama atau pesan"> 
+<div class="inbox-filters" id="inboxFilters"> 
+    <button type="button" class="inbox-filter active" data-inbox-filter="all" onclick="setInboxFilter('all',this)">Semua</button> 
+    <button type="button" class="inbox-filter" data-inbox-filter="online" onclick="setInboxFilter('online',this)">Online</button> 
+    <button type="button" class="inbox-filter" data-inbox-filter="frequent" onclick="setInboxFilter('frequent',this)">Sering Chat</button> 
+</div> 
+<div id="inboxList" class="inbox-list"> 
+    <button type="button" class="inbox-row" data-search="obrolan umum qivi chat bersama" onclick="openPublicChat()"> 
+	<span class="inbox-avatar inbox-group-avatar">	</span> 
+      <span class="inbox-row-copy"><strong>Obrolan Umum QIVI</ strong><small>Ruang obrolan bersama pengguna QIVI</small></span> 
+<span class="inbox-row-time">QIVI</span> 
+</button> 
+    <div class="inbox-empty-note">Chat pribadi dan status online kontak akan muncul di sini setelah fitur pesan pribadi tersambung.</div> 
+</div> 
+<div id="publicChatPanel" class="panel public-chat-panel hidden">     <div class="public-chat-heading"><button type="button" class="btn secondary small" onclick="closePublicChat()">‹ Kembali</
+button><div><h3>Obrolan Umum QIVI</h3><p class="note">Pesan bersama pengguna QIVI</p></div></div> 
+    <p id="chatStatus" class="note" aria-live="polite">Menyiapkan chat online… </p> 
+    <div id="chatMessages" class="chat-list"><div class="empty">Memuat pesan…</div></div> 
+<label for="chatInput">Pesan</label> 
+    <div class="chat-compose"><textarea id="chatInput" maxlength="1000" placeholder="Tulis pesan..." rows="2"></textarea><button class="btn" id="sendChatButton" type="button" onclick="sendMessage()">Kirim</ button></div> 
+    <p class="note">Jangan kirim kata sandi, nomor rekening, atau informasi pribadi sensitif.</p> 
+    <button class="btn secondary small" type="button" 
+onclick="loadChatMessages(true)">	Muat ulang pesan</button> 
+</div> 
+</section> 
+<section class="page" id="nyanyi"> 
+<h2>	QIVI Karaoke</h2> 
+<div class="karaoke-cover"> 
+<div class="mic"> </div> 
+<h3 style="text-align:center">Panggung karaoke QIVI</h3> 
+    <p class="muted" style="text-align:center">Pilih lagu dari perangkatmu, tambahkan lirik, lalu bernyanyi!</p> 
+<label for="karaokeTitle">Judul lagu</label> 
+    <input id="karaokeTitle" maxlength="100" placeholder="Contoh: Lagu favoritku"> 
+<label for="karaokeSinger">Nama penyanyi</label> 
+    <input id="karaokeSinger" maxlength="80" placeholder="Nama penyanyi 
+(opsional)"> 
+<label for="karaokeAudio">Pilih file audio dari HP</label> 
+<input id="karaokeAudio" type="file" accept="audio/*"> 
+<label for="karaokeLyricsInput">Lirik lagu (opsional)</label> 
+    <textarea id="karaokeLyricsInput" maxlength="8000" placeholder="Tulis lirik per baris. Untuk sinkronisasi, awali baris dengan waktu, misalnya 
+[00:12]Indonesia tanah airku..."></textarea> 
+    <button class="btn" type="button" onclick="addKaraokeSong()">	 
+Tambahkan ke daftar lagu</button> 
+    <p class="note">File audio diputar dari perangkat ini. Daftar lagu hanya tersimpan selama halaman masih terbuka; belum diunggah ke server.</p> 
+</div> 
+<div class="panel"> 
+	<h3>	Pemutar karaoke</h3> 
+    <p id="karaokeNowPlaying" class="muted">Pilih lagu dari daftar untuk mulai.</p> 
+    <audio id="karaokePlayer" controls preload="metadata" style="width:100%;margin:8px 0"></audio> 
+<div class="grid"> 
+      <button class="btn secondary" type="button" onclick="karaokeRestart()">	Ulangi</button>       <button class="btn secondary" type="button" 
+onclick="openPage('rooms')">	Jelajahi Rooms</button> 
+</div> 
+	<h3 style="margin-top:16px">	Lirik</h3> 
+    <div id="karaokeLyrics" class="karaoke-lyrics">Lirik akan tampil di sini. Untuk sinkronisasi, gunakan format [mm:ss] di awal setiap baris.</div><p class="note">Contoh: [00:05] Indonesia tanah airku — setiap baris akan menyala sesuai waktu audio.</p> 
+</div> 
+<div class="panel"> 
+	<h3>	Katalog lagu QIVI</h3> 
+    <p id="karaokeServerStatus" class="note" aria-live="polite">Memuat lagu dari server…</p> 
+    <button class="btn secondary small" type="button" 
+onclick="loadRemoteKaraokeSongs(true)"> Muat ulang katalog lagu</ button> 
+    <div id="karaokeSongList"><div class="empty">Memuat lagu dari server…</ div></div> </div> 
+</section> 
+<section class="page" id="rooms"> 
+  <div class="rooms-heading"><h2> QIVI Rooms</h2><span class="roomslive-pill"><i></i> Ruang sosial</span></div> 
+  <div class="rooms-hero"><div class="rooms-hero-icon"> </ div><h3>Temukan ruangmu</h3><p>Ngobrol, berbagi musik, dan bernyanyi bersama teman di QIVI. Masuk ke ruang yang sama agar bisa terhubung.</ p><button class="btn" type="button" 
+onclick="document.getElementById('roomNameInput').focus();document.getE lementById('roomNameInput').scrollIntoView({behavior:'smooth',block:'center'
+})">	Gabung ruang</button></div> 
+<div class="rooms-room-card"> 
+    <div class="rooms-card-title"><div class="rooms-icon"> </ div><div><h3>Ruang musik bersama</h3><small>Obrolan realtime dan berbagi lagu</small></div></div> 
+<label for="roomNameInput">Nama ruang</label> 
+    <input id="roomNameInput" maxlength="40" autocomplete="off" placeholder="Contoh: Ruang Musik QIVI" value="Ruang Musik QIVI">     <div class="rooms-action-row"><button class="btn" type="button" id="joinMusicRoomButton" onclick="joinMusicRoom()"> Gabung</ button><button class="btn secondary" type="button" onclick="leaveMusicRoom(true)">Keluar ruang</button></div> 
+    <p id="musicRoomStatus" class="room-status" aria-live="polite">Belum bergabung ke ruang. Gunakan nama ruang yang sama di perangkat teman.</ p> 
+</div> 
+<div class="rooms-feature-grid"> 
+    <div class="rooms-feature"><div class="rooms-feature-icon"> </ div><strong>Lagu bersama</strong><p>Pilih dan bagikan lagu dari katalog QIVI.</p><button class="btn secondary" type="button" 
+onclick="document.getElementById('roomSongSelect').scrollIntoView({behavi
+or:'smooth',block:'center'})">Pilih lagu ↓</button></div> 
+    <div class="rooms-feature"><div class="rooms-feature-icon"> </ div><strong>Obrolan ruang</strong><p>Kirim pesan ke teman yang berada di ruang sama.</p><button class="btn secondary" type="button" onclick="document.getElementById('musicRoomMessage').scrollIntoView({be havior:'smooth',block:'center'})">Buka chat ↓</button></div> 
+</div> 
+<div class="rooms-room-card qivi-mic-panel"> 
+    <div class="rooms-card-title"><div class="rooms-icon"> </
+div><div><h3>Kursi mikrofon</h3><small>Konsep room sosial QIVI</small></ div></div> 
+    <div class="qivi-mic-note">Gabung ke ruang yang sama di dua HP. Aktifkan mikrofon setelah memilih kursi untuk mencoba percakapan suara langsung.</ div> 
+<div class="qivi-mic-grid" id="qiviMicSeats"> 
+      <button class="qivi-mic-seat" type="button" data-seat="1" onclick="toggleQiviMicSeat(1)"><span class="qivi-seat-avatar"> </ span><b>Kursi 1</b><small>Host</small></button> 
+      <button class="qivi-mic-seat" type="button" data-seat="2" onclick="toggleQiviMicSeat(2)"><span class="qivi-seat-avatar"> </ span><b>Kursi 2</b><small>Kosong</small></button> 
+      <button class="qivi-mic-seat" type="button" data-seat="3" onclick="toggleQiviMicSeat(3)"><span class="qivi-seat-avatar"> </ span><b>Kursi 3</b><small>Kosong</small></button> 
+      <button class="qivi-mic-seat" type="button" data-seat="4" onclick="toggleQiviMicSeat(4)"><span class="qivi-seat-avatar"> </ span><b>Kursi 4</b><small>Kosong</small></button> 
+      <button class="qivi-mic-seat" type="button" data-seat="5" onclick="toggleQiviMicSeat(5)"><span class="qivi-seat-avatar"> </ span><b>Kursi 5</b><small>Kosong</small></button> 
+      <button class="qivi-mic-seat" type="button" data-seat="6" onclick="toggleQiviMicSeat(6)"><span class="qivi-seat-avatar"> </ span><b>Kursi 6</b><small>Kosong</small></button> 
+</div> 
+    <p class="note" id="qiviMicSeatStatus" aria-live="polite">Belum memilih kursi mikrofon.</p> 
+    <div class="rooms-action-row" style="margin-top:10px"><button class="btn" type="button" id="qiviAudioToggle" onclick="toggleQiviRoomAudio()"> Aktifkan mikrofon</button><button class="btn secondary" type="button" id="qiviAudioMute" onclick="toggleQiviRoomMute()" disabled> Bisukan</ button></div> 
+    <p class="note" id="qiviAudioStatus" aria-live="polite">Audio langsung belum aktif. Gunakan earphone untuk mengurangi gema.</p> 
+<div id="qiviRemoteAudio" hidden></div> 
+</div> 
+<div class="rooms-room-card"> 
+    <div class="rooms-card-title"><div class="rooms-icon"> </ div><div><h3>Putar musik bersama</h3><small>Kontrol pemutaran lagu di ruang</small></div></div> 
+<label for="roomSongSelect">Pilih lagu dari katalog</label> 
+    <select id="roomSongSelect"><option value="">Memuat katalog lagu…</ option></select> 
+    <div class="rooms-action-row"><button class="btn" type="button" onclick="shareRoomSong()"> Bagikan lagu</button><button class="btn secondary" type="button" onclick="broadcastRoomPlayback()"> Putar bersama</button></div> 
+    <button class="btn secondary" style="width:100%;margin-top:9px" type="button" onclick="broadcastRoomPause()">	Jeda bersama</button>     <p class="note">Setiap HP memutar audionya sendiri. Sinkronisasi dapat sedikit berbeda tergantung jaringan dan browser.</p> 
+</div> 
+<div class="rooms-room-card"> 
+    <div class="rooms-chat-head"><div class="rooms-card-title" style="margin:0"><div class="rooms-icon"> </div><div><h3>Obrolan ruang</ h3><small>Pesan untuk peserta ruang</small></div></div><span class="rooms-count">Realtime</span></div> 
+    <div id="musicRoomChat" class="room-chat"><div class="empty">Gabung ruang untuk mulai mengobrol.</div></div> 
+<label for="musicRoomMessage">Tulis pesan</label>     <div class="chat-compose"><textarea id="musicRoomMessage" maxlength="500" rows="2" placeholder="Tulis pesan untuk teman..." disabled></textarea><button class="btn" type="button" id="sendRoomMessageButton" onclick="sendMusicRoomMessage()" disabled>Kirim</button></div> </div> 
+</section> 
+<section class="page" id="koin"> 
+  <h2> Dompet QIVI</h2><div class="hero" style="text-align:center"><div style="font-size:48px"> </div><p>Saldo demo</p><h1><span id="coinBalance">100</span> Koin</h1><p class="note">Saldo ini hanya contoh lokal, belum transaksi sungguhan.</p></div><div 
+class="panel"><h3>Dompet dan hadiah</h3><p class="muted">Pembelian koin, hadiah virtual, dan riwayat transaksi membutuhkan server aman. Belum ada transaksi sungguhan yang dilakukan.</p></div> </section> 
+<section class="page" id="profil"> 
+<div class="panel" style="padding-top:16px;overflow:hidden"> <div class="profile-cover"></div> 
+    <div style="display:flex;align-items:flex-end;justify-content:spacebetween;gap:10px"> 
+      <button type="button" class="profile-avatar" id="profileAvatarButton" onclick="chooseProfilePhoto()" aria-label="Ganti foto profil"> </ button><input id="qiviProfilePhotoInput" class="profile-photo-input" type="file" accept="image/*" onchange="handleProfilePhoto(event)"> 
+      <button class="btn secondary small" onclick="editProfile()"> Edit profil</ button> 
+</div> 
+<h2 id="profileName" style="margin:12px 0 3px">Pengguna QIVI</h2> 
+<p class="muted" style="margin:0;font-size:13px">Sing · Share · Live	</p> <div class="profile-stats"> 
+      <div class="profile-stat"><strong>0</strong><span>Mengikuti</span></ div> 
+<div class="profile-stat"><strong>0</strong><span>Teman</span></div>       <div class="profile-stat"><strong>0</strong><span>Pengikut</span></ div> 
+</div> 
+    <div class="home-wallet"><div class="wallet-icon"> </div><div class="wallet-copy"><small>Saldo demo</small><strong><span id="profileCoins">100</span> Koin</strong></div><button onclick="openPage('koin')">Dompet ›</button></div> 
+</div> 
+<div class="panel"> 
+<h3 style="margin-bottom:14px">Fitur kamu</h3> 
+<div class="profile-menu-grid"> 
+      <button class="profile-menu" onclick="openPage('koin')"><span> </ span>Dompet</button> 
+      <button class="profile-menu" onclick="openPage('status')"><span> </ span>Momen</button> 
+      <button class="profile-menu" onclick="openPage('video')"><span> </ span>Video saya</button> 
+      <button class="profile-menu" onclick="openPage('rooms')"><span> </ span>Rooms</button> 
+      <button class="profile-menu" onclick="openPage('nyanyi')"><span> </ span>Karaoke</button> 
+      <button class="profile-menu" onclick="openPage('live')"><span> </ span>QIVI Live</button> 
+      <button class="profile-menu" onclick="openPage('chat')"><span> </ span>Pesan</button> 
+      <button class="profile-menu" onclick="notify('Pengaturan akun akan kita kembangkan berikutnya.')"><span> </span>Pengaturan</button> 
+</div> 
+</div> 
+<div class="grid"> 
+    <div class="panel"><b id="statusCount">0</b><small class="muted" style="display:block">Status lokal</small></div> 
+    <div class="panel"><b id="videoCount">0</b><small class="muted" style="display:block">Video server</small></div> </div> 
+</section> 
+</main> 
+<nav class="bottom" aria-label="Navigasi utama">  <button class="nav active" data-page="beranda" 
+onclick="openPage('beranda')"><span> </span>Home</button> 
+ <button class="nav" data-page="status" 
+onclick="openPage('status')"><span> </span>Momen</button> 
+ <button class="nav" data-page="rooms" 
+onclick="openPage('rooms')"><span>	</span>Room</button> 
+ <button class="nav" data-page="chat" onclick="openPage('chat')"><span> </ span>Pesan</button> 
+ <button class="nav" data-page="profil" onclick="openPage('profil')"><span>
+</span>Saya</button> 
+</nav> 
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></ script> <script> 
+'use strict'; 
+// QIVI Rooms status UI revision: 2026-10-22-v2 const $=id=>document.getElementById(id); 
+const SUPABASE_URL='https://pcpskybnqrjiqpowcswh.supabase.co'; const 
+SUPABASE_PUBLISHABLE_KEY='sb_publishable_qHqEoQgximH5TGC1oski0Q
+_N7k8rnff'; 
+const VIDEO_BUCKET='qivi-videos'; const KARAOKE_BUCKET='qivi-songs'; const CHAT_TABLE='qivi_chat_messages'; const 
+qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_P UBLISHABLE_KEY) || null; 
+const state={statuses:[],videos:[],camera:null,name:'Pengguna 
+QIVI',profilePhotoUrl:'',coins:100,previewUrl:null,videoPreviewUrl:null,supabase User:null,chatChannel:null,chatLoaded:false,liveRole:null, 
+liveChannel:null,liveChatChannel:null,livePc:null,liveRoomId:null,liveSessionTo ken:null,livePeerId:n ull,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:
+[],karaokeCurrentId:null,musicRoomChann 
+el:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRe mote:false,homePresenceChannel:n 
+ull}; 
+let toastTimer; 
+function notify(message){const t=$
+('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toa stTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)} 
+function setInboxTab(tab){ 
+const messages=$('inboxMessagesTab'), contacts=$('inboxContactsTab'); messages.classList.toggle('active',tab==='messages'); contacts.classList.toggle('active',tab==='contacts'); if(tab==='contacts'){ 
+$('inboxFilters').classList.add('hidden'); 
+    $('inboxList').innerHTML='<div class="inbox-empty-note">Kontak akan ditampilkan setelah data pengguna dan status online QIVI tersambung. Untuk sekarang, obrolan umum tetap bisa dibuka melalui tab Pesan.</div>'; 
+}else{ 
+$('inboxFilters').classList.remove('hidden'); 
+    $('inboxList').innerHTML='<button type="button" class="inbox-row" datasearch="obrolan umum qivi chat bersama" onclick="openPublicChat()"><span class="inbox-avatar inbox-group-avatar">	</span><spa n class="inbox-row-copy"><strong>Obrolan Umum QIVI</ strong><small>Ruang obrolan bersama pengguna QIV 
+I</small></span><span class="inbox-row-time">QIVI</span></button><div class="inbox-empty-note">Chat
+pribadi dan status online kontak akan muncul di sini setelah fitur pesan pribadi tersambung.</div>'; 
+setInboxFilter('all',document.querySelector('[data-inbox-filter="all"]')); filterInboxRows(); 
+} 
+} 
+function setInboxFilter(filter,button){   document.querySelectorAll('#inboxFilters .inboxfilter').forEach(el=>el.classList.toggle('active',el===button)); 
+document.querySelectorAll('#inboxList .inbox-row').forEach(row=>{ 
+row.classList.toggle('hidden',filter==='online'||filter==='frequent'); 
+}); 
+const note=$('inboxList').querySelector('.inbox-empty-note'); 
+  if(note&&filter!=='all')note.textContent=filter==='online'?'Belum ada data status online kontak untuk ditampilkan.':'Daftar Sering Chat akan tersedia setelah pesan pribadi QIVI tersambung.'; 
+  else if(note)note.textContent='Chat pribadi dan status online kontak akan muncul di sini setelah fitur pesan pribadi tersambung.'; 
+} 
+function filterInboxRows(){ 
+const q=($('inboxSearch')?.value||'').trim().toLowerCase(); 
+  document.querySelectorAll('#inboxList .inboxrow').forEach(row=>row.classList.toggle('hidden',!
+String(row.dataset.search||'').includes(q))); 
+} 
+function openPublicChat(){ 
+$('publicChatPanel').classList.remove('hidden'); 
+$('publicChatPanel').scrollIntoView({behavior:'smooth',block:'start'}); loadChatMessages(); 
+} 
+function closePublicChat(){ 
+$('publicChatPanel').classList.add('hidden'); 
+window.scrollTo({top:0,behavior:'smooth'}); 
+} 
+function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}
+document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id
+===id));document.queryS 
+electorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id)); window.scrollTo({top 
+:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVi deos();if(id==='cha t'){closePublicChat();}
+if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms')
+{loadRemoteKaraokeS 
+ongs().then(renderRoomSongOptions)}} 
+const 
+qiviMicSeatState={selected:null,sessionKey:'qivi-'+Math.random().toString(36)
+.slice(2)+Date.now().toString(36)}; function setDiscoverTab(tab,button){ 
+document.querySelectorAll('.discover-tab').forEach(item=>{ 
+const active=item===button; item.classList.toggle('active',active); 
+item.setAttribute('aria-selected',active?'true':'false'); 
+}); 
+const note=$('homeOnlineNote'); 
+if(note){ 
+    if(tab==='nearby')note.textContent='Daftar ini menampilkan pengguna yang terlihat online di Room. Fitur jarak terdekat memerlukan data lokasi yang dibagikan pengguna.'; 
+    else if(tab==='new')note.textContent='Pengguna online ditampilkan dari Room yang sedang kamu ikuti. Urutan pengguna baru membutuhkan data tanggal bergabung.'; 
+    else note.textContent='Teman yang sedang aktif di Room akan muncul dengan foto profil dan tanda online.'; 
+} 
+renderHomeOnlinePeople(); 
+} 
+function renderQiviMicSeats(){ 
+const wrap=$('qiviMicSeats'); if(!wrap)return; 
+const channel=state.musicRoomChannel; let people=[]; 
+if(channel){ 
+const presence=channel.presenceState()||{}; 
+Object.values(presence).forEach(entries=>(entries||[]).forEach(entry=>{       if(entry&&entry.sessionKey!
+==qiviMicSeatState.sessionKey&&Number(entry.seat)>=2)people.push(entry); 
+})); 
+} 
+const makeAvatar=(container,url,fallback)=>{ 
+container.replaceChildren(); 
+if(url&&typeof url==='string'&&/^https?:\/\//i.test(url)){ 
+const img=document.createElement('img'); img.alt='Foto profil peserta'; img.loading='lazy'; img.src=url; 
+img.onerror=()=>{img.remove();container.textContent=fallback||'	';}; container.appendChild(img); 
+}else{ container.textContent=fallback||'	'; 
+} 
+}; 
+wrap.querySelectorAll('.qivi-mic-seat').forEach(btn=>{ 
+const seat=Number(btn.dataset.seat); const small=btn.querySelector('small'); const avatar=btn.querySelector('.qivi-seat-avatar'); let presenceLabel=btn.querySelector('.qivi-seat-presence'); 
+    if(!presenceLabel)
+{presenceLabel=document.createElement('span');presenceLabel.className=' qivi-seat-presence';btn.appendChild(presenceLabel);} 
+presenceLabel.hidden=false;presenceLabel.style.display='inline-flex'; const occupant=people.find(person=>Number(person.seat)===seat); btn.classList.toggle('is-selected',qiviMicSeatState.selected===seat); if(seat===1){ 
+small.textContent='Host'; makeAvatar(avatar,'','	'); 
+presenceLabel.textContent=state.musicRoomJoined?'Online':'Menunggu'; presenceLabel.classList.toggle('is-online',!!state.musicRoomJoined); btn.disabled=false; 
+return; 
+} 
+if(qiviMicSeatState.selected===seat){ 
+small.textContent=String(state.name||'Kamu').slice(0,16); makeAvatar(avatar,state.profilePhotoUrl,'	'); 
+      presenceLabel.textContent='Online';presenceLabel.classList.add('isonline'); btn.disabled=false; 
+}else if(occupant){ small.textContent=String(occupant.name||'Pengguna QIVI').slice(0,16); makeAvatar(avatar,occupant.avatar,' ');       presenceLabel.textContent='Online';presenceLabel.classList.add('isonline'); btn.disabled=true; 
+}else{ small.textContent='Kosong'; makeAvatar(avatar,'','	'); 
+      presenceLabel.textContent='Offline';presenceLabel.classList.remove('isonline'); btn.disabled=false; 
+} 
+}); 
+const status=$('qiviMicSeatStatus'); 
+if(status){ 
+    if(!state.musicRoomJoined)status.textContent='Gabung ke ruang yang sama terlebih dahulu agar kursi terlihat oleh perangkat lain.'; 
+    else if(qiviMicSeatState.selected)status.textContent='Kamu memilih Kursi '+qiviMicSeatState.selected+'. Status kursi dibagikan ke peserta di ruang yang sama.'; 
+    else status.textContent='Terhubung ke room. Pilih kursi 2–6 untuk duduk di panggung.'; 
+} 
+renderHomeOnlinePeople(); 
+} 
+const 
+qiviOnlineSessionKey='online-'+Math.random().toString(36).slice(2)+Date.now
+().toString(36); 
+async function startQiviHomePresence(){ 
+if(!qiviSupabase||state.homePresenceChannel)return; try{ 
+const box=$('homeOnlinePeople'); 
+    if(box){box.replaceChildren();const 
+msg=document.createElement('div');msg.className='home-onlineempty';msg.textContent='Menyambungkan ke status online 
+QIVI…';box.appendChild(msg);} 
+// Presence publik tidak perlu membuat sesi login anonim terlebih dahulu.     const channel=qiviSupabase.channel('qivi-global-online',{config:{presence:
+{key:qiviOnlineSessionKey}}}); const refresh=()=>renderHomeOnlinePeople(); channel.on('presence',{event:'sync'},refresh); channel.on('presence',{event:'join'},refresh); channel.on('presence',{event:'leave'},refresh); channel.subscribe(async status=>{ 
+if(status==='SUBSCRIBED'){ 
+state.homePresenceChannel=channel; try{ 
+          await 
+channel.track({sessionKey:qiviOnlineSessionKey,userId:state.supabaseUser?.i d||null,name:state.name||'Pengguna QIVI',avatar:state.profilePhotoUrl||'',updatedAt:Date.now()}); renderHomeOnlinePeople(); 
+}catch(e){console.warn('QIVI home presence track:',e);} 
+}else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){ console.warn('QIVI home presence status:',status); const box=$('homeOnlinePeople'); 
+        if(box){box.replaceChildren();const 
+msg=document.createElement('div');msg.className='home-onlineempty';msg.textContent='Status online belum tersambung ke server. Periksa koneksi Realtime Supabase.';box.appendChild(msg);} 
+} 
+}); 
+}catch(e){ console.warn('QIVI home presence:',e); const box=$('homeOnlinePeople'); 
+    if(box){box.replaceChildren();const 
+msg=document.createElement('div');msg.className='home-onlineempty';msg.textContent='Koneksi online gagal: '+(e?.message||'periksa 
+Supabase dan internet');box.appendChild(msg);} 
+} 
+} 
+async function refreshQiviHomePresence(){ 
+const channel=state.homePresenceChannel;if(!channel)return;   try{await 
+channel.track({sessionKey:qiviOnlineSessionKey,userId:state.supabaseUser?.i d||null,name:state.name||'Pengguna 
+QIVI',avatar:state.profilePhotoUrl||'',updatedAt:Date.now()});} catch(e){console.warn('QIVI home presence update:',e);} 
+} 
+function renderHomeOnlinePeople(){ 
+const box=$('homeOnlinePeople');if(!box)return;box.replaceChildren(); const entries=[];const globalChannel=state.homePresenceChannel; if(globalChannel){ 
+const presence=globalChannel.presenceState()||{}; 
+    
+Object.values(presence).flat().forEach(person=>{if(person&&person.sessionK ey&&person.sessionKey!==qiviOnlineSessionKey)entries.push(person);}); 
+} 
+const roomChannel=state.musicRoomChannel; if(state.musicRoomJoined&&roomChannel){ 
+const presence=roomChannel.presenceState()||{}; 
+    
+Object.values(presence).flat().forEach(person=>{if(person&&person.sessionK ey&&person.sessionKey!
+==qiviMicSeatState.sessionKey&&Number(person.seat)>=1)entries.push(pers on);}); 
+} 
+if(!entries.length){ 
+    const empty=document.createElement('div');empty.className='homeonline-empty';     empty.textContent=globalChannel?'Belum ada pengguna lain yang online. Buka QIVI di HP lain untuk menguji daftar ini.':'Menghubungkan status online 
+QIVI…'; 
+box.appendChild(empty);return; 
+} 
+const seen=new Set(); entries.forEach(person=>{ 
+    const identity=person.sessionKey||person.userId|| person.name;if(seen.has(identity))return;seen.add(identity); 
+    const card=document.createElement('div');card.className='home-onlineperson'; 
+    const avatar=document.createElement('div');avatar.className='homeonline-avatar'; 
+if(person.avatar&&/^https?:\/\//i.test(person.avatar)){ 
+      const 
+img=document.createElement('img');img.src=person.avatar;img.alt='Foto '+
+(person.name||'teman online'); 
+      
+img.onerror=()=>{img.remove();avatar.textContent=' ';};avatar.appendChild(i mg); 
+}else avatar.textContent='	';     const name=document.createElement('span');name.className='homeonline-name';name.textContent=person.name||'Pengguna QIVI'; 
+card.append(avatar,name);box.appendChild(card); 
+}); 
+} 
+async function toggleQiviMicSeat(seat){ 
+if(seat===1)return notify('Kursi 1 disediakan untuk host ruang.'); if(!state.musicRoomJoined||!state.musicRoomChannel){ 
+    $('qiviMicSeatStatus').textContent='Gabung ke ruang musik bersama terlebih dahulu.'; 
+return notify('Tekan Gabung di Ruang Musik Bersama dahulu.'); 
+} 
+const channel=state.musicRoomChannel; const presence=channel.presenceState()||{}; 
+  const 
+occupied=Object.values(presence).flat().find(entry=>entry&&entry.sessionKey
+!==qiviMicSeatState.sessionKey&&Number(entry.seat)===seat); if(occupied)return notify('Kursi ini sudah ditempati pengguna lain.'); const next=qiviMicSeatState.selected===seat?null:seat; try{ 
+qiviMicSeatState.selected=next;     await 
+channel.track({sessionKey:qiviMicSeatState.sessionKey,name:state.name||'Pe ngguna QIVI',avatar:state.profilePhotoUrl||'',seat:next|| null,updatedAt:Date.now()}); 
+renderQiviMicSeats(); 
+    notify(next?'Kamu duduk di Kursi '+next+'.':'Kamu meninggalkan kursi mikrofon.'); 
+}catch(e){ qiviMicSeatState.selected=null; renderQiviMicSeats(); 
+notify('Kursi belum tersambung. Coba gabung ulang ke room.'); 
+} 
+} 
+// QIVI Rooms audio WebRTC: signaling memakai Supabase Broadcast pada channel ruang yang sama. 
+const qiviAudio={stream:null,pcs:new Map(),muted:false,enabled:false,roomKey:null}; function qiviAudioStatus(msg){const el=$ ('qiviAudioStatus');if(el)el.textContent=msg;} 
+function qiviAudioPeers(){const ch=state.musicRoomChannel;if(!ch)return 
+[];const ps=ch.presenceState()||{};return 
+Object.values(ps).flat().filter(x=>x&&x.sessionKey&&x.sessionKey!
+==qiviMicSeatState.sessionKey);} async function qiviAudioSend(event,payload){if(! state.musicRoomChannel)throw new Error('Gabung ke ruang terlebih dahulu.');await state.musicRoomChannel.send({type:'broadcast',event,payload: {...payload,from:qiviMicSeatState.sessionKey,room:qiviAudio.roomKey|| state.musicRoomName||''}});} 
+function qiviAudioCleanupPeer(id){const pc=qiviAudio.pcs.get(id);if(pc) {try{pc.close()}catch{}qiviAudio.pcs.delete(id)}const el=$('qiviaudio-'+id);if(el)el.remove();} async function qiviAudioMakePeer(peer,createOffer){if(!qiviAudio.stream||! state.musicRoomChannel||!peer|| peer===qiviMicSeatState.sessionKey)return;let pc=qiviAudio.pcs.get(peer);if(pc)return pc;pc=new 
+ RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},
+{urls:'stun:stun1.l.google.com 
+:19302'}]});qiviAudio.pcs.set(peer,pc);qiviAudio.stream.getTracks().forEach(t=
+>pc.addTrack(t,qiviAud 
+io.stream));pc.onicecandidate=e=>{if(e.candidate)qiviAudioSend('qivi-audioice',{to:peer,candidate:e 
+.candidate.toJSON()}).catch(()=>{})};pc.ontrack=e=>{let audio=$('qiviaudio-'+peer);if(!audio){audio 
+=document.createElement('audio');audio.id='qiviaudio-'+peer;audio.autoplay=true;audio.playsInline=t rue;$('qiviRemoteAudio').appendChild(audio)} audio.srcObject=e.streams[0];audio.play().catch(()=>qivi 
+AudioStatus('Audio diterima. Jika belum terdengar, sentuh layar lalu naikkan volume media.'))};pc.on 
+connectionstatechange=()=>{if(pc.connectionState==='failed'|| pc.connectionState==='closed'||pc.conne ctionState==='disconnected')
+{if(pc.connectionState==='failed')qiviAudioStatus('Koneksi suara ke pese rta terputus. Coba matikan lalu aktifkan mikrofon kembali.');if(pc.connectionState==='closed')qiviAu dioCleanupPeer(peer)}};if(createOffer){const offer=await pc.createOffer();await pc.setLocalDescripti on(offer);await qiviAudioSend('qivi-audio-offer', {to:peer,sdp:pc.localDescription})}return pc;} 
+async function qiviAudioHandleSignal(event){const d=event?.payload||{};if(! d.from||d.from===qiviMicSeatState.sessionKey||d.to!
+==qiviMicSeatState.sessionKey)return;if(d.room&&qiviAudio.roomKey&&d.roo m! 
+==qiviAudio.roomKey)return;try{if(d.kind==='ice'){const pc=qiviAudio.pcs.get(d.from);if(pc&&d.candid 
+ate)try{await pc.addIceCandidate(d.candidate)}catch(e){console.warn('QIVI audio ICE:',e)}return}if(! 
+qiviAudio.stream)return;if(d.kind==='offer'){let pc=qiviAudio.pcs.get(d.from);if(pc)qiviAudioCleanup Peer(d.from);pc=await qiviAudioMakePeer(d.from,false);await pc.setRemoteDescription(d.sdp);const ans 
+wer=await pc.createAnswer();await pc.setLocalDescription(answer);await qiviAudioSend('qivi-audio-ans 
+wer',{to:d.from,sdp:pc.localDescription})}else if(d.kind==='answer'){const pc=qiviAudio.pcs.get(d.fr 
+om);if(pc&&pc.signalingState==='have-local-offer')await pc.setRemoteDescription(d.sdp)}}catch(e){con sole.warn('QIVI audio signal:',e);qiviAudioStatus('Sinyal suara gagal diproses: 
+'+(e.message||'coba gabung ulang ruang.'))}} 
+async function toggleQiviRoomAudio(){if(qiviAudio.enabled){await stopQiviRoomAudio();return}if(!state.musicRoomJoined||! state.musicRoomChannel)return notify('Gabung ke ruang yang sama terlebih dahulu. 
+');if(!qiviMicSeatState.selected)return notify('Pilih Kursi 2–6 terlebih dahulu.');if(!navigator.med 
+iaDevices?.getUserMedia||!window.RTCPeerConnection)return notify('Browser HP ini belum mendukung aud io WebRTC.');const btn=$
+('qiviAudioToggle');btn.disabled=true;try{qiviAudio.stream=await navigator.m ediaDevices.getUserMedia({audio:
+{echoCancellation:true,noiseSuppression:true,autoGainControl:true},v ideo:false});qiviAudio.enabled=true;qiviAudio.muted=false;qiviAudio.roomKey
+=state.musicRoomName; qiv 
+iAudio.stream.getAudioTracks().forEach(t=>t.enabled=true);btn.textContent='
+Matikan mikrofon';$('qi viAudioMute').disabled=false;$('qiviAudioMute').textContent=' Bisukan';qiviAudioStatus('Mikrofon a 
+ktif. Izinkan akses mikrofon jika diminta; gunakan earphone. Menghubungkan peserta…');for(const peer  of qiviAudioPeers())
+{if(qiviMicSeatState.sessionKey.localeCompare(peer.sessionKey)<0)await qiviAudi 
+oMakePeer(peer.sessionKey,true)}notify('Mikrofon aktif.');}catch(e)
+{qiviAudio.enabled=false;qiviAudi 
+o.stream?.getTracks().forEach(t=>t.stop());qiviAudio.stream=null;qiviAudioSta tus('Mikrofon gagal dia 
+ktifkan: '+(e.message||'periksa izin mikrofon dan buka melalui 
+HTTPS.'));notify('Mikrofon belum akti 
+f. Periksa izin mikrofon browser.')}finally{btn.disabled=false}} 
+function toggleQiviRoomMute(){if(!qiviAudio.stream)return; qiviAudio.muted=! qiviAudio.muted;qiviAudio.stream.getAudioTracks().forEach(t=>t.enabled=! qiviAudio.muted);$('qiviAudioMute').textContent=qiviAudio.muted?' Nyalakan suara':' Bisukan';qiviAudioStatus(qiviAudio.muted?'Mikrofon dibisukan.':'Mikrofon aktif.');} async function stopQiviRoomAudio()
+{qiviAudio.stream?.getTracks().forEach(t=>t.stop());qiviAudio.stream=null;for( const id of 
+[...qiviAudio.pcs.keys()])qiviAudioCleanupPeer(id);qiviAudio.enabled=false;qivi
+Audio.muted=false;$('qiviAudioToggle').textContent=' Aktifkan mikrofon';$
+('qiviAudioMute').disabled=true;$('qiviAudioMute').textContent=' Bisukan';qiviAudioStatus('Audio langsung dimatikan.');} function updateStatusForm(){const type=$('statusType').value;$
+('textFields').classList.toggle('hidden',type!=='text');$
+('fileFields').classList.toggle('hidden',type==='text');clearStatusPreview()} 
+function clearStatusPreview(){if(state.previewUrl)
+{URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}$
+('statusPreview').replaceChildren()} 
+$('statusFile').addEventListener('change',()=>{clearStatusPreview();const f=$
+('statusFile').files[0];if(!f)return;const type=$
+('statusType').value;if((type==='image'&&!f.type.startsWith('image/'))||(t ype==='video'&&!f.type.startsWith('video/')))return notify('Jenis file tidak sesuai pilihan.');if(f. 
+size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');state.previewUrl=URL.createObjectURL( f);const 
+m=document.createElement(type==='image'?'img':'video');m.className='med ia';m.src=state.prev 
+iewUrl;if(type==='video'){m.controls=true;m.playsInline=true}else m.alt='Pratinjau foto status';$('s tatusPreview').appendChild(m)}); 
+function publishStatus(){const type=$('statusType').value;const item={id:Date.now(),type,created:Date.now(),text:'',url:''};if(type==='text') {item.text=$('statusText').value.trim();if(!item.text)retur n notify('Tulis status terlebih dahulu.')}else{const f=$('statusFile').files[0];if(! f)return notify( 
+'Pilih file terlebih dahulu.');if(f.size>30*1024*1024)return notify('Ukuran file maksimal 30 MB.');i 
+tem.url=URL.createObjectURL(f);item.fileName=f.name} state.statuses.unshift(item);$('statusText').val ue='';$
+('statusFile').value='';clearStatusPreview();renderStatuses();notify('Status ditambahkan di p 
+erangkat ini.')} 
+function makeStatusCard(s,includeDelete){const 
+c=document.createElement('article');c.className='status-card';const title=document.createElement('b');title.textContent=' 
+'+state.name;c.appendChild(tit le);const 
+meta=document.createElement('p');meta.className='note';meta.textContent
+='Baru saja · statu 
+s lokal';c.appendChild(meta);if(s.type==='text'){const p=document.createElement('p');p.textContent=s 
+.text;c.appendChild(p)}else{const 
+m=document.createElement(s.type==='image'?'img':'video');m.classNa 
+me='media';m.src=s.url;if(s.type==='video')
+{m.controls=true;m.playsInline=true}else m.alt='Foto stat us';c.appendChild(m)}if(includeDelete){const b=document.createElement('button');b.className='btn sec ondary small';b.textContent='Hapus 
+Status';b.onclick=()=>{state.statuses=state.statuses.filter(x=>x. id!==s.id);renderStatuses();notify('Status dihapus dari perangkat ini.')};c.appendChild(b)}return c} 
+function renderStatuses(){const mine=$('myStatuses'),all=$
+('allStatuses'),stories=$
+('homeStories');mine.replaceChildren();all.replaceChildren();stories.replaceChil dren();if(!state.statuses.length){min 
+e.innerHTML='<div class="empty">Belum ada status.</ div>';all.innerHTML='<div class="empty">Belum ada 
+ status terbaru.</div>';stories.innerHTML='<div class="empty">Belum ada status.</div>'}else{state.st 
+atuses.forEach(s=>{mine.appendChild(makeStatusCard(s,true));all.appendChi ld(makeStatusCard(s,false)) 
+;const b=document.createElement('button');b.className='story';const ring=document.createElement('div ');ring.className='story-ring';const 
+inner=document.createElement('div');inner.className='story-inne r';if(s.type==='image'){const 
+img=document.createElement('img');img.src=s.url;img.alt='';inner.appen dChild(img)}else 
+inner.textContent=s.type==='video'?' ':' ';ring.appendChild(inner);b.appendC hild(ri 
+ng);const 
+label=document.createElement('span');label.textContent=state.name;b.appen dChild(label);b.o 
+nclick=()=>openPage('status');stories.appendChild(b)})}$
+('statusCount').textContent=state.statuses.l ength} 
+function previewVideo(){const f=$('videoFile').files[0];if(!f)return notify('Pilih video dari HP dahulu.');if(!f.type.startsWith('video/'))return notify('Pilih file video yang valid.');if(f.size>50*10 
+24*1024)return notify('Ukuran video maksimal 50 MB.');if(state.videoPreviewUrl)URL.revokeObjectURL(s 
+tate.videoPreviewUrl);state.videoPreviewUrl=URL.createObjectURL(f);const box=$('videoPreview');box.r eplaceChildren();const 
+v=document.createElement('video');v.className='media';v.controls=true;v.pla ys 
+Inline=true;v.src=state.videoPreviewUrl;box.appendChild(v);const b=document.createElement('button'); 
+b.className='btn';b.textContent='Unggah video ke QIVI';b.onclick=()=>uploadVideo(f,b);box.appendChil d(b)} 
+function safeFilePart(value){return 
+String(value||'video').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/
+[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,90)||'video'} async function ensureSupabaseSession(){if(!qiviSupabase)throw new Error('Pustaka Supabase gagal dimuat. Periksa koneksi internet lalu muat ulang.');const {data:sessionData,error:sessionError}=await qi viSupabase.auth.getSession();if(sessionError)throw sessionError;if(sessionData.session?.user){state. 
+supabaseUser=sessionData.session.user;return state.supabaseUser}const 
+{data,error}=await qiviSupabas 
+e.auth.signInAnonymously();if(error)throw new Error('Login anonim Supabase gagal. Pastikan Anonymous 
+ Sign-Ins diaktifkan: '+error.message);if(!data.user)throw new Error('Supabase belum memberikan sesi 
+pengguna.');state.supabaseUser=data.user;return data.user} 
+async function uploadVideo(file,button){if(!file)return notify('Pilih video terlebih dahulu.');if(file.size>50*1024*1024)return notify('Ukuran video maksimal 50 MB.');button.disabled=true;const oldTex 
+t=button.textContent;button.textContent='Mengunggah video…';try{const user=await ensureSupabaseSessi 
+on();const title=$('videoTitle').value.trim()||file.name;const safeTitle=safeFilePart(title);const s 
+afeName=safeFilePart(file.name);const ext=(file.name.match(/\.([a-zA-Z0-9]
+{1,8})$/)||[])[1]||'mp4';c 
+onst objectName=Date.now()+'__'+safeTitle+'__'+safeName.replace(/\.[^.]+
+$/,'')+'.'+ext;const path=ob jectName;const {data,error}=await 
+qiviSupabase.storage.from(VIDEO_BUCKET).upload(path,file,{cacheCon trol:'3600',contentType:file.type||'video/mp4',upsert:false});if(error)throw error;const {data:publi cData}
+=qiviSupabase.storage.from(VIDEO_BUCKET).getPublicUrl(data.path);state.vi deos.unshift({id:data 
+.path,title,url:publicData.publicUrl,path:data.path,owner:user.id});$
+('videoFile').value='';$('video 
+Title').value='';if(state.videoPreviewUrl)
+{URL.revokeObjectURL(state.videoPreviewUrl);state.videoPre 
+viewUrl=null}$('videoPreview').replaceChildren();renderVideos();notify('Video berhasil diunggah ke s 
+erver QIVI.');$('videoServerStatus').textContent='Terhubung ke Supabase · video ditampilkan dari pen 
+yimpanan server.'}catch(e){const msg=e?.message||'Kesalahan tidak diketahui';notify('Unggah gagal: ' 
++msg);$('videoServerStatus').textContent='Unggah belum berhasil. Periksa koneksi, login anonim, nama  bucket, dan policy INSERT.'}
+finally{button.disabled=false;button.textContent=oldText}} 
+async function loadRemoteVideos(showNotice=false){if(!qiviSupabase){$ ('videoServerStatus').textContent='Pustaka Supabase belum termuat.';return} try{await ensureSupabaseSession();const {data,error}=awa it qiviSupabase.storage.from(VIDEO_BUCKET).list('',{limit:100,sortBy:
+{column:'created_at',order:'des c'}});if(error)throw error;const items=(data||[]).filter(x=>x.name&&! x.name.startsWith('.')&&!x.name 
+.startsWith('avatars/')).map(x=>{const parts=x.name.split('__');let title=x.name;try{if(parts.length 
+>=3)title=decodeURIComponent(parts[1])}catch{}const {data:publicData}
+=qiviSupabase.storage.from(VIDE 
+O_BUCKET).getPublicUrl(x.name);return{id:x.name,title,url:publicData.publicUr l,path:x.name}});state. 
+videos=items;renderVideos();$('videoServerStatus').textContent='Terhubung ke Supabase · '+items.leng 
+th+' video ditemukan di server.';if(showNotice)notify('Daftar video server diperbarui.')}catch(e){$( 
+'videoServerStatus').textContent='Belum dapat membaca video server: '+
+(e?.message||'periksa izin SEL 
+ECT dan login anonim');if(showNotice)notify('Gagal memuat video server: '+ (e?.message||'kesalahan ko 
+neksi'))}} 
+function renderVideos(){const feed=$('videoFeed');feed.replaceChildren();if(! state.videos.length)feed.innerHTML='<div class="empty">Belum ada video di server.</div>';state.videos.forEach(v=>{const c=d 
+ocument.createElement('article');c.className='panel video-card';const rawName=String(v.path||v.id||' 
+');const rawTitle=String(v.title||'');const looksLikeOpaqueName=!rawTitle|| rawTitle===rawName||/^lv_ 
+[a-zA-Z0-9_-]+\.(mp4|mov|webm|m4v)$/i.test(rawTitle);const h=document.createElement('h3');h.classNam 
+e='video-card-title';h.textContent=looksLikeOpaqueName?'Video QIVI':rawTitle;c.appendChild(h);if(loo 
+ksLikeOpaqueName&&rawName){const 
+fileLabel=document.createElement('p');fileLabel.className='note vid eo-file-name';fileLabel.textContent='Nama file: '+rawName;c.appendChild(fileLabel)}const m=document. 
+createElement('video');m.className='media';m.controls=true;m.playsInline=tr ue;m.preload='metadata';m 
+.src=v.url;m.addEventListener('error',()=>{let note=c.querySelector('.videoerror');if(!note){note=d 
+ocument.createElement('p');note.className='note videoerror';note.textContent='Video tidak dapat dim uat. Periksa izin baca bucket Supabase dan alamat file.';c.appendChild(note)}},{once:true});c.append 
+Child(m);feed.appendChild(c)});$
+('videoCount').textContent=state.videos.length} 
+function makeLiveSessionToken(){return 
+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)} function makeLiveRoomCode(){return 
+'QIVI-'+Math.random().toString(36).slice(2,8).toUpperCase()} function setLiveStatus(message){const el=$('liveStatus');if(el){const hide=['Koneksi WebRTC aktif. Menunggu video…','Jalur jaringan tersambung. Menunggu 
+video…'];el.textContent=hide.includes(message)?'':message;el.classList.toggle
+('hidden',hide.includes(message)||!message)}} 
+function liveErrorMessage(e){return e?.message||String(e||'kesalahan tidak diketahui')} 
+async function sendLiveSignal(type,payload,recipientId=null){ 
+const user=await ensureSupabaseSession(); 
+  const {error}=await 
+qiviSupabase.from('qivi_live_signals').insert({room_id:state.liveRoomId,sender
+_id:user.id,recipient_id:recipientId,signal_type:type,payload}); if(error)throw error; 
+} 
+async function subscribeLiveRoom(room){ 
+if(!qiviSupabase)throw new Error('Supabase belum termuat.');   if(state.liveChannel){await 
+qiviSupabase.removeChannel(state.liveChannel);state.liveChannel=null;} 
+state.liveSeenSignals=new Set();state.livePendingIce=[]; return new Promise((resolve,reject)=>{ 
+let settled=false; 
+    const channel=qiviSupabase.channel('qivilive-'+room+'-'+Math.random().toString(36).slice(2,7)) 
+      .on('postgres_changes',
+{event:'INSERT',schema:'public',table:'qivi_live_signals',filter:'room_id=eq.'+roo m},event=>{handleLiveSignal(event.new).catch(e=>{setLiveStatus('Sinyal Live bermasalah: '+liveErrorMessage(e));});}) 
+.subscribe(status=>{         if(status==='SUBSCRIBED'&&!settled) {settled=true;clearTimeout(timer);resolve(channel);}         else if((status==='CHANNEL_ERROR'||status==='TIMED_OUT'|| status==='CLOSED')&&!settled){settled=true;clearTimeout(timer);reject(new Error('Koneksi Realtime Live gagal: '+status));} 
+}); 
+state.liveChannel=channel; 
+    const timer=setTimeout(()=>{if(!settled){settled=true;reject(new 
+Error('Realtime Live belum merespons. Periksa koneksi dan tabel 
+Supabase.'));}},12000); 
+}); 
+} 
+async function loadExistingLiveSignals(){   const {data,error}=await 
+qiviSupabase.from('qivi_live_signals').select('id,room_id,sender_id,recipient_id, signal_type,payload,created_at').eq('room_id',state.liveRoomId).order('created
+_at',{ascending:true}).limit(100); if(error)throw error; 
+for(const row of (data||[]))await handleLiveSignal(row); 
+} 
+function createLivePeerConnection(){ if(state.livePc)state.livePc.close(); 
+  const pc=new RTCPeerConnection({iceServers:
+[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}); state.livePc=pc; 
+  
+if(state.liveRole==='host'&&state.camera)state.camera.getTracks().forEach(tr ack=>pc.addTrack(track,state.camera)); 
+pc.onicecandidate=async event=>{ 
+if(!event.candidate||!state.liveRoomId||!state.liveSessionToken)return; 
+    try{await sendLiveSignal('ice',
+{candidate:event.candidate.toJSON(),session:state.liveSessionToken},state.liv ePeerId||null)}catch(e){setLiveStatus('Gagal mengirim sinyal jaringan: 
+'+liveErrorMessage(e));} 
+}; 
+pc.ontrack=event=>{ 
+const remote=$('liveRemoteVideo'); if(remote){ 
+      const incoming=event.streams&&event.streams[0]?event.streams[0]:new 
+MediaStream([event.track]); remote.srcObject=incoming; 
+$('liveRemoteWrap').classList.remove('hidden'); remote.muted=false; remote.autoplay=true; remote.playsInline=true; 
+const playRemote=()=>remote.play().then(()=>{ 
+        setLiveStatus('Video diterima. Jika layar masih hitam, periksa koneksi media.'); 
+}).catch(()=>{         setLiveStatus('Sinyal tersambung, tetapi video belum dapat diputar. Ketuk video lalu tekan Putar.'); 
+}); 
+playRemote(); 
+event.track.onunmute=playRemote; 
+      event.track.onended=()=>setLiveStatus('Aliran video berhenti. Host mungkin mematikan kamera atau Live.'); 
+} 
+    setLiveStatus(state.liveRole==='host'?'Penonton terhubung dan menerima siaran.':'Sinyal tersambung. Menunggu aliran video…'); 
+}; 
+pc.onconnectionstatechange=()=>{ 
+    
+if(pc.connectionState==='connected')setLiveStatus(state.liveRole==='host'?'Li ve aktif · penonton terhubung.':'');     else if(pc.connectionState==='failed')setLiveStatus('Koneksi media gagal. Jaringan mungkin memerlukan server TURN.'); 
+    else if(pc.connectionState==='disconnected')setLiveStatus('Koneksi terputus sementara; mencoba menyambung kembali…'); 
+}; 
+pc.oniceconnectionstatechange=()=>{ 
+    if(pc.iceConnectionState==='failed')setLiveStatus('Jalur media gagal. Jaringan mungkin memerlukan server TURN.');     else if(pc.iceConnectionState==='connected'||
+pc.iceConnectionState==='completed')setLiveStatus(''); 
+}; 
+return pc; 
+} 
+async function addPendingIceForSession(session){ 
+if(!state.livePc||!state.livePc.remoteDescription)return; const keep=[]; 
+for(const item of state.livePendingIce){ 
+    if(item.payload?.session!==session){if(!session||! item.payload?.session)keep.push(item);continue;}     try{await state.livePc.addIceCandidate(new RTCIceCandidate(item.payload.candidate));}catch(e){console.warn('QIVI Live 
+ICE:',e);} 
+} 
+state.livePendingIce=keep; 
+} 
+async function handleLiveSignal(row){ 
+if(!row||!row.id||!state.liveRoomId||row.room_id!==state.liveRoomId)return; if(state.liveSeenSignals.has(row.id))return; state.liveSeenSignals.add(row.id); const user=await ensureSupabaseSession(); if(row.sender_id===user.id)return; 
+if(row.recipient_id&&row.recipient_id!==user.id)return; 
+const payload=row.payload||{}; if(row.signal_type==='stop'){ 
+    if(!state.liveSessionToken||payload.session===state.liveSessionToken)
+{setLiveStatus('Host telah mengakhiri siaran.');if(state.livePc)
+{state.livePc.close();state.livePc=null;}$('liveRemoteVideo').srcObject=null;$
+('liveRemoteWrap').classList.add('hidden');} return; 
+} 
+if(row.signal_type==='offer'&&state.liveRole==='viewer'){ 
+    if(state.liveSessionToken&&state.liveSessionToken!
+==payload.session)return; state.liveSessionToken=payload.session;state.livePeerId=row.sender_id; const pc=state.livePc||createLivePeerConnection(); 
+    if(!pc.remoteDescription){await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));await 
+addPendingIceForSession(state.liveSessionToken);const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await sendLiveSignal('answer',
+{sdp:pc.localDescription,session:state.liveSessionToken},state.livePeerId);set
+LiveStatus('Jawaban terkirim. Menghubungkan video host…');} return; 
+} 
+if(row.signal_type==='answer'&&state.liveRole==='host'){ 
+    if(payload.session!==state.liveSessionToken||!state.livePc|| state.livePc.remoteDescription)return;     state.livePeerId=row.sender_id;await state.livePc.setRemoteDescription(new RTCSessionDescription(payload.sdp));await 
+addPendingIceForSession(state.liveSessionToken);setLiveStatus('Jawaban penonton diterima. Menyambungkan video…');return; 
+} 
+if(row.signal_type==='ice'){ 
+    if(state.liveSessionToken&&payload.session&&payload.session!
+==state.liveSessionToken)return; 
+    if(!state.liveSessionToken||!state.livePc?.remoteDescription)
+{state.livePendingIce.push(row);return;} 
+    try{await state.livePc.addIceCandidate(new 
+RTCIceCandidate(payload.candidate));}catch(e){console.warn('QIVI Live 
+ICE:',e);} 
+} 
+} 
+function renderLiveChatEmpty(message){ 
+const box=$('liveChatMessages'); 
+if(box)box.innerHTML='<div class="empty">'+message+'</div>'; 
+} 
+function 
+appendLiveChatMessage(name,message,sentAt=Date.now(),mine=false){ const box=$('liveChatMessages');if(!box)return; 
+const empty=box.querySelector('.empty');if(empty)box.replaceChildren(); const item=document.createElement('div'); 
+item.className='room-chat-item'+(mine?' chat-bubble mine':''); const meta=document.createElement('small'); 
+  meta.textContent=String(name||'Pengguna QIVI').slice(0,40)+' · '+new Date(sentAt||Date.now()).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2digit'}); 
+  const 
+body=document.createElement('div');body.textContent=String(message||'').slic e(0,500); 
+  
+item.append(meta,body);box.appendChild(item);box.scrollTop=box.scrollHeig ht; 
+while(box.children.length>80)box.firstElementChild.remove(); 
+} 
+async function subscribeLiveChat(room){ 
+if(!qiviSupabase)throw new Error('Supabase belum termuat.'); 
+  if(state.liveChatChannel){try{await 
+qiviSupabase.removeChannel(state.liveChatChannel)}catch{} state.liveChatChannel=null;} 
+renderLiveChatEmpty('Menghubungkan chat Live…'); 
+$('liveChatInput').disabled=true;$('sendLiveChatButton').disabled=true; 
+  $('liveChatStatus').textContent='Menghubungkan chat untuk ruang 
+'+room+'…'; return new Promise((resolve,reject)=>{ let settled=false; 
+    const channel=qiviSupabase.channel('qivi-live-chat-'+room,{config:
+{broadcast:{self:false}}}); channel.on('broadcast',{event:'live-message'},event=>{ 
+const d=event.payload||{}; 
+appendLiveChatMessage(d.name,d.message,d.sentAt,false); 
+}); 
+channel.subscribe(status=>{ 
+if(status==='SUBSCRIBED'&&!settled){ 
+settled=true;clearTimeout(timer);state.liveChatChannel=channel; $('liveChatInput').disabled=false;$('sendLiveChatButton').disabled=false;         $('liveChatStatus').textContent='Chat Live terhubung. Pesan akan tampil pada host dan penonton di ruang ini.'; 
+        renderLiveChatEmpty('Belum ada pesan. Sapa teman yang sedang menonton!'); resolve(channel); 
+      }else if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)&&! settled){ 
+        settled=true;clearTimeout(timer);reject(new Error('Koneksi chat Live gagal: '+status)); 
+} 
+}); 
+    const timer=setTimeout(()=>{if(!settled){settled=true;reject(new Error('Chat 
+Live belum merespons.'));}},12000); 
+}); 
+} 
+async function sendLiveChatMessage(){ 
+const input=$('liveChatInput');const message=input.value.trim(); if(!message)return notify('Tulis pesan terlebih dahulu.'); 
+  if(!state.liveRoomId||!state.liveRole||!state.liveChatChannel)return notify('Mulai Live atau gabung ke ruang Live terlebih dahulu.'); 
+const button=$('sendLiveChatButton');button.disabled=true; try{ 
+    const 
+payload={name:state.name,message:message.slice(0,500),sentAt:Date.now()
+}; 
+    await state.liveChatChannel.send({type:'broadcast',event:'livemessage',payload}); 
+    
+appendLiveChatMessage(payload.name,payload.message,payload.sentAt,tru e); 
+input.value=''; 
+}catch(e){ 
+    $('liveChatStatus').textContent='Pesan belum terkirim: '+
+(e?.message||'koneksi bermasalah'); notify('Pesan Live gagal dikirim.'); 
+}finally{button.disabled=!state.liveChatChannel||!state.liveRole;} 
+} 
+$('liveChatInput').addEventListener('keydown',event=>{   if(event.key==='Enter'&&!event.shiftKey) {event.preventDefault();sendLiveChatMessage();} 
+}); 
+async function startLiveHost(){ try{ 
+await stopLive(false); 
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error('Browser tidak mendukung kamera.'); 
+const user=await ensureSupabaseSession(); 
+    
+state.liveRole='host';state.liveRoomId=makeLiveRoomCode();state.liveSessio nToken=makeLiveSessionToken();state.livePeerId=null;     $('liveRoomCode').value=state.liveRoomId;$
+('liveRoomDisplay').textContent=state.liveRoomId;$
+('liveRoomShare').classList.remove('hidden'); setLiveStatus('Meminta izin kamera dan mikrofon…'); 
+    state.camera=await navigator.mediaDevices.getUserMedia({video:
+{facingMode:'user'},audio:true}); 
+    $('liveLocalVideo').srcObject=state.camera;$
+('liveLocalWrap').classList.remove('hidden');$
+('liveRemoteVideo').srcObject=null;$('liveRemoteWrap').classList.add('hidden'); await subscribeLiveRoom(state.liveRoomId); 
+    try{await subscribeLiveChat(state.liveRoomId)}catch(chatError){$ ('liveChatStatus').textContent='Video Live berjalan, tetapi chat belum tersambung: '+(chatError?.message||'periksa Realtime');} await loadExistingLiveSignals(); 
+    const pc=createLivePeerConnection();const offer=await pc.createOffer();await pc.setLocalDescription(offer);     await sendLiveSignal('offer',
+{sdp:pc.localDescription,session:state.liveSessionToken,host_name:state.na me.slice(0,40)},null); 
+    setLiveStatus('Live siap. Bagikan kode '+state.liveRoomId+' kepada penonton. Biarkan halaman ini terbuka.');notify('QIVI Live dimulai. Bagikan kode ruang kepada penonton.'); 
+  }catch(e){setLiveStatus('Live belum berhasil dimulai: 
+'+liveErrorMessage(e));notify('Live gagal: '+liveErrorMessage(e));await stopLive(false);} 
+} 
+async function joinLiveViewer(){ try{ 
+await stopLive(false); 
+const room=$('liveRoomCode').value.trim().toUpperCase(); if(!room)return notify('Masukkan kode ruang dari host terlebih dahulu.');     await 
+ensureSupabaseSession();state.liveRole='viewer';state.liveRoomId=room;stat e.liveSessionToken=null;state.livePeerId=null;     $('liveRoomShare').classList.add('hidden');$
+('liveLocalWrap').classList.add('hidden');$
+('liveRemoteWrap').classList.remove('hidden');$
+('liveRemoteVideo').srcObject=null; 
+    setLiveStatus('Mencari siaran '+room+'…');await subscribeLiveRoom(room);try{await subscribeLiveChat(room)} catch(chatError){$('liveChatStatus').textContent='Siaran dicari, tetapi chat belum tersambung: '+(chatError?.message||'periksa Realtime');}await loadExistingLiveSignals();     if(!state.liveSessionToken)setLiveStatus('Belum ditemukan siaran aktif. 
+Pastikan host sudah mulai Live dan kode ruang benar.'); else setLiveStatus('Menemukan siaran. Menghubungkan…');   }catch(e){setLiveStatus('Gagal bergabung ke Live: 
+'+liveErrorMessage(e));notify('Gagal bergabung: '+liveErrorMessage(e));} 
+} 
+async function copyLiveRoomCode(){const code=state.liveRoomId||$ ('liveRoomCode').value.trim();if(!code)return notify('Kode ruang belum tersedia.');try{await navigator.clipboard.writeText(code);notify('Kode ruang disalin.')}catch{notify('Kode ruang: '+code)}} async function stopLive(notifyUser=true){   const 
+room=state.liveRoomId,session=state.liveSessionToken,role=state.liveRole;   if(notifyUser&&room&&role==='host'&&qiviSupabase){try{await sendLiveSignal('stop',{session},null)}catch(e){console.warn('QIVI Live stop:',e);}}   if(state.livePc)
+{state.livePc.onicecandidate=null;state.livePc.ontrack=null;state.livePc.close()
+;state.livePc=null;}   if(state.camera)
+{state.camera.getTracks().forEach(t=>t.stop());state.camera=null;}   if(state.liveChannel&&qiviSupabase){try{await qiviSupabase.removeChannel(state.liveChannel)}catch{} state.liveChannel=null;} 
+  if(state.liveChatChannel&&qiviSupabase){try{await qiviSupabase.removeChannel(state.liveChatChannel)}catch{} state.liveChatChannel=null;} 
+  $('liveChatInput').value='';$('liveChatInput').disabled=true;$
+('sendLiveChatButton').disabled=true;$('liveChatStatus').textContent='Chat Live belum tersambung.';renderLiveChatEmpty('Mulai atau gabung Live untuk membuka chat.'); 
+  $('liveLocalVideo').srcObject=null;$('liveRemoteVideo').srcObject=null;$
+('liveLocalWrap').classList.add('hidden');$
+('liveRemoteWrap').classList.add('hidden'); 
+  
+state.liveRole=null;state.liveRoomId=null;state.liveSessionToken=null;state.liv ePeerId=null;state.liveSeenSignals=new Set();state.livePendingIce=[];   if(notifyUser){setLiveStatus('Kamu telah keluar dari Live.');notify('Live dihentikan.');} 
+} 
+function stopCamera(){stopLive(false)} function chatAvatarUrl(row){ 
+const saved=String(row&&row.sender_avatar_url||'').trim(); if(saved)return saved; 
+ 
+if(state.supabaseUser&&row&&row.sender_id===state.supabaseUser.id&&sta te.profilePhotoUrl)return state.profilePhotoUrl; return ''; 
+} 
+function renderChatMessages(rows){ 
+const box=$('chatMessages');box.replaceChildren(); 
+ if(!rows||!rows.length){const 
+empty=document.createElement('div');empty.className='empty';empty.textC ontent='Belum ada pesan. Jadilah yang pertama menyapa!';box.appendChild(empty);return} 
+rows.forEach(row=>{ 
+const line=document.createElement('div');line.className='chat-row'; 
+  const avatar=document.createElement('img');avatar.className='chatavatar';avatar.alt='Foto '+(row.sender_name||'Pengguna 
+QIVI');avatar.src=chatAvatarUrl(row);avatar.onerror=()=>{avatar.onerror=null;av atar.src='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#35264b"/><text x="20" y="27" font-size="23" textanchor="middle">	</text></svg>')}; 
+  const item=document.createElement('article');item.className='chatbubble'+(state.supabaseUser&&row.sender_id===state.supabaseUser.id?' mine':''); 
+  const meta=document.createElement('div');meta.className='chatmeta';meta.textContent=(row.sender_name||'Pengguna QIVI')+' · '+
+(row.created_at?new Date(row.created_at).toLocaleString('id-ID',
+{dateStyle:'short',timeStyle:'short'}):'baru saja');   const 
+body=document.createElement('div');body.textContent=row.content||'';item.ap pend(meta,body);line.append(avatar,item);box.appendChild(line); });box.scrollTop=box.scrollHeight 
+} 
+async function loadChatMessages(showNotice=false){if(!qiviSupabase){$ ('chatStatus').textContent='Supabase belum termuat. Periksa koneksi internet.';return}try{const user=await ensureSupabaseSession(); const {data,error}=await 
+qiviSupabase.from(CHAT_TABLE).select('id,sender_id,sender_name,sender_a vata 
+r_url,content,created_at').order('created_at', {ascending:true}).limit(100);if(error)throw error;rend 
+erChatMessages(data||[]);$('chatStatus').textContent='Chat online siap · '+
+(data||[]).length+' pesan 
+ terbaru dimuat.';state.chatLoaded=true;if(!state.chatChannel)
+{state.chatChannel=qiviSupabase.channe l('qivi-public-chat').on('postgres_changes',
+{event:'INSERT',schema:'public',table:CHAT_TABLE},payloa d=>{const row=payload.new;if(row){const box=$('chatMessages');const empty=box.querySelector('.empty' );if(empty)box.replaceChildren();const 
+line=document.createElement('div');line.className='chat-row'; const avatar=document.createElement('img');avatar.className='chatavatar';avatar.alt='Foto profil';a 
+vatar.src=chatAvatarUrl(row);avatar.onerror=()=>{avatar.onerror=null;avatar.sr c='data:image/svg+xml; 
+charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/
+2000/svg" viewBox="0 0 40 40"><rec 
+t width="40" height="40" rx="20" fill="#35264b"/><text x="20" y="27" fontsize="23" text-anchor="mid dle"> </text></svg>')};const 
+item=document.createElement('article');item.className='chat-bubble'+(s tate.supabaseUser&&row.sender_id===state.supabaseUser.id?' mine':'');const meta=document.createEleme nt('div');meta.className='chat-
+meta';meta.textContent=(row.sender_name||'Pengguna QIVI')+' · '+(row. created_at?new Date(row.created_at).toLocaleString('id-ID',
+{dateStyle:'short',timeStyle:'short'}):'b aru saja');const 
+body=document.createElement('div');body.textContent=row.content||'';item.ap pend(met 
+a,body);line.append(avatar,item);box.appendChild(line);box.scrollTop=box.scr ollHeight}}).subscribe(s 
+tatus=>{if(status==='SUBSCRIBED')$('chatStatus').textContent='Chat online terhubung · pesan baru aka 
+n muncul otomatis.'})}if(showNotice)notify('Pesan chat berhasil dimuat.')} catch(e){$('chatStatus').t 
+extContent='Chat online belum siap: '+(e?.message||'periksa tabel dan policy 
+Supabase');if(showNotic 
+e)notify('Chat belum tersambung. Siapkan tabel Supabase sesuai panduan.');if(!$('chatMessages').chil dren.length){const 
+empty=document.createElement('div');empty.className='empty';empty.textC ontent='Ch 
+at online belum dikonfigurasi. Buat tabel dan policy Supabase terlebih dahulu.';$('chatMessages').ap pendChild(empty)}}} 
+async function sendMessage(){const value=$('chatInput').value.trim();if(! value)return notify('Tulis pesan terlebih dahulu.');const button=$ ('sendChatButton');button.disabled=true;try{const user=await ensureSupabaseSession();const {error}=await qiviSupabase.from(CHAT_TABLE).insert({sender_id:user.id, 
+sender_name:state.name.slice(0,40),sender_avatar_url:state.profilePhotoUrl|| null,content:value});if( 
+error)throw error;$('chatInput').value='';$('chatStatus').textContent='Pesan terkirim.';await loadCh 
+atMessages();notify('Pesan terkirim ke chat QIVI.')}catch(e){$
+('chatStatus').textContent='Pesan belu 
+m terkirim: '+(e?.message||'periksa tabel dan policy Supabase');notify('Chat belum siap. Periksa kon 
+figurasi Supabase.')}finally{button.disabled=false}} 
+function karaokeAudioUrl(audioPath){ 
+const value=String(audioPath||'').trim(); if(/^https?:\/\//i.test(value))return value; 
+  const {data}
+=qiviSupabase.storage.from(KARAOKE_BUCKET).getPublicUrl(value); return data.publicUrl; 
+} 
+function karaokeTitleFromFilename(name){ 
+let title=String(name||'Lagu QIVI').replace(/\.[^.]+$/,''); 
+title=title.replace(/^\d+__/,'').replace(/__/g,' — ').replace(/[_-]+/g,' ').trim(); 
+  title=title.replace(/\bKARAOKE\b/ig,'').replace(/\bTANPA VOKAL\b/ ig,'').replace(/\s+/g,' ').trim(); 
+return title||'Lagu QIVI'; 
+} 
+// Lirik bawaan untuk lagu Rukun Sama Teman. 
+// Timestamp ini perkiraan awal; sesuaikan setelah mendengarkan audio agar sinkron tepat. 
+function defaultKaraokeLyrics(name){ 
+const key=String(name||'').toLowerCase().replace(/[_-]+/g,' '); if(!key.includes('rukun')||!key.includes('teman'))return ''; return [ 
+'[00:05]Semua insan ciptaan Tuhan', 
+'[00:10]Berbeda rupa dan kemampuan', 
+'[00:15]Mari saling menghormati', 
+'[00:20]Jangan saling menyakiti', 
+'[00:26]Tak ada guna permusuhan', 
+'[00:31]Tak ada guna pertengkaran', 
+'[00:36]Mari jalin persahabatan', 
+'[00:41]Rukun sama teman', 
+'[00:47]Banyak kawan kita tenang', 
+'[00:52]Banyak sahabat kita hebat', 
+'[00:57]Mari bergandeng tangan', 
+'[01:02]Rukun sama teman', 
+'[01:08]Semua insan ciptaan Tuhan', 
+'[01:13]Berbeda rupa dan kemampuan', 
+'[01:18]Mari saling menghormati', 
+'[01:23]Jangan saling menyakiti', 
+'[01:29]Tak ada guna permusuhan', 
+'[01:34]Tak ada guna pertengkaran', 
+'[01:39]Mari jalin persahabatan', 
+'[01:44]Rukun sama teman', 
+'[01:50]Banyak kawan kita tenang', 
+'[01:55]Banyak sahabat kita hebat', 
+'[02:00]Mari bergandeng tangan', 
+'[02:05]Rukun sama teman', 
+'[02:11]Banyak kawan kita tenang', 
+'[02:16]Banyak sahabat kita hebat', 
+'[02:21]Mari bergandeng tangan', 
+'[02:26]Rukun sama teman' 
+].join('\n'); 
+} 
+async function loadRemoteKaraokeSongs(showNotice=false){ 
+const status=$('karaokeServerStatus'); const select=$('roomSongSelect'); if(!qiviSupabase){ 
+    if(status)status.textContent='Supabase belum termuat. Periksa koneksi internet.'; 
+    if(select){select.replaceChildren();const 
+option=document.createElement('option');option.value='';option.textContent='
+Katalog belum tersambung';select.appendChild(option);} return; 
+} 
+if(status)status.textContent='Memuat katalog lagu dari penyimpanan QIVI…'; 
+  if(select){select.replaceChildren();const 
+option=document.createElement('option');option.value='';option.textContent='
+Memuat katalog lagu…';select.appendChild(option);} try{ 
+const bucket=qiviSupabase.storage.from(KARAOKE_BUCKET); 
+    const audioExt=/\.(mp3|mpeg|mp4|m4a|aac|ogg|oga|wav|webm|flac|opus)
+$/i; 
+const paths=[]; const visited=new Set(); 
+async function scanFolder(folder='',depth=0){ 
+if(depth>5||visited.has(folder))return; visited.add(folder); 
+const {data:items,error}=await bucket.list(folder,{ 
+limit:1000,sortBy:{column:'name',order:'asc'} 
+}); 
+if(error)throw error; for(const item of (items||[])){ 
+if(!item?.name||item.name.startsWith('.'))continue; const path=folder?folder+'/'+item.name:item.name; if(audioExt.test(item.name)){paths.push(path);continue;} 
+if(item.id===null||item.metadata==null)await scanFolder(path,depth+1); 
+} 
+} 
+await scanFolder(''); 
+const uniquePaths=[...new Set(paths)]; const remoteSongs=uniquePaths.map(path=>{ 
+const filename=path.split('/').pop(); const {data:publicData}=bucket.getPublicUrl(path); 
+const existing=state.karaokeSongs.find(song=>song.audioPath===path); return { 
+id:'storage-song-'+path,serverId:null, title:existing?.title||karaokeTitleFromFilename(filename), singer:existing?.singer||'Katalog lagu QIVI', lyrics:existing?.lyrics||defaultKaraokeLyrics(filename), 
+        lyricLines:existing?.lyricLines?.length? existing.lyricLines:parseKaraokeLyrics(existing?.lyrics|| defaultKaraokeLyrics(filename)), url:publicData.publicUrl,audioPath:path,remote:true,storageSong:true 
+}; 
+}); 
+const localSongs=state.karaokeSongs.filter(song=>!song.remote); state.karaokeSongs=[...localSongs,...remoteSongs]; renderKaraokeSongs(); renderRoomSongOptions(); 
+    if(status)status.textContent='Penyimpanan lagu tersambung · 
+'+remoteSongs.length+' file audio ditemukan.'; 
+    if(!remoteSongs.length&&status)status.textContent='Belum ditemukan file audio di bucket qivi-songs. Periksa apakah lagu sudah diunggah ke bucket ini dan izin SELECT Storage.'; 
+    if(showNotice)notify('Katalog lagu diperbarui: '+remoteSongs.length+' file audio ditemukan.'); 
+}catch(e){     if(status)status.textContent='Katalog belum dapat dibaca: '+ (e?.message||'periksa izin SELECT pada bucket qivi-songs.');     if(select){select.replaceChildren();const 
+option=document.createElement('option');option.value='';option.textContent=' Gagal memuat katalog lagu';select.appendChild(option);} 
+    if(showNotice)notify('Katalog lagu belum dapat dimuat. Periksa kebijakan Storage qivi-songs.'); 
+} 
+} 
+async function addKaraokeSong(){ 
+const file=$('karaokeAudio').files[0]; 
+if(!file)return notify('Pilih file audio dari HP terlebih dahulu.'); 
+  if(!file.type.startsWith('audio/'))return notify('File yang dipilih bukan audio. 
+Pilih file audio.'); if(file.size>30*1024*1024)return notify('Ukuran audio maksimal 30 MB.'); 
+  if(!qiviSupabase)return notify('Supabase belum termuat. Periksa koneksi internet.'); 
+const title=$('karaokeTitle').value.trim()||file.name.replace(/\.[^.]+$/,''); const singer=$('karaokeSinger').value.trim()||'Penyanyi tidak dicantumkan'; const lyrics=$('karaokeLyricsInput').value.trim(); 
+const button=document.querySelector('#nyanyi .karaoke-cover .btn'); const oldText=button?button.textContent:'	Tambahkan ke daftar lagu'; if(button){button.disabled=true;button.textContent='Mengunggah lagu…';} 
+  if($('karaokeServerStatus'))$
+('karaokeServerStatus').textContent='Menyiapkan sesi dan mengunggah audio…'; try{ 
+const user=await ensureSupabaseSession(); const cleanName=safeFilePart(file.name); 
+const ext=(file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'mp3'; 
+    const path=user.id+'/'+Date.now()+'__'+safeFilePart(title)
++'__'+cleanName.replace(/\.[^.]+$/,'')+'.'+ext; const {data:uploadData,error:uploadError}=await qiviSupabase.storage 
+      .from(KARAOKE_BUCKET).upload(path,file,
+{cacheControl:'3600',contentType:file.type||'audio/mpeg',upsert:false});     if(uploadError)throw new Error('Unggah audio gagal: 
+'+uploadError.message);     const {data:publicData}
+=qiviSupabase.storage.from(KARAOKE_BUCKET).getPublicUrl(uploadData.pa th); 
+const song={ id:'storage-song-'+uploadData.path, serverId:null, 
+title, 
+singer, 
+lyrics, 
+lyricLines:parseKaraokeLyrics(lyrics), url:publicData.publicUrl, audioPath:uploadData.path, remote:true, 
+storageSong:true 
+}; 
+    state.karaokeSongs=[song,...state.karaokeSongs.filter(item=>item.id!
+==song.id)]; 
+    $('karaokeTitle').value='';$('karaokeSinger').value='';$
+('karaokeLyricsInput').value='';$('karaokeAudio').value=''; renderKaraokeSongs(); 
+    if($('karaokeServerStatus'))$('karaokeServerStatus').textContent='Lagu berhasil diunggah ke penyimpanan QIVI.'; 
+playKaraokeSong(song.id); 
+notify('Lagu berhasil diunggah ke penyimpanan QIVI.'); 
+}catch(e){ const message=e?.message||'kesalahan tidak diketahui'; 
+    if($('karaokeServerStatus'))$
+('karaokeServerStatus').textContent='Penyimpanan lagu gagal: '+message; notify(message); 
+}finally{ 
+if(button){button.disabled=false;button.textContent=oldText;} 
+} 
+} 
+function renderKaraokeSongs(){ 
+const list=$('karaokeSongList');if(!list)return;list.replaceChildren(); 
+  if(!state.karaokeSongs.length){list.innerHTML='<div class="empty">Belum ada lagu di katalog. Pilih audio dari HP untuk mengunggah lagu ke server QIVI.</div>';return;} 
+state.karaokeSongs.forEach(song=>{ 
+const row=document.createElement('div');row.className='karaoke-row'; const info=document.createElement('div');info.className='song-info'; const title=document.createElement('b');title.textContent=song.title; 
+    const 
+sub=document.createElement('small');sub.textContent=(song.singer||'Penyan yi tidak dicantumkan')+(song.remote?' · tersimpan di server':' · lokal'); info.append(title,sub); 
+    const play=document.createElement('button');play.className='btn small';play.type='button';play.textContent=state.karaokeCurrentId===song.id?'
+Dipilih':'	Putar';play.onclick=()=>playKaraokeSong(song.id); row.append(info,play); 
+    if(!song.remote){const 
+del=document.createElement('button');del.className='btn secondary small';del.type='button';del.textContent='Hapus';del.onclick=()=>removeKaraok eSong(song.id);row.appendChild(del);} 
+list.appendChild(row); 
+}); 
+} 
+function parseKaraokeLyrics(text){ 
+return String(text||'').split(/\r?\n/).map(line=>{ 
+const match=line.match(/^\s*\[(\d{1,2}):(\d{2})(?:[.:](\d{1,2}))?\]\s*(.*)$/); if(!match)return {time:null,text:line.trim()}; const fraction=match[3]?Number('0.'+match[3]):0; 
+    return {time:Number(match[1])*60+Number(match[2])
++fraction,text:match[4]}; 
+}).filter(line=>line.text||line.time!==null); 
+} 
+function renderKaraokeLyrics(song,time=0){ 
+const box=$('karaokeLyrics');if(!box)return;box.replaceChildren(); 
+  if(!song||!song.lyrics){box.textContent='Lirik belum ditambahkan untuk lagu ini.';return;} 
+const lines=song.lyricLines||parseKaraokeLyrics(song.lyrics); const hasTiming=lines.some(line=>line.time!==null); if(!hasTiming){box.textContent=song.lyrics;return;} let activeIndex=-1; 
+  lines.forEach((line,index)=>{if(line.time!
+==null&&line.time<=time)activeIndex=index;}); lines.forEach((line,index)=>{ 
+    const row=document.createElement('div');row.className='karaoke-line'+
+(index===activeIndex?' active':'');row.textContent=line.text||' '; box.appendChild(row); 
+if(index===activeIndex)row.dataset.active='true'; 
+}); 
+const active=box.querySelector('[data-active="true"]'); 
+if(active)active.scrollIntoView({block:'center',behavior:'smooth'}); 
+} 
+function playKaraokeSong(id){ 
+const song=state.karaokeSongs.find(item=>item.id===id);if(!song)return; state.karaokeCurrentId=id; 
+const player=$('karaokePlayer');player.src=song.url;player.load(); $('karaokeNowPlaying').textContent='	'+song.title+' — '+song.singer; renderKaraokeLyrics(song,0); renderKaraokeSongs(); 
+  player.play().catch(()=>notify('Lagu dipilih. Tekan tombol Putar pada pemutar audio jika belum berbunyi.')); 
+} 
+function karaokeRestart(){ 
+  const player=$('karaokePlayer');if(!player.src)return notify('Pilih lagu terlebih dahulu.'); 
+  player.currentTime=0;player.play().catch(()=>notify('Tekan Putar untuk memulai lagu dari awal.')); 
+} 
+$('karaokePlayer').addEventListener('timeupdate',()=>{const 
+song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId);if(so ng&&song.lyricLines?.some(line=>line.time!==null))renderKaraokeLyrics(song,
+$('karaokePlayer').currentTime);}); function removeKaraokeSong(id){ 
+const song=state.karaokeSongs.find(item=>item.id===id);if(!song)return; 
+  if(song.remote)return notify('Lagu server tidak dihapus dari sini agar katalog bersama tetap aman.'); 
+  if(state.karaokeCurrentId===id){const player=$
+('karaokePlayer');player.pause();player.removeAttribute('src');player.load();stat e.karaokeCurrentId=null;$('karaokeNowPlaying').textContent='Pilih lagu dari daftar untuk mulai.';$('karaokeLyrics').textContent='Lirik akan tampil di sini. 
+Untuk sinkronisasi, gunakan format [mm:ss] di awal setiap baris.';} 
+  
+if(song.url&&song.url.startsWith('blob:'))URL.revokeObjectURL(song.url);state. karaokeSongs=state.karaokeSongs.filter(item=>item.id!
+==id);renderKaraokeSongs();notify('Lagu dihapus dari daftar perangkat ini.'); 
+} 
+function setMusicRoomStatus(message){ 
+const el=$('musicRoomStatus'); 
+if(el)el.textContent=message; 
+} 
+function renderRoomSongOptions(){ 
+const select=$('roomSongSelect'); if(!select)return; const previous=select.value; select.replaceChildren(); const songs=state.karaokeSongs||[]; if(!songs.length){ 
+const option=document.createElement('option'); option.value='';option.textContent='Belum ada lagu di katalog'; select.appendChild(option);return; 
+} 
+songs.forEach(song=>{ const option=document.createElement('option'); option.value=song.id; 
+option.textContent=song.title+(song.singer?' — '+song.singer:''); select.appendChild(option); 
+}); 
+if(songs.some(song=>song.id===previous))select.value=previous;   else 
+if(state.karaokeCurrentId&&songs.some(song=>song.id===state.karaokeCurr entId))select.value=state.karaokeCurrentId; 
+} 
+function appendMusicRoomMessage(name,message,system=false){ 
+const box=$('musicRoomChat');if(!box)return; 
+const empty=box.querySelector('.empty');if(empty)box.replaceChildren(); 
+  const item=document.createElement('div');item.className='room-chatitem';   const 
+meta=document.createElement('small');meta.textContent=system?'QIVI 
+Rooms':String(name||'Teman QIVI').slice(0,40);   const 
+body=document.createElement('div');body.textContent=String(message||'').slic e(0,500); 
+  
+item.append(meta,body);box.appendChild(item);box.scrollTop=box.scrollHeig ht; 
+while(box.children.length>60)box.firstElementChild.remove(); 
+} 
+async function joinMusicRoom(){ 
+  if(!qiviSupabase)return notify('Supabase belum termuat. Periksa koneksi internet.'); 
+const raw=$('roomNameInput').value.trim(); 
+if(!raw)return notify('Masukkan nama ruang terlebih dahulu.'); 
+  const roomKey=raw.toLowerCase().normalize('NFKD').replace(/[\u0300-
+\u036f]/g,'').replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40); if(!roomKey)return notify('Nama ruang tidak valid.'); const button=$('joinMusicRoomButton');button.disabled=true; try{ 
+await leaveMusicRoom(false); await ensureSupabaseSession(); 
+const channel=qiviSupabase.channel('qivi-music-room-'+roomKey,{ 
+config:{broadcast:{self:false},presence:{key:qiviMicSeatState.sessionKey}} 
+}); 
+channel.on('presence',{event:'sync'},()=>{renderQiviMicSeats();}); channel.on('presence',{event:'join'},()=>{renderQiviMicSeats();}); channel.on('presence',{event:'leave'},()=>{renderQiviMicSeats();}); 
+    ['qivi-audio-offer','qivi-audio-answer','qivi-audioice'].forEach(ev=>channel.on('broadcast',{event:ev},payload=>{const d=payload.payload||{};qiviAudioHandleSignal({...payload.payload, payload:
+{...d,kind:ev==='qivi-audio-offer'?'offer':ev==='qivi-audioanswer'?'answer':'ice'}})})); 
+    channel.on('presence',{event:'sync'},
+()=>{renderQiviMicSeats();if(qiviAudio.enabled){for(const peer of qiviAudioPeers())
+{if(qiviMicSeatState.sessionKey.localeCompare(peer.sessionKey)<0&&!
+qiviAudio.pcs.has(peer.sessionKey))qiviAudioMakePeer(peer.sessionKey,true) .catch(e=>qiviAudioStatus('Tidak dapat memulai koneksi suara: 
+'+e.message));}}}); channel.on('broadcast',{event:'room-message'},payload=>{ const d=payload.payload||{}; 
+appendMusicRoomMessage(d.name,d.message,false); 
+}); 
+channel.on('broadcast',{event:'room-song'},payload=>{ 
+const d=payload.payload||{}; 
+      appendMusicRoomMessage(d.name,'Membagikan lagu: '+(d.title||'Lagu 
+QIVI')); 
+const select=$('roomSongSelect'); 
+      const 
+match=state.karaokeSongs.find(song=>song.audioPath===d.audioPath|| song.title===d.title); if(match&&select)select.value=match.id; 
+}); 
+channel.on('broadcast',{event:'room-playback'},payload=>{ 
+const d=payload.payload||{}; 
+      const 
+song=state.karaokeSongs.find(item=>(d.audioPath&&item.audioPath===d.au dioPath)||item.title===d.title); if(!song)return; 
+      applyRoomPlayback(song,d).catch(()=>notify('Perintah lagu diterima. Jika audio belum berjalan, buka Nyanyi lalu tekan Putar.'));       appendMusicRoomMessage(d.name,(d.action==='pause'?'Menjeda lagu: 
+':'Memutar bersama: ')+song.title); 
+}); 
+channel.subscribe(async status=>{ 
+if(status==='SUBSCRIBED'){ 
+        
+state.musicRoomChannel=channel;state.musicRoomName=raw;state.musicR oomJoined=true; 
+        $('musicRoomMessage').disabled=false;$ ('sendRoomMessageButton').disabled=false; 
+        setMusicRoomStatus('Terhubung ke ruang “'+raw+'”. Minta teman bergabung dengan nama ruang yang sama.');         try{await 
+channel.track({sessionKey:qiviMicSeatState.sessionKey,name:state.name||'Pe ngguna QIVI',avatar:state.profilePhotoUrl||'',seat:qiviMicSeatState.selected|| null,updatedAt:Date.now()});}catch(e){console.warn('QIVI seat presence:',e);}         appendMusicRoomMessage('QIVI','Kamu bergabung ke ruang 
+“'+raw+'”.',true); 
+renderRoomSongOptions(); renderQiviMicSeats(); 
+      }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'|| status==='CLOSED'){ 
+        setMusicRoomStatus('Koneksi ruang gagal ('+status+'). Periksa koneksi internet dan Supabase Realtime.'); 
+} 
+}); 
+}catch(e){     setMusicRoomStatus('Gagal bergabung: '+(e?.message||'kesalahan koneksi')); 
+notify('QIVI Rooms belum tersambung. Periksa koneksi Supabase.'); }finally{button.disabled=false;} 
+} 
+async function leaveMusicRoom(showNotice=true){ 
+if(qiviAudio.enabled||qiviAudio.stream)await stopQiviRoomAudio(); const channel=state.musicRoomChannel; const wasJoined=state.musicRoomJoined; 
+  // Hapus status kursi dari Presence sebelum menutup channel agar perangkat lain 
+// segera menerima event leave dan mengosongkan kursi yang ditinggalkan. if(channel){ 
+try{await channel.untrack()}catch(e){console.warn('QIVI seat untrack:',e)} 
+    if(qiviSupabase){try{await qiviSupabase.removeChannel(channel)}catch(e)
+{console.warn('QIVI room cleanup:',e)}} 
+} 
+  
+state.musicRoomChannel=null;state.musicRoomName=null;state.musicRoom
+Joined=false; qiviMicSeatState.selected=null; 
+  $('musicRoomMessage').disabled=true;$ ('sendRoomMessageButton').disabled=true; 
+  if($('musicRoomChat'))$('musicRoomChat').innerHTML='<div class="empty">Gabung ruang untuk mulai mengobrol.</div>';   setMusicRoomStatus('Belum bergabung ke ruang. Kursi akan kosong setelah peserta keluar.'); 
+renderQiviMicSeats(); 
+  if(showNotice&&wasJoined)notify('Kamu keluar dari QIVI Rooms. Kursi sudah dilepas.'); 
+} 
+async function sendMusicRoomMessage(){ 
+const message=$('musicRoomMessage').value.trim(); if(!message)return notify('Tulis pesan untuk ruang terlebih dahulu.'); const channel=state.musicRoomChannel;   if(!state.musicRoomJoined||!channel)return notify('Gabung ke ruang terlebih dahulu.'); try{     await channel.send({type:'broadcast',event:'room-message',payload:
+{name:state.name,message:message.slice(0,500),sentAt:Date.now()}}); appendMusicRoomMessage(state.name,message); 
+$('musicRoomMessage').value=''; 
+  }catch(e){notify('Pesan ruang gagal dikirim: '+(e?.message||'koneksi bermasalah'));} 
+} 
+async function shareRoomSong(){ 
+  if(!state.musicRoomJoined||!state.musicRoomChannel)return notify('Gabung ke ruang terlebih dahulu.'); 
+renderRoomSongOptions(); 
+  const song=state.karaokeSongs.find(item=>item.id===$
+('roomSongSelect').value); if(!song)return notify('Belum ada lagu yang dapat dibagikan.'); try{ 
+    await state.musicRoomChannel.send({type:'broadcast',event:'roomsong',payload:
+{name:state.name,title:song.title,singer:song.singer,audioPath:song.audioPat h}}); 
+appendMusicRoomMessage(state.name,'Membagikan lagu: '+song.title); 
+    notify('Lagu dibagikan ke ruang. Teman dapat memilihnya di katalog 
+Karaoke.'); 
+  }catch(e){notify('Gagal membagikan lagu: '+(e?.message||'koneksi bermasalah'));} 
+} 
+async function applyRoomPlayback(song,d){ 
+const player=$('karaokePlayer'); 
+state.musicRoomApplyingRemote=true; try{ 
+if(state.karaokeCurrentId!==song.id||!player.src){ 
+state.karaokeCurrentId=song.id; player.src=song.url; player.load(); 
+      $('karaokeNowPlaying').textContent=' '+song.title+' — '+
+(song.singer||'Penyanyi tidak dicantumkan'); renderKaraokeLyrics(song,0); 
+renderKaraokeSongs(); 
+} 
+if(player.readyState<1){ 
+await new Promise((resolve,reject)=>{ 
+const done=()=>{cleanup();resolve()}; 
+const fail=()=>{cleanup();reject(new Error('Audio tidak dapat dimuat'))}; 
+        const 
+cleanup=()=>{player.removeEventListener('loadedmetadata',done);player.remo veEventListener('error',fail)}; player.addEventListener('loadedmetadata',done,{once:true}); player.addEventListener('error',fail,{once:true}); 
+}); 
+} 
+try{player.currentTime=Math.max(0,Number(d.time)||0)}catch{} if(d.action==='pause')player.pause(); 
+else if(d.action==='play')await player.play(); 
+}finally{ 
+setTimeout(()=>{state.musicRoomApplyingRemote=false},700); 
+} 
+} 
+async function sendRoomPlayback(action){ 
+  if(!state.musicRoomJoined||!state.musicRoomChannel)return notify('Gabung ke ruang terlebih dahulu.'); 
+  const song=state.karaokeSongs.find(item=>item.id===$
+('roomSongSelect').value)||
+state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId); 
+if(!song)return notify('Pilih lagu terlebih dahulu.'); const player=$('karaokePlayer'); if(state.karaokeCurrentId!==song.id){ 
+state.karaokeCurrentId=song.id;player.src=song.url;player.load(); 
+    $('karaokeNowPlaying').textContent=' '+song.title+' — '+
+(song.singer||'Penyanyi tidak dicantumkan'); renderKaraokeLyrics(song,0);renderKaraokeSongs(); 
+} 
+if(action==='play'){ 
+    try{await player.play()}catch{notify('Lagu dipilih. Jika belum berbunyi, buka 
+Nyanyi lalu tekan Putar.');} 
+}else player.pause(); 
+try{ 
+    await state.musicRoomChannel.send({type:'broadcast',event:'roomplayback',payload:
+{name:state.name,title:song.title,audioPath:song.audioPath,time:Number(play er.currentTime)||0,action}}); 
+    appendMusicRoomMessage(state.name,
+(action==='pause'?'Menjeda':'Memutar')+' bersama: '+song.title);     notify(action==='pause'?'Perintah jeda dibagikan ke ruang.':'Perintah putar dibagikan ke ruang.'); 
+  }catch(e){notify('Gagal menyinkronkan lagu: '+(e?.message||'koneksi bermasalah'));} 
+} 
+function broadcastRoomPlayback(){return sendRoomPlayback('play')} function broadcastRoomPause(){return sendRoomPlayback('pause')} $('musicRoomMessage').addEventListener('keydown',event=>{   if(event.key==='Enter'&&!event.shiftKey)
+{event.preventDefault();sendMusicRoomMessage();} 
+}); 
+$('karaokePlayer').addEventListener('play',()=>{   if(state.musicRoomApplyingRemote||!state.musicRoomJoined||! state.musicRoomChannel)return;   const 
+song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId); 
+if(!song)return; 
+  state.musicRoomChannel.send({type:'broadcast',event:'roomplayback',payload:
+{name:state.name,title:song.title,audioPath:song.audioPath,time:Number($
+('karaokePlayer').currentTime)||0,action:'play'}}).catch(()=>{}); 
+}); 
+$('karaokePlayer').addEventListener('pause',()=>{   if(state.musicRoomApplyingRemote||!state.musicRoomJoined||! state.musicRoomChannel)return;   const 
+song=state.karaokeSongs.find(item=>item.id===state.karaokeCurrentId); 
+if(!song)return; 
+  state.musicRoomChannel.send({type:'broadcast',event:'roomplayback',payload:
+{name:state.name,title:song.title,audioPath:song.audioPath,time:Number($
+('karaokePlayer').currentTime)||0,action:'pause'}}).catch(()=>{}); 
+}); 
+function editProfile(){ 
+const value=prompt('Nama profil:',state.name); 
+ if(value!==null&&value.trim()){state.name=value.trim().slice(0,40);$
+('profileName').textContent=state.name;try{localStorage.setItem('qiviProfileNa me',state.name)}catch(e){}
+renderStatuses();refreshQiviHomePresence();notify('Nama profil diperbarui.')} 
+chooseProfilePhoto(); 
+} 
+function chooseProfilePhoto(){const input=$ ('qiviProfilePhotoInput');if(input)input.click()} async function handleProfilePhoto(event){ 
+const file=event.target.files&&event.target.files[0];if(!file)return; 
+ if(!file.type.startsWith('image/')){notify('Pilih file foto/ gambar.');event.target.value='';return} 
+ if(file.size>5*1024*1024){notify('Ukuran foto maksimal 5 
+MB.');event.target.value='';return} try{ 
+const user=await ensureSupabaseSession(); 
+const ext=(file.name.match(/\.([a-zA-Z0-9]{1,8})$/)||[])[1]||'jpg'; const path='avatars/'+user.id+'.'+ext; 
+  const {data,error}=await 
+qiviSupabase.storage.from(VIDEO_BUCKET).upload(path,file,
+{upsert:true,cacheControl:'3600',contentType:file.type||'image/jpeg'}); if(error)throw error; 
+  const {data:pub}
+=qiviSupabase.storage.from(VIDEO_BUCKET).getPublicUrl(data.path); state.profilePhotoUrl=pub.publicUrl; try{localStorage.setItem('qiviProfileUrl',state.profilePhotoUrl);localStorage.setI tem('qiviProfileName',state.name)}catch(e){} 
+renderProfilePhoto(); refreshQiviHomePresence(); 
+  notify('Foto berhasil diunggah. Kirim pesan baru untuk menampilkan foto di chat.'); 
+}catch(err){ 
+const msg=err&&err.message?err.message:'kesalahan penyimpanan'; notify('Foto belum tersimpan ke server: '+msg); 
+}finally{event.target.value=''} 
+} 
+function renderProfilePhoto(){ 
+ const targets=[$('profileAvatarButton'),document.querySelector('.homeavatar')]; 
+ targets.forEach(el=>{if(!el)return;el.replaceChildren();if(state.profilePhotoUrl)
+{const 
+img=document.createElement('img');img.src=state.profilePhotoUrl;img.alt='Fo to profil';el.appendChild(img)}else el.textContent='	'}); 
+} 
+function loadSavedProfile(){ 
+ try{const n=localStorage.getItem('qiviProfileName');const 
+u=localStorage.getItem('qiviProfileUrl');if(n)state.name=n.slice(0,40);if(u)state
+.profilePhotoUrl=u}catch(e){} 
+$('profileName').textContent=state.name;renderProfilePhoto(); 
+} 
+function renderCoins(){$('coinTop').textContent=state.coins;$ ('coinBalance').textContent=state.coins;if($('coinHome'))$
+('coinHome').textContent=state.coins;if($('profileCoins'))$
+('profileCoins').textContent=state.coins} window.addEventListener('pagehide',()=>{ stopCamera(); 
+const channel=state.musicRoomChannel; 
+  if(channel){try{channel.untrack()}catch(e){console.warn('QIVI pagehide untrack:',e)}} 
+const onlineChannel=state.homePresenceChannel; 
+  if(onlineChannel){try{onlineChannel.untrack()}catch(e){console.warn('QIVI online untrack:',e)}} 
+}); 
+loadSavedProfile();renderCoins();renderStatuses();renderVideos();startQiviHo mePresence();loadRemoteVideos();loadRemoteKaraokeSongs(); 
+$('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&! event.shiftKey){event.preventDefault();sendMessage()}}); if ('serviceWorker' in navigator) { 
+window.addEventListener('load', () => { 
+navigator.serviceWorker.register('/qivi-social-app/service-worker.js') 
+.catch(error => console.error('Service worker:', error)); 
+}); 
+} 
+</script> 
+</body> 
+</html> 
