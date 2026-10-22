@@ -277,6 +277,7 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 #rooms .qivi-mic-seat{min-width:0;padding:12px 5px;border-radius:17px;border:1px solid rgba(177,142,226,.2);background:linear-gradient(145deg,#241c35,#171322);color:var(--text);display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .15s,border-color .15s,background .15s}
 #rooms .qivi-mic-seat:active{transform:scale(.97)}
 #rooms .qivi-seat-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:23px;background:linear-gradient(145deg,rgba(255,79,216,.22),rgba(84,165,255,.2));border:1px solid rgba(218,170,255,.22)}
+#rooms .qivi-seat-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
 #rooms .qivi-mic-seat b{font-size:12px}
 #rooms .qivi-mic-seat small{font-size:10px;color:var(--muted)}
 #rooms .qivi-mic-seat.is-selected{border-color:#bd8aff;background:linear-gradient(145deg,rgba(155,92,255,.27),rgba(84,165,255,.12));box-shadow:0 0 0 1px rgba(189,138,255,.15),0 8px 24px rgba(92,42,150,.14)}
@@ -538,6 +539,19 @@ function renderQiviMicSeats(){
       if(entry&&entry.sessionKey!==qiviMicSeatState.sessionKey&&Number(entry.seat)>=2)people.push(entry);
     }));
   }
+  const makeAvatar=(container,url,fallback)=>{
+    container.replaceChildren();
+    if(url&&typeof url==='string'&&/^https?:\/\//i.test(url)){
+      const img=document.createElement('img');
+      img.alt='Foto profil peserta';
+      img.loading='lazy';
+      img.src=url;
+      img.onerror=()=>{img.remove();container.textContent=fallback||'🎤';};
+      container.appendChild(img);
+    }else{
+      container.textContent=fallback||'🎤';
+    }
+  };
   wrap.querySelectorAll('.qivi-mic-seat').forEach(btn=>{
     const seat=Number(btn.dataset.seat);
     const small=btn.querySelector('small');
@@ -546,21 +560,21 @@ function renderQiviMicSeats(){
     btn.classList.toggle('is-selected',qiviMicSeatState.selected===seat);
     if(seat===1){
       small.textContent='Host';
-      avatar.textContent='👑';
+      makeAvatar(avatar,'','👑');
       btn.disabled=false;
       return;
     }
     if(qiviMicSeatState.selected===seat){
-      small.textContent='Kamu';
-      avatar.textContent='🎤';
+      small.textContent=String(state.name||'Kamu').slice(0,16);
+      makeAvatar(avatar,state.profilePhotoUrl,'🎤');
       btn.disabled=false;
     }else if(occupant){
-      small.textContent=String(occupant.name||'Peserta').slice(0,16);
-      avatar.textContent='🎙️';
+      small.textContent=String(occupant.name||'Pengguna QIVI').slice(0,16);
+      makeAvatar(avatar,occupant.avatar,'🎙️');
       btn.disabled=true;
     }else{
       small.textContent='Kosong';
-      avatar.textContent='🎤';
+      makeAvatar(avatar,'','🎤');
       btn.disabled=false;
     }
   });
