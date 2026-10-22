@@ -334,6 +334,31 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 #beranda .home-hero-art{font-size:46px!important;right:12px!important;bottom:12px!important;opacity:.15!important}
 #beranda .home-wallet{margin-top:0!important}
 @media(max-width:380px){#beranda .home-hero{padding:15px!important}#beranda .home-hero h1{font-size:21px!important;max-width:82%!important}#beranda .home-hero p{font-size:11px!important}}
+
+/* Home: live people strip and reserved ad slot */
+#beranda .home-online{padding:17px;border-radius:22px;margin:0 0 20px;background:linear-gradient(135deg,rgba(46,30,70,.96),rgba(20,16,34,.98));border:1px solid rgba(183,137,245,.25)}
+#beranda .home-online-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#beranda .online-eyebrow{font-size:10px;letter-spacing:1.6px;color:#e6a5ff;font-weight:800}
+#beranda .home-online h2{font-size:21px;line-height:1.2;margin:6px 0 0}
+#beranda .online-live-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:99px;background:#18372e;color:#8cf0bc;font-size:9px;font-weight:800;white-space:nowrap}
+#beranda .online-live-pill i{width:7px;height:7px;border-radius:50%;background:#42e69a;box-shadow:0 0 8px #42e69a}
+#beranda .home-online-note{font-size:12px;line-height:1.45;color:var(--muted);margin:9px 0 13px}
+#beranda .home-online-list{display:flex;gap:12px;overflow-x:auto;padding:3px 2px 8px;min-height:78px;scrollbar-width:thin}
+#beranda .home-online-person{flex:0 0 64px;display:flex;flex-direction:column;align-items:center;gap:5px;background:transparent;border:0;color:var(--text);padding:0;min-width:0}
+#beranda .home-online-avatar{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#503074,#22203b);border:2px solid #44e69b;box-shadow:0 0 0 3px rgba(68,230,155,.10);font-size:22px}
+#beranda .home-online-avatar img{width:100%;height:100%;object-fit:cover}
+#beranda .home-online-name{font-size:11px;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#beranda .home-online-empty{display:flex;align-items:center;min-height:60px;color:var(--muted);font-size:12px;padding:8px 0}
+#beranda .home-online-action{width:100%;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(183,137,245,.22);border-radius:12px;padding:10px 13px;background:rgba(155,92,255,.13);color:#e7c4ff;font-weight:700}
+#beranda .home-ad-slot{margin:20px 0 22px;min-height:190px;border:1px dashed rgba(188,160,225,.38);border-radius:20px;padding:14px;background:linear-gradient(135deg,rgba(35,27,49,.72),rgba(17,14,27,.85));display:flex;flex-direction:column;justify-content:space-between}
+#beranda .ad-slot-top{display:flex;justify-content:space-between;align-items:center;color:#a9a0bc;font-size:10px;letter-spacing:1.5px;font-weight:800}
+#beranda .ad-label{padding:4px 7px;border:1px solid rgba(188,160,225,.3);border-radius:6px;letter-spacing:.8px}
+#beranda .ad-slot-content{display:flex;align-items:center;gap:12px;padding:18px 0}
+#beranda .ad-slot-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:rgba(155,92,255,.18);color:#e5a5ff;font-size:27px}
+#beranda .ad-slot-content strong{font-size:15px}
+#beranda .ad-slot-content p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+#beranda .ad-slot-button{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-radius:12px;background:rgba(155,92,255,.18);color:#e7c4ff;padding:11px 13px;font-weight:700}
+
 </style>
 </head>
 <body>
@@ -350,19 +375,21 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
   <div class="home-search" role="button" tabindex="0" onclick="openPage('chat')" onkeydown="if(event.key==='Enter')openPage('chat')">
     <span>⌕</span><span style="flex:1">Temukan teman dan obrolan...</span><span>☷</span>
   </div>
-  <div class="home-hero">
-    <div class="eyebrow">QIVI · SING · SHARE · LIVE</div>
-    <h1>Temukan teman. Bagikan ceritamu.</h1>
-    <p>Tempat seru untuk berbagi momen, bernyanyi, dan terhubung.</p>
-    <button class="btn" onclick="openPage('status')">＋ Buat Momen</button>
-    <div class="home-hero-art">✦</div>
-  </div>
+  <section class="home-online panel" aria-labelledby="homeOnlineTitle">
+    <div class="home-online-head"><div><span class="online-eyebrow">QIVI · TEMAN ONLINE</span><h2 id="homeOnlineTitle">Siapa yang sedang online?</h2></div><span class="online-live-pill"><i></i> LANGSUNG</span></div>
+    <p class="home-online-note">Peserta yang sedang aktif di Room yang sama akan tampil di sini.</p>
+    <div id="homeOnlinePeople" class="home-online-list"><div class="home-online-empty">Masuk ke Room untuk melihat teman yang online.</div></div>
+    <button class="home-online-action" onclick="openPage('rooms')">Masuk ke Room <span>›</span></button>
+  </section>
   <div class="home-wallet">
     <div class="wallet-icon">🪙</div><div class="wallet-copy"><small>Dompet QIVI kamu</small><strong><span id="coinHome">100</span> Koin</strong></div>
     <button onclick="openPage('koin')">Lihat dompet ›</button>
   </div>
-  <div class="home-section-head"><h3>Momen teman</h3><button onclick="openPage('status')">Lihat semua ›</button></div>
-  <div class="story-row" id="homeStories"><div class="empty">Belum ada status.</div></div>
+  <section class="home-ad-slot" aria-label="Tempat iklan">
+    <div class="ad-slot-top"><span>RUANG IKLAN</span><span class="ad-label">IKLAN</span></div>
+    <div class="ad-slot-content"><span class="ad-slot-icon">✦</span><div><strong>Tempat promosi Anda</strong><p>Area ini disediakan untuk iklan atau promosi QIVI.</p></div></div>
+    <button type="button" class="ad-slot-button" onclick="notify('Area iklan QIVI siap diisi ketika fitur iklan diaktifkan.')">Tempatkan iklan <span>›</span></button>
+  </section>
   <div class="home-section-head"><h3>Jelajahi QIVI</h3><span class="note">Pilih aktivitas</span></div>
   <div class="home-quick-grid">
     <button class="home-quick" onclick="openPage('video')"><span class="quick-icon">🎬</span><b>Video</b></button>
@@ -638,6 +665,15 @@ function renderQiviMicSeats(){
     else if(qiviMicSeatState.selected)status.textContent='Kamu memilih Kursi '+qiviMicSeatState.selected+'. Status kursi dibagikan ke peserta di ruang yang sama.';
     else status.textContent='Terhubung ke room. Pilih kursi 2–6 untuk duduk di panggung.';
   }
+  renderHomeOnlinePeople();
+}
+function renderHomeOnlinePeople(){
+  const box=$('homeOnlinePeople');if(!box)return;box.replaceChildren();
+  const entries=[];const channel=state.musicRoomChannel;
+  if(state.musicRoomJoined&&channel){const presence=channel.presenceState()||{};Object.values(presence).flat().forEach(person=>{if(person&&person.sessionKey&&Number(person.seat)>=1)entries.push(person)});}
+  if(state.musicRoomJoined&&qiviMicSeatState.selected&&!entries.some(p=>p.sessionKey===qiviMicSeatState.sessionKey))entries.unshift({sessionKey:qiviMicSeatState.sessionKey,name:state.name||'Kamu',avatar:state.profilePhotoUrl||'',seat:qiviMicSeatState.selected});
+  if(!entries.length){const empty=document.createElement('div');empty.className='home-online-empty';empty.textContent='Masuk ke Room untuk melihat teman yang online.';box.appendChild(empty);return;}
+  const seen=new Set();entries.forEach(person=>{if(seen.has(person.sessionKey))return;seen.add(person.sessionKey);const card=document.createElement('div');card.className='home-online-person';const avatar=document.createElement('div');avatar.className='home-online-avatar';if(person.avatar&&/^https?:\/\//i.test(person.avatar)){const img=document.createElement('img');img.src=person.avatar;img.alt='Foto '+(person.name||'teman online');img.onerror=()=>{img.remove();avatar.textContent='👤'};avatar.appendChild(img)}else avatar.textContent=Number(person.seat)===1?'👑':'👤';const name=document.createElement('span');name.className='home-online-name';name.textContent=person.name||'Pengguna QIVI';card.append(avatar,name);box.appendChild(card)});
 }
 async function toggleQiviMicSeat(seat){
   if(seat===1)return notify('Kursi 1 disediakan untuk host ruang.');
