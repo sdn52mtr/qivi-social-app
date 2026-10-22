@@ -282,7 +282,7 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
 <section class="page active" id="beranda">
   <div class="home-topline">
     <div><p class="home-greeting">Selamat datang kembali,</p><div class="home-title">Jelajahi QIVI ✨</div></div>
-    <button class="home-avatar" aria-label="Buka profil" onclick="openPage('profil')">👤</button>
+    <button class="home-avatar" id="homeAvatar" aria-label="Buka profil" onclick="openPage('profil')">👤</button>
   </div>
   <div class="home-search" role="button" tabindex="0" onclick="openPage('chat')" onkeydown="if(event.key==='Enter')openPage('chat')">
     <span>⌕</span><span style="flex:1">Temukan teman dan obrolan...</span><span>☷</span>
@@ -444,7 +444,7 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
   <div class="panel" style="padding-top:16px;overflow:hidden">
     <div class="profile-cover"></div>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px">
-      <div class="profile-avatar">👤</div>
+      <div class="profile-avatar" id="profileAvatar" aria-label="Foto profil">👤</div>
       <button class="btn secondary small" onclick="editProfile()">✎ Edit profil</button>
     </div>
     <h2 id="profileName" style="margin:12px 0 3px">Pengguna QIVI</h2>
@@ -493,7 +493,7 @@ const VIDEO_BUCKET='qivi-videos';
 const KARAOKE_BUCKET='qivi-songs';
 const CHAT_TABLE='qivi_chat_messages';
 const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) || null;
-const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,liveChatChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null,musicRoomChannel:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRemote:false};
+const state={statuses:[],videos:[],camera:null,name:localStorage.getItem('qivi_profile_name')||'Pengguna QIVI',profilePhoto:localStorage.getItem('qivi_profile_photo')||'',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,liveChatChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null,musicRoomChannel:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRemote:false};
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
 function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
@@ -1119,10 +1119,28 @@ $('karaokePlayer').addEventListener('pause',()=>{
   state.musicRoomChannel.send({type:'broadcast',event:'room-playback',payload:{name:state.name,title:song.title,audioPath:song.audioPath,time:Number($('karaokePlayer').currentTime)||0,action:'pause'}}).catch(()=>{});
 });
 
-function editProfile(){const value=prompt('Nama profil:',state.name);if(value&&value.trim()){state.name=value.trim().slice(0,40);$('profileName').textContent=state.name;renderStatuses();notify('Nama profil diperbarui di perangkat ini.')}}
+function renderProfilePhoto(){
+  const targets=[$('profileAvatar'),$('homeAvatar')].filter(Boolean);
+  targets.forEach(el=>{
+    el.replaceChildren();
+    if(state.profilePhoto){const img=document.createElement('img');img.src=state.profilePhoto;img.alt='Foto profil';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block';el.appendChild(img)}
+    else el.textContent='👤';
+  });
+}
+function editProfile(){
+  const current=$('profileEditDialog');if(current){current.classList.remove('hidden');return}
+  const dialog=document.createElement('div');dialog.id='profileEditDialog';dialog.style.cssText='position:fixed;inset:0;z-index:100;background:#080611dd;display:flex;align-items:center;justify-content:center;padding:18px';
+  dialog.innerHTML='<div style="width:100%;max-width:420px;background:#1b1729;border:1px solid #59416f;border-radius:20px;padding:18px;box-shadow:0 20px 60px #0009"><h2 style="margin-top:0">Edit Profil QIVI</h2><label for="editProfileName">Nama profil</label><input id="editProfileName" maxlength="40" placeholder="Nama kamu"><label for="editProfilePhoto">Pilih foto profil dari galeri HP</label><input id="editProfilePhoto" type="file" accept="image/*"><div id="editProfilePreview" style="display:flex;justify-content:center;margin:12px 0"></div><p class="note">Foto disimpan di perangkat ini. Foto belum otomatis muncul di HP lain.</p><div style="display:flex;gap:8px"><button type="button" id="saveProfileButton" class="btn" style="flex:1">Simpan</button><button type="button" id="cancelProfileButton" class="btn secondary">Batal</button></div></div>';
+  document.body.appendChild(dialog);$('editProfileName').value=state.name;
+  const preview=$('editProfilePreview');let selectedPhoto=state.profilePhoto;
+  const showPhoto=src=>{preview.replaceChildren();if(!src)return;const img=document.createElement('img');img.src=src;img.alt='Pratinjau foto profil';img.style.cssText='width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid #a86aff';preview.appendChild(img)};showPhoto(selectedPhoto);
+  $('editProfilePhoto').addEventListener('change',()=>{const file=$('editProfilePhoto').files[0];if(!file)return;if(!file.type.startsWith('image/')){notify('Pilih file foto/gambar.');return}if(file.size>10*1024*1024){notify('Ukuran foto maksimal 10 MB.');$('editProfilePhoto').value='';return}const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const max=500;const scale=Math.min(1,max/Math.max(img.width,img.height));canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);selectedPhoto=canvas.toDataURL('image/jpeg',.82);showPhoto(selectedPhoto)};img.onerror=()=>notify('Foto tidak dapat dibuka. Coba foto lain.');img.src=reader.result};reader.readAsDataURL(file)});
+  $('cancelProfileButton').onclick=()=>dialog.remove();
+  $('saveProfileButton').onclick=()=>{const name=$('editProfileName').value.trim();if(!name){notify('Nama profil tidak boleh kosong.');return}try{localStorage.setItem('qivi_profile_name',name.slice(0,40));if(selectedPhoto)localStorage.setItem('qivi_profile_photo',selectedPhoto);else localStorage.removeItem('qivi_profile_photo')}catch(e){notify('Penyimpanan HP penuh. Coba foto lebih kecil.');return}state.name=name.slice(0,40);state.profilePhoto=selectedPhoto;$('profileName').textContent=state.name;renderProfilePhoto();renderStatuses();dialog.remove();notify('Profil berhasil disimpan di perangkat ini.')};
+}
 function renderCoins(){$('coinTop').textContent=state.coins;$('coinBalance').textContent=state.coins;if($('coinHome'))$('coinHome').textContent=state.coins;if($('profileCoins'))$('profileCoins').textContent=state.coins}
 window.addEventListener('pagehide',stopCamera);
-$('profileName').textContent=state.name;renderCoins();renderStatuses();renderVideos();loadRemoteVideos();loadRemoteKaraokeSongs();
+$('profileName').textContent=state.name;renderProfilePhoto();renderCoins();renderStatuses();renderVideos();loadRemoteVideos();loadRemoteKaraokeSongs();
 $('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
