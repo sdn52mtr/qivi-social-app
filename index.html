@@ -726,11 +726,10 @@ async function stopLive(notifyUser=true){
 }
 function stopCamera(){stopLive(false)}
 function chatAvatarUrl(row){
-  // Pesan lama mungkin belum menyimpan URL foto. Untuk pesan milik sesi ini,
-  // gunakan foto profil yang saat ini tersimpan di perangkat.
-  if(row&&row.sender_avatar_url)return row.sender_avatar_url;
-  if(row&&state.supabaseUser&&row.sender_id===state.supabaseUser.id&&state.profilePhotoUrl)return state.profilePhotoUrl;
-  return '';
+ const saved=String(row&&row.sender_avatar_url||'').trim();
+ if(saved)return saved;
+ if(state.supabaseUser&&row&&row.sender_id===state.supabaseUser.id&&state.profilePhotoUrl)return state.profilePhotoUrl;
+ return '';
 }
 function renderChatMessages(rows){
  const box=$('chatMessages');box.replaceChildren();
@@ -1158,7 +1157,7 @@ async function handleProfilePhoto(event){
   state.profilePhotoUrl=pub.publicUrl;
   try{localStorage.setItem('qiviProfileUrl',state.profilePhotoUrl);localStorage.setItem('qiviProfileName',state.name)}catch(e){}
   renderProfilePhoto();
-  loadChatMessages();notify('Foto berhasil diunggah. Foto profil diperbarui. Pesan baru akan menyimpan foto ini; pesan lama milik sesi ini juga akan memakai foto terbaru.');
+  notify('Foto berhasil diunggah. Kirim pesan baru untuk menampilkan foto di chat.');
  }catch(err){
   const msg=err&&err.message?err.message:'kesalahan penyimpanan';
   notify('Foto belum tersimpan ke server: '+msg);
