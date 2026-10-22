@@ -738,7 +738,9 @@ const qiviOnlineSessionKey='online-'+Math.random().toString(36).slice(2)+Date.no
 async function startQiviHomePresence(){
   if(!qiviSupabase||state.homePresenceChannel)return;
   try{
-    await ensureSupabaseSession();
+    const box=$('homeOnlinePeople');
+    if(box){box.replaceChildren();const msg=document.createElement('div');msg.className='home-online-empty';msg.textContent='Menyambungkan ke status online QIVI…';box.appendChild(msg);}
+    // Presence publik tidak perlu membuat sesi login anonim terlebih dahulu.
     const channel=qiviSupabase.channel('qivi-global-online',{config:{presence:{key:qiviOnlineSessionKey}}});
     const refresh=()=>renderHomeOnlinePeople();
     channel.on('presence',{event:'sync'},refresh);
@@ -751,9 +753,17 @@ async function startQiviHomePresence(){
           await channel.track({sessionKey:qiviOnlineSessionKey,userId:state.supabaseUser?.id||null,name:state.name||'Pengguna QIVI',avatar:state.profilePhotoUrl||'',updatedAt:Date.now()});
           renderHomeOnlinePeople();
         }catch(e){console.warn('QIVI home presence track:',e);}
-      }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){console.warn('QIVI home presence status:',status);}
+      }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
+        console.warn('QIVI home presence status:',status);
+        const box=$('homeOnlinePeople');
+        if(box){box.replaceChildren();const msg=document.createElement('div');msg.className='home-online-empty';msg.textContent='Status online belum tersambung ke server. Periksa koneksi Realtime Supabase.';box.appendChild(msg);}
+      }
     });
-  }catch(e){console.warn('QIVI home presence:',e);}
+  }catch(e){
+    console.warn('QIVI home presence:',e);
+    const box=$('homeOnlinePeople');
+    if(box){box.replaceChildren();const msg=document.createElement('div');msg.className='home-online-empty';msg.textContent='Koneksi online gagal: '+(e?.message||'periksa Supabase dan internet');box.appendChild(msg);}
+  }
 }
 async function refreshQiviHomePresence(){
   const channel=state.homePresenceChannel;if(!channel)return;
