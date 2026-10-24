@@ -411,6 +411,56 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
  #beranda .home-wallet strong{font-size:17px!important}
 }
 
+
+/* QIVI Messages: modern social-chat layout */
+.qivi-messages-page{padding-bottom:10px}
+.messages-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 2px 16px}
+.messages-topline h2{font-size:29px;font-weight:850;margin:0 0 3px;letter-spacing:-.5px}
+.messages-topline p{font-size:12px;color:var(--muted);margin:0}
+.message-icon-btn{width:42px;height:42px;border-radius:15px;border:1px solid #49375f;background:linear-gradient(145deg,#2a1b3e,#1a1629);font-size:23px;color:#f58ae9}
+.messages-tabs{display:flex;gap:9px;overflow-x:auto;padding:0 0 14px;scrollbar-width:none}
+.messages-tabs::-webkit-scrollbar{display:none}
+.message-tab{white-space:nowrap;border:1px solid #383047;border-radius:22px;padding:9px 16px;background:#1b1729;color:#c5bdd7;font-size:13px;font-weight:700}
+.message-tab.active{background:linear-gradient(110deg,#8f35ee,#d83cc9);border-color:transparent;color:white;box-shadow:0 5px 18px #a13be633}
+.message-tab span{color:#ffda79}
+.qivi-chat-card{background:linear-gradient(180deg,#21182f,#171322 60%);border:1px solid #3c2c51;border-radius:24px;overflow:hidden;box-shadow:0 12px 32px #0002}
+.qivi-chat-heading{display:flex;align-items:center;gap:11px;padding:15px 14px;border-bottom:1px solid #332740;background:linear-gradient(100deg,#2c1c43,#20162e)}
+.qivi-chat-room-avatar{width:46px;height:46px;border-radius:17px;display:grid;place-items:center;font-size:24px;background:linear-gradient(140deg,#8d3ce8,#e64acb);box-shadow:0 4px 16px #a13be633}
+.qivi-chat-room-title{flex:1;min-width:0}.qivi-chat-room-title strong{display:block;font-size:15px}.qivi-chat-room-title small{display:block;color:#b9afcb;font-size:11px;margin-top:4px}
+.online-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#43e6a0;margin-right:5px;box-shadow:0 0 8px #43e68888}
+.chat-room-badge{font-size:9px;font-weight:850;letter-spacing:1px;color:#f3b5f2;border:1px solid #704a85;background:#382247;border-radius:8px;padding:6px 7px}
+.chat-connection{padding:7px 14px;margin:0!important;background:#1b1526;font-size:11px!important;border-bottom:1px solid #2c2239}
+.qivi-chat-list{height:calc(100dvh - 395px);min-height:270px;max-height:560px;overflow-y:auto;padding:16px 12px;gap:14px;background:radial-gradient(ellipse at 50% 0%,#35204755,transparent 65%)}
+.chat-row{display:flex;align-items:flex-end;gap:8px;max-width:100%;min-width:0}
+.chat-row:has(.chat-bubble.mine){flex-direction:row-reverse}
+.chat-avatar{width:37px;height:37px;flex:0 0 37px;object-fit:cover;border-radius:50%;border:2px solid #69427e;background:#30223d}
+.chat-bubble{max-width:calc(100% - 50px);min-width:0;padding:10px 12px;border-radius:17px 17px 17px 5px;background:#282138;border:1px solid #3a304b;color:#f7f2ff;font-size:14px;line-height:1.45;overflow-wrap:anywhere;box-shadow:0 3px 10px #0001}
+.chat-bubble.mine{border:1px solid #9d48db;background:linear-gradient(135deg,#7133a4,#48265f);border-radius:17px 17px 5px 17px}
+.chat-meta{font-size:10px;color:#c0b3d2;margin-bottom:5px;line-height:1.3}
+.qivi-compose-wrap{padding:11px 12px 9px;border-top:1px solid #382943;background:#1b1526}
+.qivi-compose{align-items:center;gap:9px;padding:5px 5px 5px 13px;border:1px solid #4b3b60;border-radius:25px;background:#110e1c}
+.qivi-compose textarea{flex:1;min-width:0;margin:0;padding:9px 0;min-height:38px;max-height:90px;resize:none;background:transparent;border:0;border-radius:0;font-size:14px;outline:none;box-shadow:none}
+.send-message-btn{width:42px;height:42px;flex:0 0 42px;border:0;border-radius:50%;background:linear-gradient(135deg,#a33ef2,#ed48d5);color:white;font-size:21px;font-weight:900;box-shadow:0 4px 14px #bb3bd544}
+.chat-safety-note{font-size:10px;color:#8f849f;margin:7px 5px 0;line-height:1.35}
+@media(max-width:420px){.qivi-chat-list{height:calc(100dvh - 370px);padding:12px 9px}.qivi-chat-heading{padding:12px}.messages-topline h2{font-size:26px}.chat-bubble{font-size:13px;padding:9px 10px}}
+
+
+/* QIVI direct messages and friends */
+.message-tab{border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:var(--surface2);color:var(--muted);font-weight:700;flex:1}
+.message-tab.active{background:linear-gradient(110deg,#542b80,#762d76);color:#fff;border-color:#a75bea}
+.messages-tabs{display:flex;gap:8px;margin:12px 0 14px}
+.dm-layout{display:grid;grid-template-columns:minmax(115px,.8fr) minmax(0,1.5fr);gap:12px}
+.dm-people,.dm-thread{min-width:0;background:rgba(10,8,18,.45);border:1px solid var(--border);border-radius:14px;padding:10px}
+.dm-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;min-width:0}
+.dm-person{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);min-width:0}
+.dm-person-info{flex:1;min-width:0;overflow-wrap:anywhere}.dm-person-info b{display:block;font-size:13px}.dm-person-info small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.dm-person button{font-size:12px;padding:7px 9px;border-radius:9px;border:1px solid #6b4a8b;background:#342343;flex-shrink:0}
+.dm-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#39254d;overflow:hidden;flex-shrink:0}.dm-avatar img{width:100%;height:100%;object-fit:cover}
+.dm-thread-heading{font-weight:800;padding:5px 3px 12px;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.dm-messages{height:300px;max-height:45vh;min-height:130px}
+.dm-messages .chat-bubble{max-width:100%}
+@media(max-width:520px){.dm-layout{grid-template-columns:minmax(0,1fr)}.dm-people{max-height:210px;overflow:auto}.dm-messages{height:260px}.dm-person{padding:8px}}
+
 </style>
 </head>
 <body>
@@ -493,17 +543,42 @@ input:focus,textarea:focus,select:focus{border-color:#a86aff;box-shadow:0 0 0 3p
   </div>
 </section>
 
-<section class="page" id="chat">
-  <h2>💬 QIVI Chat</h2>
-  <div class="panel">
-    <h3>Obrolan Umum QIVI</h3>
-    <p class="muted">Pesan dikirim ke ruang chat bersama jika tabel dan izin Supabase sudah disiapkan.</p>
-    <p id="chatStatus" class="note" aria-live="polite">Menyiapkan chat online…</p>
-    <div id="chatMessages" class="chat-list"><div class="empty">Memuat pesan…</div></div>
-    <label for="chatInput">Pesan</label>
-    <div class="chat-compose"><textarea id="chatInput" maxlength="1000" placeholder="Tulis pesan..." rows="2"></textarea><button class="btn" id="sendChatButton" type="button" onclick="sendMessage()">Kirim</button></div>
-    <p class="note">Jangan kirim kata sandi, nomor rekening, atau informasi pribadi sensitif.</p>
-    <button class="btn secondary small" type="button" onclick="loadChatMessages(true)">↻ Muat ulang pesan</button>
+<section class="page qivi-messages-page" id="chat">
+  <div class="messages-topline">
+    <div><h2>Pesan</h2><p>Terhubung dengan teman-teman QIVI</p></div>
+    <button class="message-icon-btn" type="button" onclick="loadChatMessages(true)" aria-label="Muat ulang pesan">↻</button>
+  </div>
+  <div class="messages-tabs" aria-label="Kategori pesan">
+    <button class="message-tab active" data-message-tab="public" type="button" onclick="switchMessageTab('public')">Obrolan</button>
+    <button class="message-tab" data-message-tab="private" type="button" onclick="switchMessageTab('private')">Pribadi <span>✦</span></button>
+    <button class="message-tab" data-message-tab="friends" type="button" onclick="switchMessageTab('friends')">Teman</button>
+  </div>
+  <div id="publicMessagePanel" class="qivi-chat-card">
+    <div class="qivi-chat-heading">
+      <div class="qivi-chat-room-avatar">💬</div>
+      <div class="qivi-chat-room-title"><strong>Obrolan Umum QIVI</strong><small><span class="online-dot"></span> Ruang komunitas</small></div>
+      <span class="chat-room-badge">PUBLIK</span>
+    </div>
+    <p id="chatStatus" class="note chat-connection" aria-live="polite">Menyiapkan chat online…</p>
+    <div id="chatMessages" class="chat-list qivi-chat-list"><div class="empty">Memuat pesan…</div></div>
+    <div class="qivi-compose-wrap">
+      <div class="chat-compose qivi-compose"><textarea id="chatInput" maxlength="1000" placeholder="Tulis pesan untuk teman-teman..." rows="1" aria-label="Tulis pesan"></textarea><button class="send-message-btn" id="sendChatButton" type="button" onclick="sendMessage()" aria-label="Kirim pesan">➤</button></div>
+      <p class="chat-safety-note">Bersikap baik dan jangan bagikan informasi pribadi sensitif.</p>
+    </div>
+  </div>
+  <div id="privateMessagePanel" class="qivi-chat-card hidden">
+    <div class="qivi-chat-heading"><div class="qivi-chat-room-avatar">✉️</div><div class="qivi-chat-room-title"><strong>Pesan Pribadi</strong><small>Pesan hanya untuk kamu dan teman yang dipilih</small></div></div>
+    <p id="dmStatus" class="note" aria-live="polite">Siapkan tabel pesan pribadi di Supabase satu kali.</p>
+    <div class="dm-layout"><div class="dm-people"><h3>Percakapan</h3><div id="dmConversationList" class="dm-list"><div class="empty">Belum ada percakapan.</div></div></div>
+    <div class="dm-thread"><div id="dmThreadHeading" class="dm-thread-heading">Pilih teman untuk mulai mengobrol</div><div id="dmMessages" class="chat-list dm-messages"><div class="empty">Pesan pribadi akan tampil di sini.</div></div>
+    <div class="chat-compose"><textarea id="dmInput" maxlength="1000" rows="2" placeholder="Tulis pesan pribadi..." disabled></textarea><button class="btn" id="dmSendButton" type="button" onclick="sendPrivateMessage()" disabled>Kirim</button></div></div></div>
+  </div>
+  <div id="friendsMessagePanel" class="qivi-chat-card hidden">
+    <div class="qivi-chat-heading"><div class="qivi-chat-room-avatar">🫶</div><div class="qivi-chat-room-title"><strong>Teman QIVI</strong><small>Cari pengguna dan kelola permintaan pertemanan</small></div></div>
+    <label for="friendSearchInput">Cari nama pengguna</label><div class="chat-compose"><input id="friendSearchInput" maxlength="40" placeholder="Ketik nama pengguna..." style="margin:0"><button class="btn" type="button" onclick="searchQiviUsers()">Cari</button></div>
+    <p id="friendsStatus" class="note" aria-live="polite">Cari teman berdasarkan nama profil.</p><div id="friendSearchResults" class="dm-list"></div>
+    <h3 style="margin-top:18px">Permintaan masuk</h3><div id="friendRequests" class="dm-list"><div class="empty">Memuat permintaan...</div></div>
+    <h3 style="margin-top:18px">Teman saya</h3><div id="friendList" class="dm-list"><div class="empty">Memuat daftar teman...</div></div>
   </div>
 </section>
 
@@ -651,7 +726,7 @@ const qiviSupabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHAB
 const state={statuses:[],videos:[],camera:null,name:'Pengguna QIVI',profilePhotoUrl:'',coins:100,previewUrl:null,videoPreviewUrl:null,supabaseUser:null,chatChannel:null,chatLoaded:false,liveRole:null,liveChannel:null,liveChatChannel:null,livePc:null,liveRoomId:null,liveSessionToken:null,livePeerId:null,liveSeenSignals:new Set(),livePendingIce:[],karaokeSongs:[],karaokeCurrentId:null,musicRoomChannel:null,musicRoomName:null,musicRoomJoined:false,musicRoomApplyingRemote:false,homePresenceChannel:null};
 let toastTimer;
 function notify(message){const t=$('toast');t.textContent=message;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2800)}
-function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat')loadChatMessages();if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
+function openPage(id){const target=$(id);if(!target){notify('Halaman tidak ditemukan: '+id);return}document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='status')renderStatuses();if(id==='video')renderVideos();if(id==='chat'){switchMessageTab('public');}if(id==='nyanyi')loadRemoteKaraokeSongs();if(id==='rooms'){loadRemoteKaraokeSongs().then(renderRoomSongOptions)}}
 
 const qiviMicSeatState={selected:null,sessionKey:'qivi-'+Math.random().toString(36).slice(2)+Date.now().toString(36)};
 function setDiscoverTab(tab,button){
@@ -1076,8 +1151,38 @@ function renderChatMessages(rows){
   const body=document.createElement('div');body.textContent=row.content||'';item.append(meta,body);line.append(avatar,item);box.appendChild(line);
  });box.scrollTop=box.scrollHeight
 }
-async function loadChatMessages(showNotice=false){if(!qiviSupabase){$('chatStatus').textContent='Supabase belum termuat. Periksa koneksi internet.';return}try{const user=await ensureSupabaseSession();const {data,error}=await qiviSupabase.from(CHAT_TABLE).select('id,sender_id,sender_name,sender_avatar_url,content,created_at').order('created_at',{ascending:true}).limit(100);if(error)throw error;renderChatMessages(data||[]);$('chatStatus').textContent='Chat online siap · '+(data||[]).length+' pesan terbaru dimuat.';state.chatLoaded=true;if(!state.chatChannel){state.chatChannel=qiviSupabase.channel('qivi-public-chat').on('postgres_changes',{event:'INSERT',schema:'public',table:CHAT_TABLE},payload=>{const row=payload.new;if(row){const box=$('chatMessages');const empty=box.querySelector('.empty');if(empty)box.replaceChildren();const line=document.createElement('div');line.className='chat-row';const avatar=document.createElement('img');avatar.className='chat-avatar';avatar.alt='Foto profil';avatar.src=chatAvatarUrl(row);avatar.onerror=()=>{avatar.onerror=null;avatar.src='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#35264b"/><text x="20" y="27" font-size="23" text-anchor="middle">👤</text></svg>')};const item=document.createElement('article');item.className='chat-bubble'+(state.supabaseUser&&row.sender_id===state.supabaseUser.id?' mine':'');const meta=document.createElement('div');meta.className='chat-meta';meta.textContent=(row.sender_name||'Pengguna QIVI')+' · '+(row.created_at?new Date(row.created_at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'baru saja');const body=document.createElement('div');body.textContent=row.content||'';item.append(meta,body);line.append(avatar,item);box.appendChild(line);box.scrollTop=box.scrollHeight}}).subscribe(status=>{if(status==='SUBSCRIBED')$('chatStatus').textContent='Chat online terhubung · pesan baru akan muncul otomatis.'})}if(showNotice)notify('Pesan chat berhasil dimuat.')}catch(e){$('chatStatus').textContent='Chat online belum siap: '+(e?.message||'periksa tabel dan policy Supabase');if(showNotice)notify('Chat belum tersambung. Siapkan tabel Supabase sesuai panduan.');if(!$('chatMessages').children.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='Chat online belum dikonfigurasi. Buat tabel dan policy Supabase terlebih dahulu.';$('chatMessages').appendChild(empty)}}}
+async function loadChatMessages(showNotice=false){if(!qiviSupabase){$('chatStatus').textContent='Supabase belum termuat. Periksa koneksi internet.';return}try{const user=await ensureSupabaseSession();const {data,error}=await qiviSupabase.from(CHAT_TABLE).select('id,sender_id,sender_name,sender_avatar_url,content,created_at').order('created_at',{ascending:true}).limit(100);if(error)throw error;renderChatMessages(data||[]);$('chatStatus').textContent='Chat online siap · '+(data||[]).length+' pesan terbaru dimuat.';state.chatLoaded=true;if(!state.chatChannel){state.chatChannel=qiviSupabase.channel('qivi-public-chat').on('postgres_changes',{event:'INSERT',schema:'public',table:CHAT_TABLE},payload=>{const row=payload.new;if(row){const box=$('chatMessages');const empty=box.querySelector('.empty');if(empty)box.replaceChildren();const line=document.createElement('div');line.className='chat-row';const avatar=document.createElement('img');avatar.className='chat-avatar';avatar.alt='Foto profil';avatar.src=chatAvatarUrl(row);avatar.onerror=()=>{avatar.onerror=null;avatar.src='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="20" fill="#35264b"/><text x="20" y="27" font-size="23" text-anchor="middle">👤</text></svg>')};const item=document.createElement('article');item.className='chat-bubble'+(state.supabaseUser&&row.sender_id===state.supabaseUser.id?' mine':'');const meta=document.createElement('div');meta.className='chat-meta';meta.textContent=(row.sender_name||'Pengguna QIVI')+' · '+(row.created_at?new Date(row.created_at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'baru saja');const body=document.createElement('div');body.textContent=row.content||'';item.append(meta,body);line.append(avatar,item);box.appendChild(line);box.scrollTop=box.scrollHeight}}).subscribe(status=>{if(status==='SUBSCRIBED')$('chatStatus').textContent='Chat online terhubung · pesan baru akan muncul otomatis.'})}if(showNotice)notify('Pesa
+n chat berhasil dimuat.')}catch(e){$('chatStatus').textContent='Chat online belum siap: '+(e?.message||'periksa tabel dan policy Supabase');if(showNotice)notify('Chat belum tersambung. Siapkan tabel Supabase sesuai panduan.');if(!$('chatMessages').children.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='Chat online belum dikonfigurasi. Buat tabel dan policy Supabase terlebih dahulu.';$('chatMessages').appendChild(empty)}}}
 async function sendMessage(){const value=$('chatInput').value.trim();if(!value)return notify('Tulis pesan terlebih dahulu.');const button=$('sendChatButton');button.disabled=true;try{const user=await ensureSupabaseSession();const {error}=await qiviSupabase.from(CHAT_TABLE).insert({sender_id:user.id,sender_name:state.name.slice(0,40),sender_avatar_url:state.profilePhotoUrl||null,content:value});if(error)throw error;$('chatInput').value='';$('chatStatus').textContent='Pesan terkirim.';await loadChatMessages();notify('Pesan terkirim ke chat QIVI.')}catch(e){$('chatStatus').textContent='Pesan belum terkirim: '+(e?.message||'periksa tabel dan policy Supabase');notify('Chat belum siap. Periksa konfigurasi Supabase.')}finally{button.disabled=false}}
+
+
+// QIVI Direct Messages — requires the companion SQL setup file.
+let qiviMessageTab='public';
+let qiviSelectedDmUser=null;
+let qiviDmChannel=null;
+let qiviFriendRealtime=null;
+function switchMessageTab(tab){
+ qiviMessageTab=tab;
+ document.querySelectorAll('[data-message-tab]').forEach(b=>b.classList.toggle('active',b.dataset.messageTab===tab));
+ $('publicMessagePanel').classList.toggle('hidden',tab!=='public');$('privateMessagePanel').classList.toggle('hidden',tab!=='private');$('friendsMessagePanel').classList.toggle('hidden',tab!=='friends');
+ if(tab==='public')loadChatMessages();if(tab==='private')loadPrivateConversations();if(tab==='friends')loadFriendCenter();
+}
+function dmEscapeText(value){return String(value??'')}
+function dmAvatar(url){const box=document.createElement('div');box.className='dm-avatar';if(url&&/^https?:\/\//i.test(url)){const img=document.createElement('img');img.src=url;img.alt='Foto profil';img.onerror=()=>{box.textContent='👤'};box.appendChild(img)}else box.textContent='👤';return box}
+function dmPerson(name,sub,avatar,actions=[]){const row=document.createElement('div');row.className='dm-person';row.appendChild(dmAvatar(avatar));const info=document.createElement('div');info.className='dm-person-info';const b=document.createElement('b');b.textContent=name||'Pengguna QIVI';const small=document.createElement('small');small.textContent=sub||'';info.append(b,small);row.appendChild(info);actions.forEach(a=>{const btn=document.createElement('button');btn.type='button';btn.textContent=a.label;btn.onclick=a.onClick;row.appendChild(btn)});return row}
+async function ensureQiviProfile(){const user=await ensureSupabaseSession();const {error}=await qiviSupabase.from('qivi_profiles').upsert({user_id:user.id,display_name:(state.name||'Pengguna QIVI').slice(0,40),avatar_url:state.profilePhotoUrl||null,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;return user}
+async function loadFriendCenter(){if(!qiviSupabase){$('friendsStatus').textContent='Supabase belum termuat.';return}try{await ensureQiviProfile();await Promise.all([loadFriendRequests(),loadQiviFriends()]);$('friendsStatus').textContent='Profil siap. Cari nama untuk mengirim permintaan pertemanan.'}catch(e){$('friendsStatus').textContent='Belum siap: '+(e.message||'periksa SQL Supabase')}}
+async function searchQiviUsers(){const term=$('friendSearchInput').value.trim();const out=$('friendSearchResults');out.replaceChildren();if(term.length<2){$('friendsStatus').textContent='Masukkan minimal 2 huruf untuk mencari.';return}try{const me=await ensureQiviProfile();const {data,error}=await qiviSupabase.from('qivi_profiles').select('user_id,display_name,avatar_url').ilike('display_name','%'+term.replace(/[%_]/g,'')+'%').neq('user_id',me.id).order('display_name').limit(20);if(error)throw error;if(!data?.length){out.innerHTML='<div class="empty">Nama pengguna tidak ditemukan.</div>';return}const {data:friends,error:fe}=await qiviSupabase.from('qivi_friendships').select('requester_id,addressee_id,status').or('requester_id.eq.'+me.id+',addressee_id.eq.'+me.id);if(fe)throw fe;data.forEach(person=>{const rel=(friends||[]).find(f=>(f.requester_id===person.user_id&&f.addressee_id===me.id)||(f.requester_id===me.id&&f.addressee_id===person.user_id));let label='Tambah';let fn=()=>sendFriendRequest(person.user_id);if(rel?.status==='accepted'){label='Pesan';fn=()=>openPrivateChat(person)}else if(rel){label=rel.status==='pending'?'Menunggu':'Terkirim';fn=()=>notify('Permintaan pertemanan sudah ada.')}out.appendChild(dmPerson(person.display_name,'Pengguna QIVI',person.avatar_url,[{label,onClick:fn}]))});$('friendsStatus').textContent=data.length+' pengguna ditemukan.'}catch(e){$('friendsStatus').textContent='Pencarian gagal: '+(e.message||'periksa konfigurasi SQL')}}
+async function sendFriendRequest(userId){try{const me=await ensureQiviProfile();const {error}=await qiviSupabase.from('qivi_friendships').insert({requester_id:me.id,addressee_id:userId,status:'pending'});if(error){if(error.code==='23505')throw new Error('Permintaan pertemanan sudah pernah dikirim.');throw error}notify('Permintaan pertemanan terkirim.');await loadFriendCenter();await searchQiviUsers()}catch(e){notify('Belum berhasil: '+(e.message||'periksa SQL Supabase'));$('friendsStatus').textContent=e.message||'Permintaan gagal.'}}
+async function loadFriendRequests(){const box=$('friendRequests');box.replaceChildren();const me=await ensureSupabaseSession();const {data,error}=await qiviSupabase.from('qivi_friendships').select('id,requester_id,status').eq('addressee_id',me.id).eq('status','pending').order('created_at',{ascending:false});if(error)throw error;if(!data?.length){box.innerHTML='<div class="empty">Tidak ada permintaan baru.</div>';return}for(const req of data){const {data:p,error:pe}=await qiviSupabase.from('qivi_profiles').select('display_name,avatar_url').eq('user_id',req.requester_id).maybeSingle();if(pe)throw pe;box.appendChild(dmPerson(p?.display_name||'Pengguna QIVI','Meminta berteman',p?.avatar_url,[{label:'Terima',onClick:()=>acceptFriendRequest(req.id)}]))}}
+async function acceptFriendRequest(id){try{const me=await ensureSupabaseSession();const {error}=await qiviSupabase.from('qivi_friendships').update({status:'accepted',updated_at:new Date().toISOString()}).eq('id',id).eq('addressee_id',me.id).eq('status','pending');if(error)throw error;notify('Teman berhasil ditambahkan.');await loadFriendCenter()}catch(e){notify('Tidak bisa menerima permintaan: '+(e.message||''))}}
+async function loadQiviFriends(){const box=$('friendList');box.replaceChildren();const me=await ensureSupabaseSession();const {data,error}=await qiviSupabase.from('qivi_friendships').select('requester_id,addressee_id').eq('status','accepted').or('requester_id.eq.'+me.id+',addressee_id.eq.'+me.id).order('updated_at',{ascending:false});if(error)throw error;if(!data?.length){box.innerHTML='<div class="empty">Belum ada teman. Cari nama di atas.</div>';return}for(const rel of data){const id=rel.requester_id===me.id?rel.addressee_id:rel.requester_id;const {data:p,error:pe}=await qiviSupabase.from('qivi_profiles').select('user_id,display_name,avatar_url').eq('user_id',id).maybeSingle();if(pe)throw pe;if(p)box.appendChild(dmPerson(p.display_name,'Teman QIVI',p.avatar_url,[{label:'Pesan',onClick:()=>openPrivateChat(p)}]))}}
+async function loadPrivateConversations(){const list=$('dmConversationList');if(!qiviSupabase){$('dmStatus').textContent='Supabase belum termuat.';return}try{await ensureQiviProfile();const me=state.supabaseUser;const {data:rels,error}=await qiviSupabase.from('qivi_friendships').select('requester_id,addressee_id').eq('status','accepted').or('requester_id.eq.'+me.id+',addressee_id.eq.'+me.id);if(error)throw error;list.replaceChildren();if(!rels?.length){list.innerHTML='<div class="empty">Tambah teman dahulu di tab Teman.</div>';$('dmStatus').textContent='Pesan pribadi hanya tersedia untuk teman yang sudah menerima permintaan.';return}for(const rel of rels){const id=rel.requester_id===me.id?rel.addressee_id:rel.requester_id;const {data:p,error:pe}=await qiviSupabase.from('qivi_profiles').select('user_id,display_name,avatar_url').eq('user_id',id).maybeSingle();if(pe)throw pe;if(p)list.appendChild(dmPerson(p.display_name,'Buka percakapan',p.avatar_url,[{label:'Buka',onClick:()=>openPrivateChat(p)}]))}$('dmStatus').textContent='Percakapan pribadi tersimpan online dan dibatasi untuk dua peserta.'}catch(e){$('dmStatus').textContent='Pesan pribadi belum siap: '+(e.message||'jalankan file SQL pendamping');list.innerHTML='<div class="empty">Periksa setup Supabase di file SQL pendamping.</div>'}}
+async function openPrivateChat(person){try{const me=await ensureQiviProfile();qiviSelectedDmUser=person;$('dmThreadHeading').textContent='Chat pribadi · '+person.display_name;$('dmInput').disabled=false;$('dmSendButton').disabled=false;await loadPrivateMessages();if(qiviDmChannel){qiviSupabase.removeChannel(qiviDmChannel);qiviDmChannel=null}qiviDmChannel=qiviSupabase.channel('qivi-dm-'+[me.id,person.user_id].sort().join('-')).on('postgres_changes',{event:'INSERT',schema:'public',table:'qivi_private_messages',filter:'recipient_id=eq.'+me.id},payload=>{if(qiviSelectedDmUser)loadPrivateMessages()}).on('postgres_changes',{event:'INSERT',schema:'public',table:'qivi_private_messages',filter:'sender_id=eq.'+me.id},payload=>{if(qiviSelectedDmUser)loadPrivateMessages()}).subscribe();}catch(e){$('dmStatus').textContent='Tidak bisa membuka chat: '+(e.message||'periksa tabel dan policy')}}
+async function loadPrivateMessages(){if(!qiviSelectedDmUser)return;try{const me=await ensureSupabaseSession();const peer=qiviSelectedDmUser.user_id;const {data,error}=await qiviSupabase.from('qivi_private_messages').select('id,sender_id,recipient_id,content,created_at').or('and(sender_id.eq.'+me.id+',recipient_id.eq.'+peer+'),and(sender_id.eq.'+peer+',recipient_id.eq.'+me.id+')').order('created_at',{ascending:true}).limit(200);if(error)throw error;const box=$('dmMessages');box.replaceChildren();if(!data?.length){box.innerHTML='<div class="empty">Mulai percakapan dengan mengirim pesan.</div>';return}data.forEach(row=>{const bubble=document.createElement('article');bubble.className='chat-bubble'+(row.sender_id===me.id?' mine':'');const meta=document.createElement('div');meta.className='chat-meta';meta.textContent=(row.sender_id===me.id?'Kamu':qiviSelectedDmUser.display_name)+' · '+new Date(row.created_at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'});const body=document.createElement('div');body.textContent=row.content||'';bubble.append(meta,body);box.appendChild(bubble)});box.scrollTop=box.scrollHeight}catch(e){$('dmStatus').textContent='Gagal memuat pesan: '+(e.message||'periksa setup SQL')}}
+async function sendPrivateMessage(){const input=$('dmInput');const content=input.value.trim();if(!content)return notify('Tulis pesan terlebih dahulu.');if(!qiviSelectedDmUser)return notify('Pilih teman terlebih dahulu.');const btn=$('dmSendButton');btn.disabled=true;try{const me=await ensureQiviProfile();const {error}=await qiviSupabase.from('qivi_private_messages').insert({sender_id:me.id,recipient_id:qiviSelectedDmUser.user_id,content});if(error)throw error;input.value='';await loadPrivateMessages()}catch(e){notify('Pesan belum terkirim: '+(e.message||'jalankan SQL pendamping'));$('dmStatus').textContent='Pengiriman gagal: '+(e.message||'periksa konfigurasi')}finally{btn.disabled=false}}
+$('dmInput')?.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPrivateMessage()}});
+$('friendSearchInput')?.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();searchQiviUsers()}});
 
 function karaokeAudioUrl(audioPath){
   const value=String(audioPath||'').trim();
